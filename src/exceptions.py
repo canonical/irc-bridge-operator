@@ -1,7 +1,7 @@
 # Copyright 2024 Canonical Ltd.
 # See LICENSE file for licensing details.
 
-"""Exceptions used by the bind charm."""
+"""Exceptions used by the irc-bridge charm."""
 
 
 class SnapError(Exception):

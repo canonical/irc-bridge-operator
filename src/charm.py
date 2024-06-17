@@ -2,7 +2,7 @@
 # Copyright 2024 Canonical Ltd.
 # See LICENSE file for licensing details.
 
-"""Charm for bind."""
+"""Charm for irc-bridge."""
 
 import logging
 import typing
@@ -38,7 +38,7 @@ class IRCCharm(ops.CharmBase):
     def _on_install(self, _: ops.InstallEvent) -> None:
         """Handle install."""
         self.unit.status = ops.MaintenanceStatus("Preparing irc bridge")
-        self.bind.prepare()
+        self.irc.prepare()
         self.unit.status = ops.ActiveStatus()
 
     def _on_start(self, _: ops.StartEvent) -> None:

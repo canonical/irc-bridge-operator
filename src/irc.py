@@ -1,7 +1,7 @@
 # Copyright 2024 Canonical Ltd.
 # See LICENSE file for licensing details.
 
-"""Bind charm business logic."""
+"""IRC Bridge charm business logic."""
 
 import logging
 import os
@@ -54,8 +54,8 @@ class IRCBRidgeService:
         """
         try:
             cache = snap.SnapCache()
-            charmed_bind = cache[constants.IRC_BRIDGE_SNAP_NAME]
-            charmed_bind.restart(reload=True)
+            charmed_irc_bridge = cache[constants.IRC_BRIDGE_SNAP_NAME]
+            charmed_irc_bridge.restart(reload=True)
         except snap.SnapError as e:
             error_msg = (
                 f"An exception occurred when reloading {constants.IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
@@ -71,8 +71,8 @@ class IRCBRidgeService:
         """
         try:
             cache = snap.SnapCache()
-            charmed_bind = cache[constants.IRC_BRIDGE_SNAP_NAME]
-            charmed_bind.start()
+            charmed_irc_bridge = cache[constants.IRC_BRIDGE_SNAP_NAME]
+            charmed_irc_bridge.start()
         except snap.SnapError as e:
             error_msg = (
                 f"An exception occurred when stopping {constants.IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
@@ -88,8 +88,8 @@ class IRCBRidgeService:
         """
         try:
             cache = snap.SnapCache()
-            charmed_bind = cache[constants.IRC_BRIDGE_SNAP_NAME]
-            charmed_bind.stop()
+            charmed_irc_bridge = cache[constants.IRC_BRIDGE_SNAP_NAME]
+            charmed_irc_bridge.stop()
         except snap.SnapError as e:
             error_msg = (
                 f"An exception occurred when stopping {constants.IRC_BRIDGE_SNAP_NAME}. Reason: {e}"

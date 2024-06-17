@@ -1,0 +1,26 @@
+# Copyright 2024 Canonical Ltd.
+# See LICENSE file for licensing details.
+name: irc-bridge
+display-name: IRC Bridge
+summary: IRC Bridge charm for Matrix.
+docs: https://discourse.charmhub.io/
+issues: https://github.com/canonical/irc-bridge-operator/issues
+maintainers:
+  - https://launchpad.net/~canonical-is-devops
+source: https://github.com/canonical/irc-bridge-operator
+
+description: |
+  A [Juju](https://juju.is/) [charm](https://juju.is/docs/olm/charmed-operators)
+  deploying and managing a DNS server Integrator on Kubernetes and bare metal.
+
+  A [Juju](https://juju.is/) [charm](https://juju.is/docs/olm/charmed-operators)
+  deploying and managing an IRC Bridge (with Ident) Integrator on bare metal.
+
+  This charm is meant to be used in conjunction with
+  [synapse](https://github.com/canonical/synapse-operator) and related to it.
+
+assumes:
+  - juju >= 3.1
+provides:
+  irc-bridge:
+    interface: irc_bridge

@@ -8,7 +8,6 @@ import logging
 import typing
 
 import ops
-from charms.bind.v0.dns_record import DNSRecordProvides
 
 from irc import IRCService
 

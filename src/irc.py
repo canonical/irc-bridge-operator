@@ -136,9 +136,8 @@ class IRCBRidgeService:
             path: The path of the file
             source: The contents of the file to be pushed
         """
-        with open(path, "w", encoding="utf-8") as write_file:
-            write_file.write(source)
-            logger.info("Pushed file %s", path)
+        path.write_text(source, encoding="utf-8")
+        logger.info("Pushed file %s", path)
 
     def _generate_PEM_file_local(self) -> str:
         """Generate the PEM file content.

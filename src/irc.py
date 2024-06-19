@@ -60,7 +60,7 @@ class IRCBRidgeService:
             error_msg = (
                 f"An exception occurred when reloading {constants.IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
             )
-            logger.error(error_msg)
+            logger.exception(error_msg)
             raise ReloadError(error_msg) from e
 
     def start(self) -> None:
@@ -77,7 +77,7 @@ class IRCBRidgeService:
             error_msg = (
                 f"An exception occurred when stopping {constants.IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
             )
-            logger.error(error_msg)
+            logger.exception(error_msg)
             raise StartError(error_msg) from e
 
     def stop(self) -> None:
@@ -94,7 +94,7 @@ class IRCBRidgeService:
             error_msg = (
                 f"An exception occurred when stopping {constants.IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
             )
-            logger.error(error_msg)
+            logger.exception(error_msg)
             raise StopError(error_msg) from e
 
     def prepare(self) -> None:
@@ -126,7 +126,7 @@ class IRCBRidgeService:
 
         except (snap.SnapError, snap.SnapNotFoundError) as e:
             error_msg = f"An exception occurred when installing {snap_name}. Reason: {e}"
-            logger.error(error_msg)
+            logger.exception(error_msg)
             raise InstallError(error_msg) from e
 
     def _write(self, path: pathlib.Path, source: str) -> None:

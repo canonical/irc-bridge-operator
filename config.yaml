@@ -1,0 +1,21 @@
+
+# Copyright 2024 Canonical Ltd.
+# See LICENSE file for licensing details.
+
+options:
+  enable_irc_ident:
+    type: boolean
+    default: false
+    description: |
+      Configures whether to enable IRC ident server.
+      Reference: |
+      https://github.com/matrix-org/matrix-appservice-irc/blob/develop/config.sample.yaml#L437
+  irc_bridge_admins:
+    type: string
+    description: |
+      Comma separated list of admins to be allowed to manage the bridge.
+      This takes the form of user1:domainX.com,user2:domainY.com...
+  irc_bot_name:
+    type: string
+    description: |
+      Name of the bot that will connect to the IRC network from Matrix.

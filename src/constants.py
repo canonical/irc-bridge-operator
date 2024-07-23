@@ -7,6 +7,7 @@ DATABASE_NAME = "ircbridge"
 DATABASE_RELATION_NAME = "database"
 IRC_BRIDGE_SNAP_NAME = "matrix-appservice-irc"
 IRC_BRIDGE_CONFIG_PATH = "/etc/matrix-appservice-irc/"
+IRC_BRIDGE_HEALTH_PORT = 5446
 SNAP_PACKAGES = {
     IRC_BRIDGE_SNAP_NAME: {"channel": "edge"},
 }

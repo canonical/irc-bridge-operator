@@ -13,6 +13,9 @@ import time
 import typing
 
 from charms.operator_libs_linux.v2 import snap
+from charms.operator_libs_linux.v1 import systemd
+daemon_reload, SystemdError
+
 
 import constants
 import exceptions
@@ -20,15 +23,15 @@ import exceptions
 logger = logging.getLogger(__name__)
 
 
-class ReloadError(exceptions.SnapError):
+class ReloadError(exceptions.SystemdError):
     """Exception raised when unable to reload the service."""
 
 
-class StartError(exceptions.SnapError):
+class StartError(exceptions.SystemdError):
     """Exception raised when unable to start the service."""
 
 
-class StopError(exceptions.SnapError):
+class StopError(exceptions.SystemdError):
     """Exception raised when unable to stop the service."""
 
 
@@ -61,7 +64,6 @@ class IRCBRidgeService(Object):
         - Check if the service is running
         """
         self.prepare()
-        #self.handle_new_matrix_relation_data()
         self.configure()
         self.reload()
 
@@ -71,12 +73,12 @@ class IRCBRidgeService(Object):
 
         Raises:
             ReloadError: when encountering a SnapError
+            RelationDataError: when missing relation data
         """
+        self._are_we_there_yet()
         try:
-            cache = snap.SnapCache()
-            charmed_irc_bridge = cache[constants.IRC_BRIDGE_SNAP_NAME]
-            charmed_irc_bridge.restart(reload=True)
-        except snap.SnapError as e:
+            systemd.service_reload(constants.IRC_BRIDGE_SNAP_NAME)
+        except SystemdError as e:
             error_msg = (
                 f"An exception occurred when reloading {constants.IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
             )
@@ -88,29 +90,26 @@ class IRCBRidgeService(Object):
 
         Raises:
             StartError: when encountering a SnapError
+            RelationDataError: when missing relation data
         """
+        self._are_we_there_yet()
         try:
-            cache = snap.SnapCache()
-            charmed_irc_bridge = cache[constants.IRC_BRIDGE_SNAP_NAME]
-            charmed_irc_bridge.start()
-        except snap.SnapError as e:
+            systemd.service_start(constants.IRC_BRIDGE_SNAP_NAME)
+        except SystemdError as e:
             error_msg = (
-                f"An exception occurred when stopping {constants.IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
+                f"An exception occurred when starting {constants.IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
             )
             logger.exception(error_msg)
             raise StartError(error_msg) from e
 
     def stop(self) -> None:
         """Stop the matrix-appservice-irc service.
-        Sends a SIGTERM to the service.
 
         Raises:
             StopError: when encountering a SnapError
         """
         try:
-            cache = snap.SnapCache()
-            charmed_irc_bridge = cache[constants.IRC_BRIDGE_SNAP_NAME]
-            charmed_irc_bridge.stop()
+            systemd.service_stop(constants.IRC_BRIDGE_SNAP_NAME)
         except snap.SnapError as e:
             error_msg = (
                 f"An exception occurred when stopping {constants.IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
@@ -119,26 +118,36 @@ class IRCBRidgeService(Object):
             raise StopError(error_msg) from e
 
     def prepare(self) -> None:
-        """Prepare the machine."""
+        """Prepare the machine.
+        Install the snap package and create the configuration directory and file.
+        """
         self._install_snap_package(
             snap_name=constants.IRC_BRIDGE_SNAP_NAME,
             snap_channel=constants.SNAP_PACKAGES[constants.IRC_BRIDGE_SNAP_NAME]["channel"],
         )
-        path = pathlib.Path(constants.IRC_BRIDGE_CONFIG_PATH)
+
+        config_destination_path = pathlib.Path(constants.IRC_BRIDGE_CONFIG_PATH)
         if not path.exists():
-            path.mkdir(parents=True)
-            logger.info("Created directory %s", path)
+            config_destination_path.mkdir(parents=True)
+            logger.info("Created directory %s", config_destination_path)
             template_path = pathlib.Path(constants.IRC_BRIDGE_CONFIG_TEMPLATE_PATH)
-            destination_path = path / "config.yaml"
-            template_path.copy(destination_path)
-            logger.info("Copied config.yaml to %s", path)
+            config_path = template_path / "config.yaml"
+            shutil.copy(config_path, destination_path)
+
+        systemd_destination_path = pathlib.Path("/etc/systemd/system")
+        if not pathlib.Path.exists(systemd_destination_path / "matrix-appservice-irc.target"):
+            target_path = template_path / "matrix-appservice-irc.target"
+            shutil.copy(target_path, systemd_destination_path)
+            service_path = template_path / "matrix-appservice-irc.service"
+            shutil.copy(service_path, systemd_destination_path)
+            daemon_reload()
+            service_enable("matrix-appservice-irc")
 
     def configure(self) -> None:
         """Configure the service."""
         self._generate_PEM_file_local()
         self._generate_app_registration_local()
         self._eval_conf_local()
-
 
     def _install_snap_package(
         self, snap_name: str, snap_channel: str, refresh: bool = False
@@ -165,16 +174,6 @@ class IRCBRidgeService(Object):
             logger.exception(error_msg)
             raise InstallError(error_msg) from e
 
-    def _write(self, path: pathlib.Path, source: str) -> None:
-        """Pushes a file to the unit.
-
-        Args:
-            path: The path of the file
-            source: The contents of the file to be pushed
-        """
-        path.write_text(source, encoding="utf-8")
-        logger.info("Pushed file %s", path)
-
     def _generate_PEM_file_local(self) -> None:
         """Generate the PEM file content.
 
@@ -200,15 +199,20 @@ class IRCBRidgeService(Object):
         Returns:
             A string
         """
+        matrix_string = self._handle_new_matrix_relation_data()
         app_reg_create_command = [
-                "/bin/bash",
-                "-c",
-                f"[[ -f {IRC_BRIDGE_REGISTRATION_PATH} ]] || "
-                f"/bin/node /app/app.js -r -f {IRC_BRIDGE_REGISTRATION_PATH} "
-                f"-u http://localhost:{IRC_BRIDGE_HEALTH_PORT} "
-                f"-c {IRC_BRIDGE_CONFIG_PATH} -l {IRC_BRIDGE_BOT_NAME}",
-            ],
+            "/bin/bash",
+            "-c",
+            f"[[ -f {constants.IRC_BRIDGE_CONFIG_PATH}/appservice-registration-irc.yaml ]] || "
+            f"matrix-appservice-irc -r -f {constants.IRC_BRIDGE_CONFIG_PATH}/appservice-registration-irc.yaml "
+            f"-u http://{matrix_string}:{constants.IRC_BRIDGE_HEALTH_PORT} "
+            f"-c {constants.IRC_BRIDGE_CONFIG_PATH}/config.yaml -l {constants.IRC_BRIDGE_BOT_NAME}",
+        ]
+        logger.info("Creating an app registration file for IRC bridge.")
+        exec_process = subprocess.run(
+           app_reg_create_command, shell=True, check=True, capture_output=True)
         )
+        logger.info("Application registration create output: %s.", exec_process.stdout)
 
     def _eval_conf_local(self) -> str:
         """Generate the content of the irc configuration file.
@@ -217,7 +221,7 @@ class IRCBRidgeService(Object):
             A string to write to the configuration file
         """
         db_string = self._handle_new_db_relation_data()
-        matrix_sting = self._handle_new_matrix_relation_data()
+        matrix_string = self._handle_new_matrix_relation_data()
         # we ignore the matrix string for now until we have a plugins interface
         with open(f"{IRC_BRIDGE_CONFIG_PATH}/config.yaml", "w") as f:
             data = yaml.load(f)
@@ -225,6 +229,23 @@ class IRCBRidgeService(Object):
             if db_conn == "" or db_conn != db_string:
                 db_conn = db_string
             # matrix auth string in here TODO
+
+    def _are_we_there_yet(self) -> None:
+        """Check if we have all the necessary data to proceed.
+
+        Raises:
+            exceptions.MissingRelationData: when missing relation data
+        """
+        #if not self._charm.database.is_relation_ready:
+        #    raise exceptions.MissingRelationData("Missing database relation data.")
+        #if not self._charm.matrix.is_relation_ready:
+        #    raise exceptions.MissingRelationData("Missing matrix relation data.")
+        # ^this is the way to go in the future, for now we just check if the config file has db data
+        with open(f"{IRC_BRIDGE_CONFIG_PATH}/config.yaml", "r") as f:
+            data = yaml.load(f)
+            db_conn = data["database"]["connectionString"]
+            if db_conn == "":
+                raise exceptions.MissingRelationData("Missing database relation data.")
 
     def _handle_new_db_relation_data(self) -> str:
         """Handle new DB relation data.

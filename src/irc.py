@@ -190,7 +190,6 @@ class IRCBRidgeService(Object):
         logger.info("Creating PEM file for IRC bridge.")
         exec_process = subprocess.run(
            pem_create_command, shell=True, check=True, capture_output=True)
-        )
         logger.info("PEM create output: %s.", exec_process.stdout)
 
     def _generate_app_registration_local(self) -> str:

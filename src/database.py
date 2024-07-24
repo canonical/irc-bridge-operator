@@ -11,7 +11,7 @@ from ops.framework import Object
 
 from constants import DATABASE_NAME
 
-class DatabaseService(Object):
+class DatabaseObserver(Object):
     """The Database relation observer."""
 
     def __init__(self, charm: CharmBase, relation_name: str):

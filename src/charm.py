@@ -28,7 +28,7 @@ class IRCCharm(ops.CharmBase):
         """
         super().__init__(*args)
         self._irc = IRCService()
-        self._database = DatabaseService(self, DATABASE_RELATION_NAME)
+        self._database = DatabaseObserver(self, DATABASE_RELATION_NAME)
         self.framework.observe(
             self._database.database.on.database_created, self.reconcile
         )

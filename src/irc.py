@@ -223,7 +223,7 @@ class IRCBRidgeService(Object):
         matrix_string = self._handle_new_matrix_relation_data()
         # we ignore the matrix string for now until we have a plugins interface
         with open(f"{IRC_BRIDGE_CONFIG_PATH}/config.yaml", "w") as f:
-            data = yaml.load(f)
+            data = yaml.safe_load(f)
             db_conn = data["database"]["connectionString"]
             if db_conn == "" or db_conn != db_string:
                 db_conn = db_string

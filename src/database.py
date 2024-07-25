@@ -10,6 +10,7 @@ from ops.charm import CharmBase
 from ops.framework import Object
 
 from constants import DATABASE_NAME
+from charm_types import DatasourcePostgreSQL
 
 class DatabaseObserver(Object):
     """The Database relation observer."""
@@ -29,56 +30,23 @@ class DatabaseObserver(Object):
             database_name=DATABASE_NAME,
         )
 
-    def get_relation_data(self) -> typing.Dict[str, str]:
+    def _get_relation_data(self) -> typing.Optional[DatasourcePostgreSQL]:
         """Get database data from relation.
 
         Returns:
             Dict: Information needed for setting environment variables.
-            Returns default if the relation data is not correctly initialized.
         """
-        default = {
-            "POSTGRES_USER": "",
-            "POSTGRES_PASSWORD": "",
-            "POSTGRES_HOST": "",
-            "POSTGRES_PORT": "",
-            "POSTGRES_DB": "",
-        }
+        if endpoints := self.database.endpoints() is not None:
+            primary_endpoint = endpoints.split(",")[0].split(":")
+            return DatasourcePostgreSQL(
+                user=relation_data.get("username"),
+                password=relation_data.get("password"),
+                host=primary_endpoint[0],
+                port=primary_endpoint[1],
+                db=relation_data.get("database"),
+            )
+        return None
 
-        if self.model.get_relation(self.relation_name) is None:
-            return default
-
-        relation_id = self.database.relations[0].id
-        relation_data = self.database.fetch_relation_data()[relation_id]
-
-        endpoints = relation_data.get("endpoints", "").split(",")
-        if len(endpoints) < 1:
-            return default
-
-        primary_endpoint = endpoints[0].split(":")
-        if len(primary_endpoint) < 2:
-            return default
-
-        data = {
-            "POSTGRES_USER": relation_data.get("username"),
-            "POSTGRES_PASSWORD": relation_data.get("password"),
-            "POSTGRES_HOST": primary_endpoint[0],
-            "POSTGRES_PORT": primary_endpoint[1],
-            "POSTGRES_DB": relation_data.get("database"),
-        }
-
-        if None in (
-            data["POSTGRES_USER"],
-            data["POSTGRES_PASSWORD"],
-            data["POSTGRES_DB"],
-        ):
-            return default
-
-        return data
-
-    def is_relation_ready(self) -> bool:
-        """Check if the relation is ready.
-
-        Returns:
-            bool: returns True if the relation is ready.
-        """
-        return self.get_relation_data()["POSTGRES_HOST"] != ""
+    def reconcile(self) -> typing.Optional[DatasourcePostgreSQL]:
+        """Reconcile the database relation."""
+        return self._get_relation_data()

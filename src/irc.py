@@ -14,7 +14,7 @@ import typing
 
 from charms.operator_libs_linux.v2 import snap
 from charms.operator_libs_linux.v1 import systemd
-daemon_reload, SystemdError
+from ops.framework import Object
 
 
 import constants
@@ -67,6 +67,7 @@ class IRCBRidgeService(Object):
 
     def prepare(self) -> None:
         """Prepare the machine.
+
         Install the snap package and create the configuration directory and file.
         """
         self._install_snap_package(
@@ -88,7 +89,7 @@ class IRCBRidgeService(Object):
             shutil.copy(target_path, systemd_destination_path)
             service_path = template_path / "matrix-appservice-irc.service"
             shutil.copy(service_path, systemd_destination_path)
-            daemon_reload()
+            systemd.daemon_reload()
             service_enable("matrix-appservice-irc")
 
     def _install_snap_package(
@@ -120,14 +121,10 @@ class IRCBRidgeService(Object):
         """Configure the service."""
         self._generate_PEM_file_local()
         self._generate_app_registration_local(matrix, config)
-        self._eval_conf_local()
+        self._eval_conf_local(db, matrix, config)
 
     def _generate_PEM_file_local(self) -> None:
-        """Generate the PEM file content.
-
-        Raises:
-            
-        """
+        """Generate the PEM file content."""
         pem_create_command = [
             "/bin/bash",
             "-c",
@@ -157,7 +154,6 @@ class IRCBRidgeService(Object):
         logger.info("Creating an app registration file for IRC bridge.")
         exec_process = subprocess.run(
            app_reg_create_command, shell=True, check=True, capture_output=True)
-        )
         logger.info("Application registration create output: %s.", exec_process.stdout)
 
     def _eval_conf_local(self, db: DatasourcePostgreSQL, matrix: DatasourceMatrix, config: CharmConfig) -> str:
@@ -174,8 +170,10 @@ class IRCBRidgeService(Object):
                 db_conn = db_string
             data["homeserver"]["url"] = f"https://{matrix['host']}"
             data["ircService"]["ident"] = config["ident_enabled"]
+
     def reload(self) -> None:
         """Reload the matrix-appservice-irc service.
+
         Check if the service is running and reload it.
 
         Raises:
@@ -199,7 +197,7 @@ class IRCBRidgeService(Object):
         """
         try:
             systemd.service_start(constants.IRC_BRIDGE_SNAP_NAME)
-        except SystemdError as e:
+        except systemd.SystemdError as e:
             error_msg = (
                 f"An exception occurred when starting {constants.IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
             )
@@ -220,5 +218,3 @@ class IRCBRidgeService(Object):
             )
             logger.exception(error_msg)
             raise StopError(error_msg) from e
-
-

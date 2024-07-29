@@ -6,13 +6,11 @@
 
 import logging
 import time
-import typing
 
 import ops
 import pytest
 from pytest_operator.plugin import OpsTest
 
-import constants
 import tests.integration.helpers
 
 logger = logging.getLogger(__name__)

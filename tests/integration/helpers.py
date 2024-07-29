@@ -4,12 +4,9 @@
 
 """Helper functions for the integration tests."""
 
-import json
-import pathlib
 import random
 import string
 import tempfile
-import typing
 
 import ops
 from pytest_operator.plugin import OpsTest

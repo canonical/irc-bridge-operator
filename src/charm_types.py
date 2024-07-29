@@ -33,6 +33,7 @@ class DatasourceMatrix(BaseModel):
     Attributes:
         host: Host (IP or DNS without port or protocol).
     """
+
     host: str
 
 
@@ -44,6 +45,7 @@ class CharmConfig(BaseModel):
         bot_nickname: Bot nickname.
         bridge_admins: Bridge admins.
     """
+
     ident_enabled: bool
     bot_nickname: str
     bridge_admins: typing.List[str]

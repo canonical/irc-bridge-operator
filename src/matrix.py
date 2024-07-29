@@ -10,6 +10,7 @@ from ops.framework import Object
 
 from charm_types import DatasourceMatrix
 
+
 class MatrixObserver(Object):
     """The Matrix relation observer."""
 
@@ -18,6 +19,7 @@ class MatrixObserver(Object):
 
         Args:
             charm: The parent charm to attach the observer to.
+            relation_name: The name of the relation to observe
         """
         super().__init__(charm, "matrix-observer")
         self._charm = charm
@@ -32,5 +34,9 @@ class MatrixObserver(Object):
         return DatasourceMatrix(host="localhost")
 
     def reconcile(self) -> typing.Optional[DatasourceMatrix]:
-        """Reconcile the database relation."""
+        """Reconcile the database relation.
+
+        Returns:
+            Dict: Information needed for setting environment variables.
+        """
         return self._get_relation_data()

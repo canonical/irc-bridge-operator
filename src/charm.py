@@ -82,6 +82,7 @@ class IRCCharm(ops.CharmBase):
 
     def reconcile(self) -> None:
         """Reconcile the charm.
+
         This is a more simple approach to reconciliation,
         adapted from Charming Complexity sans state and observers.
 

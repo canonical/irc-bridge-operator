@@ -4,22 +4,23 @@
 """IRC Bridge charm business logic."""
 
 import logging
-import os
 import pathlib
-import subprocess
 import shutil
-import tempfile
-import time
-import typing
+import subprocess
 
-from charms.operator_libs_linux.v2 import snap
+import yaml
 from charms.operator_libs_linux.v1 import systemd
-from ops.framework import Object
+from charms.operator_libs_linux.v2 import snap
 
-
-import constants
 import exceptions
-from charm_types import DatasourcePostgreSQL, DatasourceMatrix, CharmConfig
+from charm_types import CharmConfig, DatasourceMatrix, DatasourcePostgreSQL
+from constants import (
+    IRC_BRIDGE_CONFIG_PATH,
+    IRC_BRIDGE_CONFIG_TEMPLATE_PATH,
+    IRC_BRIDGE_HEALTH_PORT,
+    IRC_BRIDGE_SNAP_NAME,
+    SNAP_PACKAGES,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -40,18 +41,21 @@ class InstallError(exceptions.SnapError):
     """Exception raised when unable to install dependencies for the service."""
 
 
-class IRCBRidgeService(Object):
+class IRCBridgeService:
     """IRC Bridge service class.
 
     This class provides the necessary methods to manage the matrix-appservice-irc service.
     The service requires a connection to a (PostgreSQL) database and to a Matrix homeserver.
     Both of these will be part of the configuration file created by this class.
-    Once the configuration file is created, a PEM file will be generated and an app registration file.
+    Once the configuration file is created, a PEM file will be generated and an app
+    registration file.
     The app registration file will be used to register the bridge with the Matrix homeserver.
     PEM and the configuration file will be used by the matrix-appservice-irc service.
     """
 
-    def reconcile(self, db: DatasourcePostgreSQL, matrix: DatasourceMatrix, config: CharmConfig) -> None:
+    def reconcile(
+        self, db: DatasourcePostgreSQL, matrix: DatasourceMatrix, config: CharmConfig
+    ) -> None:
         """Reconcile the service.
 
         Simple flow:
@@ -60,6 +64,11 @@ class IRCBRidgeService(Object):
         - Check if we have a matrix relation
         - Check if the configuration files exist
         - Check if the service is running
+
+        Args:
+            db: the database configuration
+            matrix: the matrix configuration
+            config: the charm configuration
         """
         self.prepare()
         self.configure(db, matrix, config)
@@ -71,17 +80,17 @@ class IRCBRidgeService(Object):
         Install the snap package and create the configuration directory and file.
         """
         self._install_snap_package(
-            snap_name=constants.IRC_BRIDGE_SNAP_NAME,
-            snap_channel=constants.SNAP_PACKAGES[constants.IRC_BRIDGE_SNAP_NAME]["channel"],
+            snap_name=IRC_BRIDGE_SNAP_NAME,
+            snap_channel=SNAP_PACKAGES[IRC_BRIDGE_SNAP_NAME]["channel"],
         )
 
-        config_destination_path = pathlib.Path(constants.IRC_BRIDGE_CONFIG_PATH)
-        if not path.exists():
+        config_destination_path = pathlib.Path(IRC_BRIDGE_CONFIG_PATH)
+        if not config_destination_path.exists():
             config_destination_path.mkdir(parents=True)
             logger.info("Created directory %s", config_destination_path)
-            template_path = pathlib.Path(constants.IRC_BRIDGE_CONFIG_TEMPLATE_PATH)
+            template_path = pathlib.Path(IRC_BRIDGE_CONFIG_TEMPLATE_PATH)
             config_path = template_path / "config.yaml"
-            shutil.copy(config_path, destination_path)
+            shutil.copy(config_path, config_destination_path)
 
         systemd_destination_path = pathlib.Path("/etc/systemd/system")
         if not pathlib.Path.exists(systemd_destination_path / "matrix-appservice-irc.target"):
@@ -90,7 +99,7 @@ class IRCBRidgeService(Object):
             service_path = template_path / "matrix-appservice-irc.service"
             shutil.copy(service_path, systemd_destination_path)
             systemd.daemon_reload()
-            service_enable("matrix-appservice-irc")
+            systemd.service_enable("matrix-appservice-irc")
 
     def _install_snap_package(
         self, snap_name: str, snap_channel: str, refresh: bool = False
@@ -117,13 +126,21 @@ class IRCBRidgeService(Object):
             logger.exception(error_msg)
             raise InstallError(error_msg) from e
 
-    def configure(self, db: DatasourcePostgreSQL, matrix: DatasourceMatrix, config: CharmConfig) -> None:
-        """Configure the service."""
-        self._generate_PEM_file_local()
+    def configure(
+        self, db: DatasourcePostgreSQL, matrix: DatasourceMatrix, config: CharmConfig
+    ) -> None:
+        """Configure the service.
+
+        Args:
+            db: the database configuration
+            matrix: the matrix configuration
+            config: the charm configuration
+        """
+        self._generate_pem_file_local()
         self._generate_app_registration_local(matrix, config)
         self._eval_conf_local(db, matrix, config)
 
-    def _generate_PEM_file_local(self) -> None:
+    def _generate_pem_file_local(self) -> None:
         """Generate the PEM file content."""
         pem_create_command = [
             "/bin/bash",
@@ -134,35 +151,44 @@ class IRCBRidgeService(Object):
         ]
         logger.info("Creating PEM file for IRC bridge.")
         exec_process = subprocess.run(
-           pem_create_command, shell=True, check=True, capture_output=True)
+            pem_create_command, shell=True, check=True, capture_output=True
+        )
         logger.info("PEM create output: %s.", exec_process.stdout)
 
-    def _generate_app_registration_local(self, matrix: DatasourceMatrix, config: CharmConfig) -> str:
+    def _generate_app_registration_local(
+        self, matrix: DatasourceMatrix, config: CharmConfig
+    ) -> None:
         """Generate the content of the app registration file.
 
-        Returns:
-            A string
+        Args:
+            matrix: the matrix configuration
+            config: the charm configuration
         """
         app_reg_create_command = [
             "/bin/bash",
             "-c",
-            f"[[ -f {constants.IRC_BRIDGE_CONFIG_PATH}/appservice-registration-irc.yaml ]] || "
-            f"matrix-appservice-irc -r -f {constants.IRC_BRIDGE_CONFIG_PATH}/appservice-registration-irc.yaml "
-            f"-u http://{matrix['host']}:{constants.IRC_BRIDGE_HEALTH_PORT} "
-            f"-c {constants.IRC_BRIDGE_CONFIG_PATH}/config.yaml -l {config['bot_nickname']}",
+            f"[[ -f {IRC_BRIDGE_CONFIG_PATH}/appservice-registration-irc.yaml ]] || "
+            f"matrix-appservice-irc -r -f {IRC_BRIDGE_CONFIG_PATH}/appservice-registration-irc.yaml"
+            f" -u http://{matrix['host']}:{IRC_BRIDGE_HEALTH_PORT} "
+            f"-c {IRC_BRIDGE_CONFIG_PATH}/config.yaml -l {config['bot_nickname']}",
         ]
         logger.info("Creating an app registration file for IRC bridge.")
         exec_process = subprocess.run(
-           app_reg_create_command, shell=True, check=True, capture_output=True)
+            app_reg_create_command, shell=True, check=True, capture_output=True
+        )
         logger.info("Application registration create output: %s.", exec_process.stdout)
 
-    def _eval_conf_local(self, db: DatasourcePostgreSQL, matrix: DatasourceMatrix, config: CharmConfig) -> str:
+    def _eval_conf_local(
+        self, db: DatasourcePostgreSQL, matrix: DatasourceMatrix, config: CharmConfig
+    ) -> None:
         """Generate the content of the irc configuration file.
 
-        Returns:
-            A string to write to the configuration file
+        Args:
+            db: the database configuration
+            matrix: the matrix configuration
+            config: the charm configuration
         """
-        with open(f"{IRC_BRIDGE_CONFIG_PATH}/config.yaml", "w") as f:
+        with open(f"{IRC_BRIDGE_CONFIG_PATH}/config.yaml", "w", encoding="utf-8") as f:
             data = yaml.safe_load(f)
             db_conn = data["database"]["connectionString"]
             db_string = f"postgres://postgres:{db['password']}@{db['host']}/{db['database']}"
@@ -180,11 +206,9 @@ class IRCBRidgeService(Object):
             ReloadError: when encountering a SnapError
         """
         try:
-            systemd.service_reload(constants.IRC_BRIDGE_SNAP_NAME)
-        except SystemdError as e:
-            error_msg = (
-                f"An exception occurred when reloading {constants.IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
-            )
+            systemd.service_reload(IRC_BRIDGE_SNAP_NAME)
+        except systemd.SystemdError as e:
+            error_msg = f"An exception occurred when reloading {IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
             logger.exception(error_msg)
             raise ReloadError(error_msg) from e
 
@@ -193,14 +217,11 @@ class IRCBRidgeService(Object):
 
         Raises:
             StartError: when encountering a SnapError
-            RelationDataError: when missing relation data
         """
         try:
-            systemd.service_start(constants.IRC_BRIDGE_SNAP_NAME)
+            systemd.service_start(IRC_BRIDGE_SNAP_NAME)
         except systemd.SystemdError as e:
-            error_msg = (
-                f"An exception occurred when starting {constants.IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
-            )
+            error_msg = f"An exception occurred when starting {IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
             logger.exception(error_msg)
             raise StartError(error_msg) from e
 
@@ -211,10 +232,8 @@ class IRCBRidgeService(Object):
             StopError: when encountering a SnapError
         """
         try:
-            systemd.service_stop(constants.IRC_BRIDGE_SNAP_NAME)
+            systemd.service_stop(IRC_BRIDGE_SNAP_NAME)
         except snap.SnapError as e:
-            error_msg = (
-                f"An exception occurred when stopping {constants.IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
-            )
+            error_msg = f"An exception occurred when stopping {IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
             logger.exception(error_msg)
             raise StopError(error_msg) from e

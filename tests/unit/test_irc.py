@@ -1,11 +1,12 @@
 # Copyright 2024 Canonical Ltd.
 # See LICENSE file for licensing details.
 
-import pytest
 from unittest.mock import MagicMock
 
-from irc import IRCBRidgeService, ReloadError, StartError, StopError, InstallError
+import pytest
 from charms.operator_libs_linux.v2 import snap
+
+from irc import InstallError, IRCBRidgeService, ReloadError, StartError, StopError
 
 
 def test_reload_success():

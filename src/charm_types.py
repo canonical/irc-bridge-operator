@@ -6,6 +6,7 @@
 """Type definitions for the Synapse charm."""
 
 import typing
+
 from pydantic import BaseModel, Field
 
 

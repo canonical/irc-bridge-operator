@@ -8,15 +8,15 @@ import logging
 import typing
 
 import ops
-
-from irc import IRCService
-from database import DatabaseService
-from constants import DATABASE_RELATION_NAME, MATRIX_RELATION_NAME
-from charm_types import CharmConfig
 from pydantic import ValidationError
 
-logger = logging.getLogger(__name__)
+from charm_types import CharmConfig
+from constants import DATABASE_RELATION_NAME, MATRIX_RELATION_NAME
+from database_observer import DatabaseObserver
+from irc import IRCBridgeService
+from matrix_observer import MatrixObserver
 
+logger = logging.getLogger(__name__)
 
 
 class IRCCharm(ops.CharmBase):
@@ -29,30 +29,15 @@ class IRCCharm(ops.CharmBase):
             args: Arguments passed to the CharmBase parent constructor.
         """
         super().__init__(*args)
-        self._irc = IRCService()
+        self._irc = IRCBridgeService()
         self._database = DatabaseObserver(self, DATABASE_RELATION_NAME)
         self._matrix = MatrixObserver(self, MATRIX_RELATION_NAME)
-        self.framework.observe(
-            self._database.database.on.database_created, self._on_database_created
-        )
-        self.framework.observe(
-            self.on[DATABASE_RELATION_NAME].relation_broken,
-            self._on_database_relation_broken
-        )
         self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(self.on.install, self._on_install)
         self.framework.observe(self.on.start, self._on_start)
         self.framework.observe(self.on.stop, self._on_stop)
 
-    def _on_database_created(self, _: ops.DatabaseCreatedEvent) -> None:
-        """Handle database created."""
-        self.reconcile()
-
-    def _on_database_relation_broken(self, _: ops.RelationBrokenEvent) -> None:
-        """Handle database relation broken."""
-        self.reconcile()
-
-    def _on_config_changed(self, _: ops.ChangedEvent) -> None:
+    def _on_config_changed(self, _: ops.ConfigChangedEvent) -> None:
         """Handle config changed."""
         self.reconcile()
 
@@ -75,9 +60,9 @@ class IRCCharm(ops.CharmBase):
             CharmConfig: The reconciled charm configuration.
         """
         return CharmConfig(
-                ident_enabled=self.model.config["ident_enabled"],
-                bot_nickname=self.model.config["bot_nickname"],
-                bridge_admins=self.model.config["bridge_admins"],
+            ident_enabled=self.model.config["ident_enabled"],
+            bot_nickname=self.model.config["bot_nickname"],
+            bridge_admins=self.model.config["bridge_admins"],
         )
 
     def reconcile(self) -> None:
@@ -93,9 +78,9 @@ class IRCCharm(ops.CharmBase):
         populate database connection string and matrix homeserver URL
         in the config template and (re)start the service.
         """
-        try: 
-            db = self._database.reconcile()
-        except ValidationError as e:
+        try:
+            db = self._database.db_connection
+        except ValidationError:
             self.unit.status = ops.BlockedStatus("Database relation not ready")
             return
         matrix = self._matrix.reconcile()

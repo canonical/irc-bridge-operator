@@ -18,3 +18,35 @@ class SnapError(Exception):
             msg (str): Explanation of the error.
         """
         self.msg = msg
+
+
+class SystemdError(Exception):
+    """Exception raised when an action on the systemd service fails.
+
+    Attrs:
+        msg (str): Explanation of the error.
+    """
+
+    def __init__(self, msg: str):
+        """Initialize a new instance of the SystemdError exception.
+
+        Args:
+            msg (str): Explanation of the error.
+        """
+        self.msg = msg
+
+
+class RelationDataError(Exception):
+    """Exception raised when we don't have the expected data in the relation or no relation.
+
+    Attrs:
+        msg (str): Explanation of the error.
+    """
+
+    def __init__(self, msg: str):
+        """Initialize a new instance of the RelationDataError exception.
+
+        Args:
+            msg (str): Explanation of the error.
+        """
+        self.msg = msg

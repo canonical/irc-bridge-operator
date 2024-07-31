@@ -21,3 +21,7 @@ assumes:
 provides:
   irc-bridge:
     interface: irc_bridge
+requires:
+  database:
+    interface: postgresql_client
+    limit: 1

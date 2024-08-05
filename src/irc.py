@@ -169,8 +169,8 @@ class IRCBridgeService:
             "-c",
             f"[[ -f {IRC_BRIDGE_CONFIG_PATH}/appservice-registration-irc.yaml ]] || "
             f"matrix-appservice-irc -r -f {IRC_BRIDGE_CONFIG_PATH}/appservice-registration-irc.yaml"
-            f" -u http://{matrix['host']}:{IRC_BRIDGE_HEALTH_PORT} "
-            f"-c {IRC_BRIDGE_CONFIG_PATH}/config.yaml -l {config['bot_nickname']}",
+            f" -u http://{matrix.host}:{IRC_BRIDGE_HEALTH_PORT} "
+            f"-c {IRC_BRIDGE_CONFIG_PATH}/config.yaml -l {config.bot_nickname}",
         ]
         logger.info("Creating an app registration file for IRC bridge.")
         exec_process = subprocess.run(
@@ -188,14 +188,19 @@ class IRCBridgeService:
             matrix: the matrix configuration
             config: the charm configuration
         """
-        with open(f"{IRC_BRIDGE_CONFIG_PATH}/config.yaml", "w", encoding="utf-8") as f:
+        with open(f"{IRC_BRIDGE_CONFIG_PATH}/config.yaml", "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
-            db_conn = data["database"]["connectionString"]
-            db_string = f"postgres://postgres:{db['password']}@{db['host']}/{db['database']}"
-            if db_conn == "" or db_conn != db_string:
-                db_conn = db_string
-            data["homeserver"]["url"] = f"https://{matrix['host']}"
-            data["ircService"]["ident"] = config["ident_enabled"]
+        db_conn = data["database"]["connectionString"]
+        db_string = f"postgres://{db.user}:{db.password}@{db.host}/{db.database}"
+        if db_conn == "" or db_conn != db_string:
+            db_conn = db_string
+        data["homeserver"]["url"] = f"https://{matrix.host}"
+        data["ircService"]["ident"] = config["ident_enabled"]
+        data["ircService"]["permissions"] = {}
+        for admin in config.get("bridge_admins", []):
+            data["ircService"]["permissions"][admin] = "admin"
+        with open(f"{IRC_BRIDGE_CONFIG_PATH}/config.yaml", "w", encoding="utf-8") as f:
+            yaml.dump(data, f)
 
     def reload(self) -> None:
         """Reload the matrix-appservice-irc service.

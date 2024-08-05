@@ -53,7 +53,8 @@ class IRCCharm(ops.CharmBase):
         """Handle stop."""
         self._irc.stop()
 
-    def _charm_reconcile(self) -> CharmConfig:
+    @property
+    def _charm_config(self) -> CharmConfig:
         """Reconcile the charm.
 
         Returns:
@@ -78,14 +79,24 @@ class IRCCharm(ops.CharmBase):
         populate database connection string and matrix homeserver URL
         in the config template and (re)start the service.
         """
+        ops.MaintenanceStatus("Reconciling charm")
         try:
+            logger.info("DB Reconciling charm")
             db = self._database.db_connection
         except ValidationError:
-            self.unit.status = ops.BlockedStatus("Database relation not ready")
+            self.unit.status = ops.BlockedStatus("Database configuration not correct")
             return
+        logger.info("Matrix Reconciling charm")
         matrix = self._matrix.reconcile()
-        config = self._charm_reconcile()
+        try:
+            logger.info("Config Reconciling charm")
+            config = self._charm_config
+        except (KeyError, ValidationError) as e:
+            self.unit.status = ops.BlockedStatus(f"Invalid configuration: {e}")
+            return
+        logger.info("IRC Reconciling charm")
         self._irc.reconcile(db, matrix, config)
+        self.unit.status = ops.ActiveStatus()
 
 
 if __name__ == "__main__":  # pragma: nocover

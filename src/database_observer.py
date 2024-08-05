@@ -37,24 +37,32 @@ class DatabaseObserver(Object):
             database_name=DATABASE_NAME,
         )
         self.framework.observe(self.database.on.database_created, self._on_database_created)
-        self.db_data = None
 
-    def _on_database_created(self, event: DatabaseCreatedEvent) -> None:
+    def _on_database_created(self, _: DatabaseCreatedEvent) -> None:
         """Handle database created.
 
         Args:
             event: The database created event.
         """
-        primary_endpoint = event.endpoints.split(",")[0].split(":")
-        self.db_data = DatasourcePostgreSQL(
-            user=event.username,
-            password=event.password,
-            host=primary_endpoint[0],
-            port=primary_endpoint[1],
-            db=event.database,
-        )
+        self._charm.reconcile()
 
     @property
     def db_connection(self) -> typing.Optional[DatasourcePostgreSQL]:
         """Reconcile the database relation."""
-        return self.db_data
+        # not using get_relation due this issue
+        # https://github.com/canonical/operator/issues/1153
+        if not self.model.relations.get(self.database.relation_name):
+            return None
+
+        relation_id = self.database.relations[0].id
+        relation_data = self.database.fetch_relation_data()[relation_id]
+
+        endpoint = relation_data.get("endpoints", ":")
+
+        return DatasourcePostgreSQL(
+            user=relation_data.get("username", ""),
+            password=relation_data.get("password", ""),
+            host=endpoint.split(":")[0],
+            port=endpoint.split(":")[1],
+            db=DATABASE_NAME,
+        )

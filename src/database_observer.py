@@ -47,7 +47,7 @@ class DatabaseObserver(Object):
         self._charm.reconcile()
 
     @property
-    def db_connection(self) -> typing.Optional[DatasourcePostgreSQL]:
+    def uri(self) -> typing.Optional[DatasourcePostgreSQL]:
         """Reconcile the database relation."""
         # not using get_relation due this issue
         # https://github.com/canonical/operator/issues/1153

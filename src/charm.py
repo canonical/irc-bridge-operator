@@ -82,7 +82,7 @@ class IRCCharm(ops.CharmBase):
         ops.MaintenanceStatus("Reconciling charm")
         try:
             logger.info("DB Reconciling charm")
-            db = self._database.db_connection
+            db = self._database.uri
         except ValidationError:
             self.unit.status = ops.BlockedStatus("Database configuration not correct")
             return

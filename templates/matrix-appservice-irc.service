@@ -1,5 +1,5 @@
 [Unit]
-Description=Synapse master
+Description=Synapse main
 
 # This service should be restarted when the synapse target is restarted.
 PartOf=matrix-appservice-irc.target

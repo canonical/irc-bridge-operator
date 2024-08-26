@@ -3,15 +3,15 @@
 
 """Database observer unit tests."""
 
+from unittest.mock import patch
+
 import ops
 import pytest
 from ops.testing import Harness
-from unittest.mock import patch
-
-from database_observer import DatabaseObserver
-from charm_types import DatasourcePostgreSQL
-
 from pydantic import ValidationError
+
+from charm_types import DatasourcePostgreSQL
+from database_observer import DatabaseObserver
 
 REQUIRER_METADATA = """
 name: observer-charm
@@ -35,7 +35,6 @@ class ObservedCharm(ops.CharmBase):
 
     def reconcile(self):
         """Reconcile method."""
-        pass
 
 
 def test_database_created_calls_reconcile():
@@ -49,8 +48,9 @@ def test_database_created_calls_reconcile():
     harness.add_relation("database", "database-provider")
     relation = harness.charm.framework.model.get_relation("database", 0)
 
-
-    with patch.object(harness.charm.database._charm, "reconcile") as mock_reconcile:
+    with patch.object(
+        harness.charm.database._charm, "reconcile"  # pylint: disable=protected-access
+    ) as mock_reconcile:
         harness.charm.database.database.on.database_created.emit(relation)
         assert mock_reconcile.called
 
@@ -75,7 +75,13 @@ def test_uri():
     )
 
     assert harness.charm.database.uri == (
-        DatasourcePostgreSQL(user='user1', password='somepass', host='postgresql-k8s-primary.local', port='5432', db='ircbridge')
+        DatasourcePostgreSQL(
+            user="user1",
+            password="somepass",
+            host="postgresql-k8s-primary.local",
+            port="5432",
+            db="ircbridge",
+        )
     )
 
 
@@ -90,4 +96,4 @@ def test_uri_when_no_relation_data():
     harness.add_relation("database", "database-provider")
 
     with pytest.raises(ValidationError):
-        harness.charm.database.uri
+        harness.charm.database.uri  # pylint: disable=pointless-statement

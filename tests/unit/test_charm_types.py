@@ -1,24 +1,26 @@
-import pytest
+# Copyright 2024 Canonical Ltd.
+# See LICENSE file for licensing details.
+
+"""Tests for the charm_types module."""
+
 from charm_types import DatasourcePostgreSQL
 
+
 def test_datasource_postgresql():
-    # Arrange
+    """Test the DatasourcePostgreSQL class.
+
+    arrange: Create a DatasourcePostgreSQL instance.
+    act: Access the instance attributes.
+    assert: The attributes are the same as the input values
+    """
     user = "test_user"
     password = "test_password"
     host = "localhost"
     port = "5432"
     db = "test_db"
 
-    # Act
-    datasource = DatasourcePostgreSQL(
-        user=user,
-        password=password,
-        host=host,
-        port=port,
-        db=db
-    )
+    datasource = DatasourcePostgreSQL(user=user, password=password, host=host, port=port, db=db)
 
-    # Assert
     assert datasource.user == user
     assert datasource.password == password
     assert datasource.host == host

@@ -16,9 +16,10 @@ from constants import DATABASE_NAME
 class DatabaseObserver(Object):
     """The Database relation observer.
 
-    Attrs:
-        db_connection: The database connection.
+    Attributes:
         relation_name: The name of the relation to observe.
+        database: The database relation interface.
+        uri: The database uri.
     """
 
     def __init__(self, charm: CharmBase, relation_name: str):
@@ -39,12 +40,8 @@ class DatabaseObserver(Object):
         self.framework.observe(self.database.on.database_created, self._on_database_created)
 
     def _on_database_created(self, _: DatabaseCreatedEvent) -> None:
-        """Handle database created.
-
-        Args:
-            event: The database created event.
-        """
-        self._charm.reconcile()
+        """Handle database created."""
+        self._charm.reconcile()  # type: ignore
 
     @property
     def uri(self) -> typing.Optional[DatasourcePostgreSQL]:

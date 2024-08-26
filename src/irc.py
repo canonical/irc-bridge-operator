@@ -150,9 +150,7 @@ class IRCBridgeService:
             + "-outform PEM -algorithm RSA -pkeyopt rsa_keygen_bits:2048",
         ]
         logger.info("Creating PEM file for IRC bridge.")
-        exec_process = subprocess.run(
-            pem_create_command, shell=True, check=True, capture_output=True
-        )
+        subprocess.run(pem_create_command, shell=True, check=True, capture_output=True)
 
     def _generate_app_registration_local(
         self, matrix: DatasourceMatrix, config: CharmConfig
@@ -172,9 +170,7 @@ class IRCBridgeService:
             f"-c {IRC_BRIDGE_CONFIG_PATH}/config.yaml -l {config.bot_nickname}",
         ]
         logger.info("Creating an app registration file for IRC bridge.")
-        exec_process = subprocess.run(
-            app_reg_create_command, shell=True, check=True, capture_output=True
-        )
+        subprocess.run(app_reg_create_command, shell=True, check=True, capture_output=True)
 
     def _eval_conf_local(
         self, db: DatasourcePostgreSQL, matrix: DatasourceMatrix, config: CharmConfig

@@ -8,7 +8,7 @@
 import re
 import typing
 
-from pydantic import BaseModel, Field, validator, ValidationError
+from pydantic import BaseModel, Field, ValidationError, validator
 
 
 class DatasourcePostgreSQL(BaseModel):

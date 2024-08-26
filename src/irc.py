@@ -153,7 +153,6 @@ class IRCBridgeService:
         exec_process = subprocess.run(
             pem_create_command, shell=True, check=True, capture_output=True
         )
-        logger.info("PEM create output: %s.", exec_process.stdout)
 
     def _generate_app_registration_local(
         self, matrix: DatasourceMatrix, config: CharmConfig
@@ -176,7 +175,6 @@ class IRCBridgeService:
         exec_process = subprocess.run(
             app_reg_create_command, shell=True, check=True, capture_output=True
         )
-        logger.info("Application registration create output: %s.", exec_process.stdout)
 
     def _eval_conf_local(
         self, db: DatasourcePostgreSQL, matrix: DatasourceMatrix, config: CharmConfig

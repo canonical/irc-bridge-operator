@@ -191,13 +191,13 @@ class IRCBridgeService:
         with open(f"{IRC_BRIDGE_CONFIG_PATH}/config.yaml", "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
         db_conn = data["database"]["connectionString"]
-        db_string = f"postgres://{db.user}:{db.password}@{db.host}/{db.database}"
+        db_string = f"postgres://{db.user}:{db.password}@{db.host}/{db.db}"
         if db_conn == "" or db_conn != db_string:
             db_conn = db_string
         data["homeserver"]["url"] = f"https://{matrix.host}"
-        data["ircService"]["ident"] = config["ident_enabled"]
+        data["ircService"]["ident"] = config.ident_enabled
         data["ircService"]["permissions"] = {}
-        for admin in config.get("bridge_admins", []):
+        for admin in config.bridge_admins:
             data["ircService"]["permissions"][admin] = "admin"
         with open(f"{IRC_BRIDGE_CONFIG_PATH}/config.yaml", "w", encoding="utf-8") as f:
             yaml.dump(data, f)

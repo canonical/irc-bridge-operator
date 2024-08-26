@@ -1,3 +1,4 @@
+import builtins
 import pytest
 from unittest.mock import MagicMock
 from charm_types import DatasourcePostgreSQL, DatasourceMatrix, CharmConfig
@@ -214,7 +215,7 @@ def test_install_snap_package_raises_install_error_if_snap_installation_fails(
 
 
 def test_configure_generates_pem_file_local(irc_bridge_service, mocker):
-    mock_run = mocker.patch.object(irc_bridge_service.subprocess, "run")
+    mock_run = mocker.patch.object(subprocess, "run")
 
     irc_bridge_service._generate_pem_file_local()
 
@@ -233,13 +234,13 @@ def test_configure_generates_pem_file_local(irc_bridge_service, mocker):
 
 
 def test_configure_generates_app_registration_local(irc_bridge_service, mocker):
-    mock_run = mocker.patch.object(irc_bridge_service.subprocess, "run")
+    mock_run = mocker.patch.object(subprocess, "run")
 
     matrix = DatasourceMatrix(host="matrix.example.com")
     config = CharmConfig(
         ident_enabled=True,
         bot_nickname="my_bot",
-        bridge_admins=["@admin1:example.com", "@admin2:example.com"],
+        bridge_admins="admin1:example.com,admin2:example.com",
     )
 
     irc_bridge_service._generate_app_registration_local(matrix, config)
@@ -260,9 +261,9 @@ def test_configure_generates_app_registration_local(irc_bridge_service, mocker):
 
 
 def test_configure_evaluates_configuration_file_local(irc_bridge_service, mocker):
-    mock_open = mocker.patch.object(irc_bridge_service.open, "open")
-    mock_safe_load = mocker.patch.object(irc_bridge_service.yaml, "safe_load")
-    mock_dump = mocker.patch.object(irc_bridge_service.yaml, "dump")
+    mock_open = mocker.patch.object(builtins, "open")
+    mock_safe_load = mocker.patch.object(yaml, "safe_load")
+    mock_dump = mocker.patch.object(yaml, "dump")
 
     db = DatasourcePostgreSQL(
         user="test_user",
@@ -275,21 +276,24 @@ def test_configure_evaluates_configuration_file_local(irc_bridge_service, mocker
     config = CharmConfig(
         ident_enabled=True,
         bot_nickname="my_bot",
-        bridge_admins=["@admin1:example.com", "@admin2:example.com"],
+        bridge_admins="admin1:example.com,admin2:example.com",
     )
 
     irc_bridge_service._eval_conf_local(db, matrix, config)
 
-    mock_open.assert_called_once_with(
-        f"{IRC_BRIDGE_CONFIG_PATH}/config.yaml", "r", encoding="utf-8"
-    )
+    calls = [
+        mocker.call(f"{IRC_BRIDGE_CONFIG_PATH}/config.yaml", "r", encoding="utf-8"),
+        mocker.call(f"{IRC_BRIDGE_CONFIG_PATH}/config.yaml", "w", encoding="utf-8"),
+    ]
+
+    mock_open.assert_has_calls(calls, any_order=True)
     mock_safe_load.assert_called_once_with(mock_open().__enter__())
     mock_dump.assert_called_once_with(mock_safe_load(), mock_open().__enter__())
 
 
 def test_reload_reloads_matrix_appservice_irc_service(irc_bridge_service, mocker):
     mock_service_reload = mocker.patch.object(
-        irc_bridge_service.systemd, "service_reload"
+        systemd, "service_reload"
     )
 
     irc_bridge_service.reload()
@@ -299,7 +303,7 @@ def test_reload_reloads_matrix_appservice_irc_service(irc_bridge_service, mocker
 
 def test_reload_raises_reload_error_if_reload_fails(irc_bridge_service, mocker):
     mock_service_reload = mocker.patch.object(
-        irc_bridge_service.systemd, "service_reload", side_effect=systemd.SystemdError
+        systemd, "service_reload", side_effect=systemd.SystemdError
     )
 
     with pytest.raises(ReloadError):
@@ -310,7 +314,7 @@ def test_reload_raises_reload_error_if_reload_fails(irc_bridge_service, mocker):
 
 def test_start_starts_matrix_appservice_irc_service(irc_bridge_service, mocker):
     mock_service_start = mocker.patch.object(
-        irc_bridge_service.systemd, "service_start"
+        systemd, "service_start"
     )
 
     irc_bridge_service.start()
@@ -320,7 +324,7 @@ def test_start_starts_matrix_appservice_irc_service(irc_bridge_service, mocker):
 
 def test_start_raises_start_error_if_start_fails(irc_bridge_service, mocker):
     mock_service_start = mocker.patch.object(
-        irc_bridge_service.systemd, "service_start", side_effect=systemd.SystemdError
+        systemd, "service_start", side_effect=systemd.SystemdError
     )
 
     with pytest.raises(StartError):
@@ -330,7 +334,7 @@ def test_start_raises_start_error_if_start_fails(irc_bridge_service, mocker):
 
 
 def test_stop_stops_matrix_appservice_irc_service(irc_bridge_service, mocker):
-    mock_service_stop = mocker.patch.object(irc_bridge_service.systemd, "service_stop")
+    mock_service_stop = mocker.patch.object(systemd, "service_stop")
 
     irc_bridge_service.stop()
 
@@ -339,7 +343,7 @@ def test_stop_stops_matrix_appservice_irc_service(irc_bridge_service, mocker):
 
 def test_stop_raises_stop_error_if_stop_fails(irc_bridge_service, mocker):
     mock_service_stop = mocker.patch.object(
-        irc_bridge_service.systemd, "service_stop", side_effect=snap.SnapError
+        systemd, "service_stop", side_effect=snap.SnapError
     )
 
     with pytest.raises(StopError):

@@ -3,7 +3,8 @@
 import builtins
 import pathlib
 import shutil
-import subprocess
+import subprocess  # nosec
+from secrets import token_hex
 from unittest.mock import MagicMock
 
 import pytest
@@ -42,7 +43,7 @@ def test_reconcile_calls_prepare_configure_and_reload_methods(irc_bridge_service
 
     db = DatasourcePostgreSQL(
         user="test_user",
-        password="test_password",
+        password=token_hex(16),
         host="localhost",
         port="5432",
         db="test_db",
@@ -259,7 +260,7 @@ def test_configure_generates_pem_file_local(irc_bridge_service, mocker):
             + "openssl genpkey -out {IRC_BRIDGE_CONFIG_PATH}/irc_passkey.pem "
             + "-outform PEM -algorithm RSA -pkeyopt rsa_keygen_bits:2048",
         ],
-        shell=True,
+        shell=True,  # nosec
         check=True,
         capture_output=True,
     )
@@ -296,7 +297,7 @@ def test_configure_generates_app_registration_local(irc_bridge_service, mocker):
             f" -u http://{matrix.host}:{IRC_BRIDGE_HEALTH_PORT} "
             f"-c {IRC_BRIDGE_CONFIG_PATH}/config.yaml -l {config.bot_nickname}",
         ],
-        shell=True,
+        shell=True,  # nosec
         check=True,
         capture_output=True,
     )
@@ -316,7 +317,7 @@ def test_configure_evaluates_configuration_file_local(irc_bridge_service, mocker
 
     db = DatasourcePostgreSQL(
         user="test_user",
-        password="test_password",
+        password=token_hex(16),
         host="localhost",
         port="5432",
         db="test_db",

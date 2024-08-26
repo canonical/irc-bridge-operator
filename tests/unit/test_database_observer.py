@@ -3,6 +3,7 @@
 
 """Database observer unit tests."""
 
+from secrets import token_hex
 from unittest.mock import patch
 
 import ops
@@ -61,6 +62,7 @@ def test_uri():
     act: populate the relation databag.
     assert: the uri matches the databag content.
     """
+    password = token_hex(16)
     harness = Harness(ObservedCharm, meta=REQUIRER_METADATA)
     harness.begin()
     harness.add_relation(
@@ -69,7 +71,7 @@ def test_uri():
         app_data={
             "database": "ircbridge",
             "endpoints": "postgresql-k8s-primary.local:5432",
-            "password": "somepass",
+            "password": password,
             "username": "user1",
         },
     )
@@ -77,7 +79,7 @@ def test_uri():
     assert harness.charm.database.uri == (
         DatasourcePostgreSQL(
             user="user1",
-            password="somepass",
+            password=password,
             host="postgresql-k8s-primary.local",
             port="5432",
             db="ircbridge",

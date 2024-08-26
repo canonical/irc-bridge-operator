@@ -170,7 +170,9 @@ class IRCBridgeService:
             f"-c {IRC_BRIDGE_CONFIG_PATH}/config.yaml -l {config.bot_nickname}",
         ]
         logger.info("Creating an app registration file for IRC bridge.")
-        subprocess.run(app_reg_create_command, shell=True, check=True, capture_output=True)  # nosec
+        subprocess.run(
+            app_reg_create_command, shell=True, check=True, capture_output=True
+        )  # nosec
 
     def _eval_conf_local(
         self, db: DatasourcePostgreSQL, matrix: DatasourceMatrix, config: CharmConfig

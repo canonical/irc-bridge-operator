@@ -304,7 +304,7 @@ class MatrixAuthRequirerData(BaseModel):
 
 
 class MatrixAuthRequestProcessed(ops.RelationEvent):
-    """DNS event emitted when a new request is processed."""
+    """MatrixAuth event emitted when a new request is processed."""
 
     def get_matrix_auth_provider_relation_data(self) -> MatrixAuthProviderData:
         """Get a MatrixAuthProviderData for the relation data.
@@ -325,7 +325,7 @@ class MatrixAuthRequiresEvents(ops.CharmEvents):
     This class defines the events that a MatrixAuth requirer can emit.
 
     Attributes:
-        dns_record_request_processed: the MatrixAuthRequestProcessed.
+        matrix_auth_request_processed: the MatrixAuthRequestProcessed.
     """
 
     matrix_auth_request_processed = ops.EventSource(MatrixAuthRequestProcessed)
@@ -417,9 +417,9 @@ class MatrixAuthRequires(ops.Object):
 
 
 class MatrixAuthProvidesEvents(ops.CharmEvents):
-    """DNS record provider events.
+    """MatrixAuth provider events.
 
-    This class defines the events that a DNS record provider can emit.
+    This class defines the events that a MatrixAuth provider can emit.
 
     Attributes:
         matrix_auth_request_received: the MatrixAuthRequestReceived.
@@ -429,7 +429,7 @@ class MatrixAuthProvidesEvents(ops.CharmEvents):
 
 
 class MatrixAuthProvides(ops.Object):
-    """Provider side of the DNS record relation.
+    """Provider side of the MatrixAuth relation.
 
     Attributes:
         on: events the provider can emit.
@@ -512,7 +512,7 @@ class MatrixAuthProvides(ops.Object):
 
         Args:
             relation: the relation for which to update the data.
-            dns_record_provider_data: a MatrixAuthProviderData instance wrapping the data to be
+            matrix_auth_provider_data: a MatrixAuthProviderData instance wrapping the data to be
                 updated.
         """
         relation_data = matrix_auth_provider_data.to_relation_data()

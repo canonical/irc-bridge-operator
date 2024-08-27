@@ -86,13 +86,14 @@ logger = logging.getLogger(__name__)
 DEFAULT_RELATION_NAME = "matrix-plugin-auth"
 
 
+#### Data models for Provider and Requirer ####
 class MatrixAuthProviderData(BaseModel):
     """Represent the MatrixAuth provider data.
 
     Attributes:
         homeserver: the homeserver URL.
         shared_secret: the Matrix shared secret.
-        shared_secret_id: the shared secret ID.
+        shared_secret_id: the shared secret Juju secret ID.
     """
 
     homeserver: Optional[str] = None
@@ -192,7 +193,7 @@ class MatrixAuthRequirerData(BaseModel):
 
     Attributes:
         registration: a generated app registration file.
-        registration_id: the registration secret ID.
+        registration_id: the registration Juju secret ID.
     """
 
     registration: Optional[SecretStr] = Field(default=None, exclude=True)
@@ -303,6 +304,7 @@ class MatrixAuthRequirerData(BaseModel):
             raise ValueError from ex
 
 
+#### Events ####
 class MatrixAuthRequestProcessed(ops.RelationEvent):
     """MatrixAuth event emitted when a new request is processed."""
 
@@ -331,6 +333,19 @@ class MatrixAuthRequiresEvents(ops.CharmEvents):
     matrix_auth_request_processed = ops.EventSource(MatrixAuthRequestProcessed)
 
 
+class MatrixAuthProvidesEvents(ops.CharmEvents):
+    """MatrixAuth provider events.
+
+    This class defines the events that a MatrixAuth provider can emit.
+
+    Attributes:
+        matrix_auth_request_received: the MatrixAuthRequestReceived.
+    """
+
+    matrix_auth_request_received = ops.EventSource(MatrixAuthRequestReceived)
+
+
+#### Requires and Provides ####
 class MatrixAuthRequires(ops.Object):
     """Requirer side of the MatrixAuth requires relation.
 
@@ -415,17 +430,6 @@ class MatrixAuthRequires(ops.Object):
         relation_data = matrix_auth_requirer_data.to_relation_data(self.model, relation)
         relation.data[self.charm.model.app].update(relation_data)
 
-
-class MatrixAuthProvidesEvents(ops.CharmEvents):
-    """MatrixAuth provider events.
-
-    This class defines the events that a MatrixAuth provider can emit.
-
-    Attributes:
-        matrix_auth_request_received: the MatrixAuthRequestReceived.
-    """
-
-    matrix_auth_request_received = ops.EventSource(MatrixAuthRequestReceived)
 
 
 class MatrixAuthProvides(ops.Object):

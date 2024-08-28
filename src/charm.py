@@ -56,6 +56,7 @@ class IRCCharm(ops.CharmBase):
 
     def _on_stop(self, _: ops.StopEvent) -> None:
         """Handle stop."""
+        self.unit.status = ops.MaintenanceStatus("Stopping charm")
         self._irc.stop()
 
     @property

@@ -52,7 +52,7 @@ class DatabaseObserver(Object):
             return None
 
         relation_id = self.database.relations[0].id
-        relation_data = self.database.fetch_relation_data()[relation_id]
+        relation_data = self.database.fetch_relation_data(relation_ids=[relation_id])[0]
 
         endpoint = relation_data.get("endpoints", ":")
 

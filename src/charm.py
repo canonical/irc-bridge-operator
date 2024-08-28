@@ -66,9 +66,9 @@ class IRCCharm(ops.CharmBase):
             CharmConfig: The reconciled charm configuration.
         """
         return CharmConfig(
-            ident_enabled=self.model.config["ident_enabled"],
-            bot_nickname=self.model.config["bot_nickname"],
-            bridge_admins=self.model.config["bridge_admins"],
+            ident_enabled=self.model.config.get("ident_enabled", None),
+            bot_nickname=self.model.config.get("bot_nickname", None),
+            bridge_admins=self.model.config.get("bridge_admins", None),
         )
 
     def reconcile(self) -> None:
@@ -96,7 +96,7 @@ class IRCCharm(ops.CharmBase):
         try:
             logger.info("Config Reconciling charm")
             config = self._charm_config
-        except (KeyError, ValidationError) as e:
+        except ValidationError as e:
             self.unit.status = ops.BlockedStatus(f"Invalid configuration: {e}")
             return
         logger.info("IRC Reconciling charm")

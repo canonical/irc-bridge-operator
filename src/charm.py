@@ -34,6 +34,7 @@ class IRCCharm(ops.CharmBase):
         self._matrix = MatrixObserver(self, MATRIX_RELATION_NAME)
         self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(self.on.install, self._on_install)
+        self.framework.observe(self.on.upgrade_charm, self._on_upgrade_charm)
         self.framework.observe(self.on.start, self._on_start)
         self.framework.observe(self.on.stop, self._on_stop)
 
@@ -43,6 +44,10 @@ class IRCCharm(ops.CharmBase):
 
     def _on_install(self, _: ops.InstallEvent) -> None:
         """Handle install."""
+        self.reconcile()
+
+    def _on_upgrade_charm(self, _: ops.UpgradeCharmEvent) -> None:
+        """Handle upgrade charm."""
         self.reconcile()
 
     def _on_start(self, _: ops.StartEvent) -> None:

@@ -59,7 +59,6 @@ class IRCCharm(ops.CharmBase):
         self.unit.status = ops.MaintenanceStatus("Stopping charm")
         self._irc.stop()
 
-    @property
     def _charm_config(self) -> CharmConfig:
         """Reconcile the charm.
 

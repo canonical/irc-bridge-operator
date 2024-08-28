@@ -52,14 +52,14 @@ class DatabaseObserver(Object):
             return None
 
         relation_id = self.database.relations[0].id
-        relation_data = self.database.fetch_relation_data()[relation_id]
+        relation_data = self.database.fetch_relation_data(relation_ids=[relation_id])[0]
 
-        endpoint = relation_data.get("endpoints", ":")
+        host, port = relation_data.get("endpoints", ":").split(":")
 
         return DatasourcePostgreSQL(
             user=relation_data.get("username", ""),
             password=relation_data.get("password", ""),
-            host=endpoint.split(":")[0],
-            port=endpoint.split(":")[1],
+            host=host,
+            port=port,
             db=DATABASE_NAME,
         )

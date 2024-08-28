@@ -34,6 +34,7 @@ class IRCCharm(ops.CharmBase):
         self._matrix = MatrixObserver(self, MATRIX_RELATION_NAME)
         self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(self.on.install, self._on_install)
+        self.framework.observe(self.on.upgrade_charm, self._on_upgrade_charm)
         self.framework.observe(self.on.start, self._on_start)
         self.framework.observe(self.on.stop, self._on_stop)
 
@@ -45,15 +46,19 @@ class IRCCharm(ops.CharmBase):
         """Handle install."""
         self.reconcile()
 
+    def _on_upgrade_charm(self, _: ops.UpgradeCharmEvent) -> None:
+        """Handle upgrade charm."""
+        self.reconcile()
+
     def _on_start(self, _: ops.StartEvent) -> None:
         """Handle start."""
         self.reconcile()
 
     def _on_stop(self, _: ops.StopEvent) -> None:
         """Handle stop."""
+        self.unit.status = ops.MaintenanceStatus("Stopping charm")
         self._irc.stop()
 
-    @property
     def _charm_config(self) -> CharmConfig:
         """Reconcile the charm.
 
@@ -61,9 +66,9 @@ class IRCCharm(ops.CharmBase):
             CharmConfig: The reconciled charm configuration.
         """
         return CharmConfig(
-            ident_enabled=self.model.config["ident_enabled"],
-            bot_nickname=self.model.config["bot_nickname"],
-            bridge_admins=self.model.config["bridge_admins"],
+            ident_enabled=self.model.config.get("ident_enabled", None),
+            bot_nickname=self.model.config.get("bot_nickname", None),
+            bridge_admins=self.model.config.get("bridge_admins", None),
         )
 
     def reconcile(self) -> None:
@@ -91,7 +96,7 @@ class IRCCharm(ops.CharmBase):
         try:
             logger.info("Config Reconciling charm")
             config = self._charm_config
-        except (KeyError, ValidationError) as e:
+        except ValidationError as e:
             self.unit.status = ops.BlockedStatus(f"Invalid configuration: {e}")
             return
         logger.info("IRC Reconciling charm")

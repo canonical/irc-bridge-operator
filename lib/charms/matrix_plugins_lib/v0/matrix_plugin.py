@@ -161,6 +161,7 @@ class MatrixAuthProviderData(BaseModel):
         dumped_model = self.model_dump(exclude_unset=True)
         dumped_data = {
             "shared_secret_id": dumped_model["shared_secret_id"],
+            "homeserver": dumped_model["homeserver"],
         }
         return dumped_data
 
@@ -197,7 +198,7 @@ class MatrixAuthRequirerData(BaseModel):
     """
 
     registration: Optional[SecretStr] = Field(default=None, exclude=True)
-    registration_secret_id: Optional[SecretStr] = Field(default=None, exclude=True)
+    registration_secret_id: Optional[SecretStr] = Field(default=None)
 
     def set_registration_id(self, model: ops.Model, relation: ops.Relation) -> None:
         """Store the app registration as a Juju secret.
@@ -367,25 +368,25 @@ class MatrixAuthRequires(ops.Object):
         self.relation_name = relation_name
         self.framework.observe(charm.on[relation_name].relation_changed, self._on_relation_changed)
 
-    def get_remote_relation_data(self) -> Optional[MatrixAuthProviderData]:
+    def get_remote_relation_data(self) -> Optional[MatrixAuthRequirerData]:
         """Retrieve the remote relation data.
 
         Returns:
-            MatrixAuthProviderData: the relation data.
+            MatrixAuthRequirerData: the relation data.
         """
         relation = self.model.get_relation(self.relation_name)
         return self._get_remote_relation_data(relation) if relation else None
 
-    def _get_remote_relation_data(self, relation: ops.Relation) -> MatrixAuthProviderData:
+    def _get_remote_relation_data(self, relation: ops.Relation) -> MatrixAuthRequirerData:
         """Retrieve the remote relation data.
 
         Args:
             relation: the relation to retrieve the data from.
 
         Returns:
-            MatrixAuthProviderData: the relation data.
+            MatrixAuthRequirerData: the relation data.
         """
-        return MatrixAuthProviderData.from_relation(relation)
+        return MatrixAuthRequirerData.from_relation(relation=relation)
 
     def _is_remote_relation_data_valid(self, relation: ops.Relation) -> bool:
         """Validate the relation data.
@@ -478,7 +479,7 @@ class MatrixAuthProvides(ops.Object):
         Returns:
             the relation data and the processed entries for it.
         """
-        return MatrixAuthProviderData.from_relation(model, relation)
+        return MatrixAuthProviderData.from_relation(relation=relation)
 
     def _is_remote_relation_data_valid(self, relation: ops.Relation) -> bool:
         """Validate the relation data.

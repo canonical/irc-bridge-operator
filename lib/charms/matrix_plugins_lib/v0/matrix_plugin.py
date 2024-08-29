@@ -98,7 +98,7 @@ class MatrixAuthProviderData(BaseModel):
 
     homeserver: Optional[str] = None
     shared_secret: Optional[SecretStr] = Field(default=None, exclude=True)
-    shared_secret_id: Optional[SecretStr] = Field(default=None, exclude=True)
+    shared_secret_id: Optional[SecretStr] = Field(default=None)
 
     def set_shared_secret_id(self, model: ops.Model, relation: ops.Relation) -> None:
         """Store the Matrix shared secret as a Juju secret.
@@ -478,7 +478,7 @@ class MatrixAuthProvides(ops.Object):
         Returns:
             the relation data and the processed entries for it.
         """
-        return MatrixAuthRequirerData.from_relation(model, relation)
+        return MatrixAuthProviderData.from_relation(model, relation)
 
     def _is_remote_relation_data_valid(self, relation: ops.Relation) -> bool:
         """Validate the relation data.
@@ -519,5 +519,5 @@ class MatrixAuthProvides(ops.Object):
             matrix_auth_provider_data: a MatrixAuthProviderData instance wrapping the data to be
                 updated.
         """
-        relation_data = matrix_auth_provider_data.to_relation_data()
+        relation_data = matrix_auth_provider_data.to_relation_data(self.model, relation)
         relation.data[self.charm.model.app].update(relation_data)

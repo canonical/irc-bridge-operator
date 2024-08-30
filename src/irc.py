@@ -60,8 +60,6 @@ class IRCBridgeService:
 
         Simple flow:
         - Check if the snap is installed
-        - Check if we have a database relation
-        - Check if we have a matrix relation
         - Check if the configuration files exist
         - Check if the service is running
 

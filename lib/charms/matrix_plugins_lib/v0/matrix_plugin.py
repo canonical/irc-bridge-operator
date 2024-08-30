@@ -166,7 +166,7 @@ class MatrixAuthProviderData(BaseModel):
         return dumped_data
 
     @classmethod
-    def from_relation(cls, relation: ops.Relation) -> "MatrixAuthProviderData":
+    def from_relation(cls, model: ops.Model, relation: ops.Relation) -> "MatrixAuthProviderData":
         """Initialize a new instance of the MatrixAuthProviderData class from the relation.
 
         Args:
@@ -179,13 +179,22 @@ class MatrixAuthProviderData(BaseModel):
             ValueError: if the value is not parseable.
         """
         try:
-            loaded_data = {}
             app = cast(ops.Application, relation.app)
             relation_data = relation.data[app]
-            for key, value in relation_data.items():
-                loaded_data[key] = json.loads(value)
-            return MatrixAuthProviderData.model_validate(loaded_data)
+            shared_secret_id = (
+                (relation_data["shared_secret_id"])
+                if "shared_secret_id" in relation_data
+                else None
+            )
+            shared_secret = MatrixAuthProviderData.get_shared_secret(model, shared_secret_id)
+            homeserver = relation_data.get("homeserver")
+            return MatrixAuthProviderData(
+                homeserver=homeserver,
+                shared_secret=shared_secret,
+            )
+
         except json.JSONDecodeError as ex:
+            logger.warning("Invalid relation data %s", ex)
             raise ValueError from ex
 
 
@@ -265,10 +274,8 @@ class MatrixAuthRequirerData(BaseModel):
         return dumped_data
 
     @classmethod
-    def from_relation(
-        cls, model: ops.Model, relation: ops.Relation
-    ) -> Tuple["MatrixAuthRequirerData", "MatrixAuthProviderData"]:
-        """Get a Tuple of MatrixAuthRequirerData and MatrixAuthProviderData from the relation data.
+    def from_relation(cls, model: ops.Model, relation: ops.Relation) -> "MatrixAuthRequirerData":
+        """Get a MatrixAuthRequirerData from the relation data.
 
         Args:
             model: the Juju model.
@@ -289,15 +296,8 @@ class MatrixAuthRequirerData(BaseModel):
                 else None
             )
             registration = MatrixAuthRequirerData.get_registration(model, registration_secret_id)
-            return (
-                MatrixAuthRequirerData(
-                    registration=registration,
-                    registration_secret_id=registration_secret_id,
-                ),
-                MatrixAuthProviderData(
-                    homeserver=None,
-                    shared_secret=None,
-                ),
+            return MatrixAuthRequirerData(
+                registration=registration,
             )
 
         except json.JSONDecodeError as ex:
@@ -315,7 +315,7 @@ class MatrixAuthRequestProcessed(ops.RelationEvent):
         Returns:
             the MatrixAuthProviderData for the relation data.
         """
-        return MatrixAuthProviderData.from_relation(self.relation)
+        return MatrixAuthProviderData.from_relation(self.model, self.relation)
 
 
 class MatrixAuthRequestReceived(ops.RelationEvent):
@@ -368,25 +368,25 @@ class MatrixAuthRequires(ops.Object):
         self.relation_name = relation_name
         self.framework.observe(charm.on[relation_name].relation_changed, self._on_relation_changed)
 
-    def get_remote_relation_data(self) -> Optional[MatrixAuthRequirerData]:
+    def get_remote_relation_data(self) -> Optional[MatrixAuthProviderData]:
         """Retrieve the remote relation data.
 
         Returns:
-            MatrixAuthRequirerData: the relation data.
+            MatrixAuthProviderData: the relation data.
         """
         relation = self.model.get_relation(self.relation_name)
         return self._get_remote_relation_data(relation) if relation else None
 
-    def _get_remote_relation_data(self, relation: ops.Relation) -> MatrixAuthRequirerData:
+    def _get_remote_relation_data(self, relation: ops.Relation) -> MatrixAuthProviderData:
         """Retrieve the remote relation data.
 
         Args:
             relation: the relation to retrieve the data from.
 
         Returns:
-            MatrixAuthRequirerData: the relation data.
+            MatrixAuthProviderData: the remote relation data.
         """
-        return MatrixAuthRequirerData.from_relation(relation=relation)
+        return MatrixAuthProviderData.from_relation(model=self.model, relation=relation)
 
     def _is_remote_relation_data_valid(self, relation: ops.Relation) -> bool:
         """Validate the relation data.
@@ -432,7 +432,6 @@ class MatrixAuthRequires(ops.Object):
         relation.data[self.charm.model.app].update(relation_data)
 
 
-
 class MatrixAuthProvides(ops.Object):
     """Provider side of the MatrixAuth relation.
 
@@ -454,32 +453,25 @@ class MatrixAuthProvides(ops.Object):
         self.relation_name = relation_name
         self.framework.observe(charm.on[relation_name].relation_changed, self._on_relation_changed)
 
-    def get_remote_relation_data(
-        self,
-    ) -> List[Tuple[MatrixAuthRequirerData, MatrixAuthProviderData]]:
-        """Retrieve all the remote relations data.
+    def get_remote_relation_data(self) -> Optional[MatrixAuthRequirerData]:
+        """Retrieve the remote relation data.
 
         Returns:
-            the relation data and the processed entries for it.
+            MatrixAuthRequirerData: the relation data.
         """
-        relations_data: List[Tuple[MatrixAuthRequirerData, MatrixAuthProviderData]] = []
-        for relation in self.model.relations[self.relation_name]:
-            relations_data.append(self._get_remote_relation_data(self.model, relation))
-        return relations_data
+        relation = self.model.get_relation(self.relation_name)
+        return self._get_remote_relation_data(relation) if relation else None
 
-    def _get_remote_relation_data(
-        self, model: ops.Model, relation: ops.Relation
-    ) -> Tuple[MatrixAuthRequirerData, MatrixAuthProviderData]:
+    def _get_remote_relation_data(self, relation: ops.Relation) -> MatrixAuthRequirerData:
         """Retrieve the remote relation data.
 
         Args:
-            model: the Juju model.
             relation: the relation to retrieve the data from.
 
         Returns:
-            the relation data and the processed entries for it.
+            MatrixAuthRequirerData: the remote relation data.
         """
-        return MatrixAuthProviderData.from_relation(relation=relation)
+        return MatrixAuthRequirerData.from_relation(self.model, relation=relation)
 
     def _is_remote_relation_data_valid(self, relation: ops.Relation) -> bool:
         """Validate the relation data.
@@ -491,7 +483,7 @@ class MatrixAuthProvides(ops.Object):
             true: if the relation data is valid.
         """
         try:
-            _ = self._get_remote_relation_data(self.model, relation)
+            _ = self._get_remote_relation_data(relation)
             return True
         except ValueError as ex:
             logger.warning("Error validating the relation data %s", ex)

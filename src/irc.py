@@ -15,11 +15,21 @@ from charms.operator_libs_linux.v2 import snap
 import exceptions
 from charm_types import CharmConfig, DatasourceMatrix, DatasourcePostgreSQL
 from constants import (
-    IRC_BRIDGE_CONFIG_PATH,
-    IRC_BRIDGE_CONFIG_TEMPLATE_PATH,
     IRC_BRIDGE_HEALTH_PORT,
+    IRC_BRIDGE_KEY_ALGO,
+    IRC_BRIDGE_KEY_OPTS,
+    IRC_BRIDGE_CONFIG_DIR_PATH,
+    IRC_BRIDGE_CONFIG_FILE_PATH,
+    IRC_BRIDGE_PEM_FILE_PATH,
+    IRC_BRIDGE_REGISTRATION_FILE_PATH,
+    IRC_BRIDGE_TEMPLATE_CONFIG_FILE_PATH,
+    IRC_BRIDGE_TEMPLATE_TARGET_FILE_PATH,
+    IRC_BRIDGE_TEMPLATE_UNIT_FILE_PATH,
+    IRC_BRIDGE_TARGET_FILE_PATH,
+    IRC_BRIDGE_UNIT_FILE_PATH,
     IRC_BRIDGE_SNAP_NAME,
     SNAP_PACKAGES,
+    SYSTEMD_DIR_PATH
 )
 
 logger = logging.getLogger(__name__)
@@ -82,22 +92,16 @@ class IRCBridgeService:
             snap_channel=SNAP_PACKAGES[IRC_BRIDGE_SNAP_NAME]["channel"],
         )
 
-        config_destination_path = pathlib.Path(IRC_BRIDGE_CONFIG_PATH)
-        if not config_destination_path.exists():
-            config_destination_path.mkdir(parents=True)
-            logger.info("Created directory %s", config_destination_path)
-            template_path = pathlib.Path(IRC_BRIDGE_CONFIG_TEMPLATE_PATH)
-            config_path = template_path / "config.yaml"
-            shutil.copy(config_path, config_destination_path)
+        if not IRC_BRIDGE_CONFIG_DIR_PATH.exists():
+            IRC_BRIDGE_CONFIG_DIR_PATH.mkdir(parents=True)
+            logger.info("Created directory %s", IRC_BRIDGE_CONFIG_DIR_PATH)
+            shutil.copy(IRC_BRIDGE_TEMPLATE_CONFIG_FILE_PATH, IRC_BRIDGE_CONFIG_DIR_PATH)
 
-        systemd_destination_path = pathlib.Path("/etc/systemd/system")
-        if not pathlib.Path.exists(systemd_destination_path / "matrix-appservice-irc.target"):
-            target_path = template_path / "matrix-appservice-irc.target"
-            shutil.copy(target_path, systemd_destination_path)
-            service_path = template_path / "matrix-appservice-irc.service"
-            shutil.copy(service_path, systemd_destination_path)
+        if not IRC_BRIDGE_UNIT_FILE_PATH.exists() or not IRC_BRIDGE_TARGET_FILE_PATH.exists():
+            shutil.copy(IRC_BRIDGE_TEMPLATE_UNIT_FILE_PATH, SYSTEMD_DIR_PATH)
+            shutil.copy(IRC_BRIDGE_TEMPLATE_TARGET_FILE_PATH, SYSTEMD_DIR_PATH)
             systemd.daemon_reload()
-            systemd.service_enable("matrix-appservice-irc")
+            systemd.service_enable(IRC_BRIDGE_SNAP_NAME)
 
     def _install_snap_package(
         self, snap_name: str, snap_channel: str, refresh: bool = False
@@ -143,9 +147,9 @@ class IRCBridgeService:
         pem_create_command = [
             "/bin/bash",
             "-c",
-            f"[[ -f {IRC_BRIDGE_CONFIG_PATH}/irc_passkey.pem ]] || "
-            + "openssl genpkey -out {IRC_BRIDGE_CONFIG_PATH}/irc_passkey.pem "
-            + "-outform PEM -algorithm RSA -pkeyopt rsa_keygen_bits:2048",
+            f"[[ -f {IRC_BRIDGE_PEM_FILE_PATH} ]] || "
+            + "openssl genpkey -out {IRC_BRIDGE_PEM_FILE_PATH} "
+            + "-outform PEM -algorithm {IRC_BRIDGE_KEY_ALGO} -pkeyopt {IRC_BRIDGE_KEY_OPTS}",
         ]
         logger.info("Creating PEM file for IRC bridge.")
         subprocess.run(pem_create_command, shell=True, check=True, capture_output=True)  # nosec
@@ -162,10 +166,10 @@ class IRCBridgeService:
         app_reg_create_command = [
             "/bin/bash",
             "-c",
-            f"[[ -f {IRC_BRIDGE_CONFIG_PATH}/appservice-registration-irc.yaml ]] || "
-            f"matrix-appservice-irc -r -f {IRC_BRIDGE_CONFIG_PATH}/appservice-registration-irc.yaml"
+            f"[[ -f {IRC_BRIDGE_REGISTRATION_FILE_PATH} ]] || "
+            f"matrix-appservice-irc -r -f {IRC_BRIDGE_REGISTRATION_FILE_PATH}"
             f" -u http://{matrix.host}:{IRC_BRIDGE_HEALTH_PORT} "
-            f"-c {IRC_BRIDGE_CONFIG_PATH}/config.yaml -l {config.bot_nickname}",
+            f"-c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
         ]
         logger.info("Creating an app registration file for IRC bridge.")
         subprocess.run(
@@ -182,7 +186,7 @@ class IRCBridgeService:
             matrix: the matrix configuration
             config: the charm configuration
         """
-        with open(f"{IRC_BRIDGE_CONFIG_PATH}/config.yaml", "r", encoding="utf-8") as f:
+        with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
         db_conn = data["database"]["connectionString"]
         db_string = f"postgres://{db.user}:{db.password}@{db.host}/{db.db}"
@@ -193,7 +197,7 @@ class IRCBridgeService:
         data["ircService"]["permissions"] = {}
         for admin in config.bridge_admins:
             data["ircService"]["permissions"][admin] = "admin"
-        with open(f"{IRC_BRIDGE_CONFIG_PATH}/config.yaml", "w", encoding="utf-8") as f:
+        with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "w", encoding="utf-8") as f:
             yaml.dump(data, f)
 
     def reload(self) -> None:

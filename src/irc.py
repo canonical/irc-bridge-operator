@@ -186,7 +186,7 @@ class IRCBridgeService:
             matrix: the matrix configuration
             config: the charm configuration
         """
-        with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "r", encoding="utf-8") as f:
+        with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "r", encoding="utf-8") as config_file:
             data = yaml.safe_load(f)
         db_conn = data["database"]["connectionString"]
         db_string = f"postgres://{db.user}:{db.password}@{db.host}/{db.db}"
@@ -197,7 +197,7 @@ class IRCBridgeService:
         data["ircService"]["permissions"] = {}
         for admin in config.bridge_admins:
             data["ircService"]["permissions"][admin] = "admin"
-        with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "w", encoding="utf-8") as f:
+        with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "w", encoding="utf-8") as config_file:
             yaml.dump(data, f)
 
     def reload(self) -> None:

@@ -17,13 +17,20 @@ from charms.operator_libs_linux.v2 import snap
 
 from charm_types import CharmConfig, DatasourceMatrix, DatasourcePostgreSQL
 from constants import (
-    IRC_BRIDGE_CONFIG_PATH,
-    IRC_BRIDGE_CONFIG_TEMPLATE_PATH,
+    IRC_BRIDGE_CONFIG_DIR_PATH,
+    IRC_BRIDGE_CONFIG_FILE_PATH,
     IRC_BRIDGE_HEALTH_PORT,
+    IRC_BRIDGE_KEY_ALGO,
+    IRC_BRIDGE_KEY_OPTS,
+    IRC_BRIDGE_PEM_FILE_PATH,
+    IRC_BRIDGE_REGISTRATION_FILE_PATH,
+    IRC_BRIDGE_SNAP_NAME,
+    IRC_BRIDGE_TEMPLATE_CONFIG_FILE_PATH,
+    IRC_BRIDGE_TEMPLATE_TARGET_FILE_PATH,
+    IRC_BRIDGE_TEMPLATE_UNIT_FILE_PATH,
+    SYSTEMD_DIR_PATH,
 )
 from irc import InstallError, IRCBridgeService, ReloadError, StartError, StopError
-
-SYSTEMD_SYSTEM_PATH = "/etc/systemd/system"
 
 
 @pytest.fixture(name="irc_bridge_service")
@@ -83,26 +90,26 @@ def test_prepare_installs_snap_package_and_creates_configuration_files(irc_bridg
     irc_bridge_service.prepare()
 
     mock_install_snap_package.assert_called_once_with(
-        snap_name="matrix-appservice-irc", snap_channel="edge"
+        snap_name=IRC_BRIDGE_SNAP_NAME, snap_channel="edge"
     )
     mock_mkdir.assert_called_once_with(parents=True)
     copy_calls = [
         mocker.call(
-            pathlib.Path(IRC_BRIDGE_CONFIG_TEMPLATE_PATH) / "config.yaml",
-            pathlib.Path(IRC_BRIDGE_CONFIG_PATH),
+            IRC_BRIDGE_TEMPLATE_CONFIG_FILE_PATH,
+            IRC_BRIDGE_CONFIG_DIR_PATH,
         ),
         mocker.call(
-            pathlib.Path(IRC_BRIDGE_CONFIG_TEMPLATE_PATH) / "matrix-appservice-irc.target",
-            pathlib.Path(SYSTEMD_SYSTEM_PATH),
+            IRC_BRIDGE_TEMPLATE_UNIT_FILE_PATH,
+            SYSTEMD_DIR_PATH,
         ),
         mocker.call(
-            pathlib.Path(IRC_BRIDGE_CONFIG_TEMPLATE_PATH) / "matrix-appservice-irc.service",
-            pathlib.Path(SYSTEMD_SYSTEM_PATH),
+            IRC_BRIDGE_TEMPLATE_TARGET_FILE_PATH,
+            SYSTEMD_DIR_PATH,
         ),
     ]
     mock_copy.assert_has_calls(copy_calls)
     mock_daemon_reload.assert_called_once()
-    mock_service_enable.assert_called_once_with("matrix-appservice-irc")
+    mock_service_enable.assert_called_once_with(IRC_BRIDGE_SNAP_NAME)
 
 
 def test_prepare_does_not_copy_files_if_already_exist(irc_bridge_service, mocker):
@@ -126,7 +133,7 @@ def test_prepare_does_not_copy_files_if_already_exist(irc_bridge_service, mocker
     irc_bridge_service.prepare()
 
     mock_install_snap_package.assert_called_once_with(
-        snap_name="matrix-appservice-irc", snap_channel="edge"
+        snap_name=IRC_BRIDGE_SNAP_NAME, snap_channel="edge"
     )
     mock_mkdir.assert_not_called()
     mock_copy.assert_not_called()
@@ -149,7 +156,7 @@ def test_prepare_raises_install_error_if_snap_installation_fails(irc_bridge_serv
         irc_bridge_service.prepare()
 
     mock_install_snap_package.assert_called_once_with(
-        snap_name="matrix-appservice-irc", snap_channel="edge"
+        snap_name=IRC_BRIDGE_SNAP_NAME, snap_channel="edge"
     )
 
 
@@ -164,11 +171,11 @@ def test_install_snap_package_installs_snap_if_not_present(irc_bridge_service, m
     mock_snap_cache = mocker.patch.object(snap, "SnapCache")
     mock_snap_package = MagicMock()
     mock_snap_package.present = False
-    mock_snap_cache.return_value = {"matrix-appservice-irc": mock_snap_package}
+    mock_snap_cache.return_value = {IRC_BRIDGE_SNAP_NAME: mock_snap_package}
     mock_ensure = mocker.patch.object(mock_snap_package, "ensure")
 
     irc_bridge_service._install_snap_package(  # pylint: disable=protected-access
-        snap_name="matrix-appservice-irc", snap_channel="edge"
+        snap_name=IRC_BRIDGE_SNAP_NAME, snap_channel="edge"
     )
 
     mock_snap_cache.assert_called_once()
@@ -186,11 +193,11 @@ def test_install_snap_package_does_not_install_snap_if_already_present(irc_bridg
     mock_snap_cache = mocker.patch.object(snap, "SnapCache")
     mock_snap_package = MagicMock()
     mock_snap_package.present = True
-    mock_snap_cache.return_value = {"matrix-appservice-irc": mock_snap_package}
+    mock_snap_cache.return_value = {IRC_BRIDGE_SNAP_NAME: mock_snap_package}
     mock_ensure = mocker.patch.object(mock_snap_package, "ensure")
 
     irc_bridge_service._install_snap_package(  # pylint: disable=protected-access
-        snap_name="matrix-appservice-irc", snap_channel="edge"
+        snap_name=IRC_BRIDGE_SNAP_NAME, snap_channel="edge"
     )
 
     mock_snap_cache.assert_called_once()
@@ -208,11 +215,11 @@ def test_install_snap_package_refreshes_snap_if_already_present(irc_bridge_servi
     mock_snap_cache = mocker.patch.object(snap, "SnapCache")
     mock_snap_package = MagicMock()
     mock_snap_package.present = True
-    mock_snap_cache.return_value = {"matrix-appservice-irc": mock_snap_package}
+    mock_snap_cache.return_value = {IRC_BRIDGE_SNAP_NAME: mock_snap_package}
     mock_ensure = mocker.patch.object(mock_snap_package, "ensure")
 
     irc_bridge_service._install_snap_package(  # pylint: disable=protected-access
-        snap_name="matrix-appservice-irc", snap_channel="edge", refresh=True
+        snap_name=IRC_BRIDGE_SNAP_NAME, snap_channel="edge", refresh=True
     )
 
     mock_snap_cache.assert_called_once()
@@ -231,12 +238,12 @@ def test_install_snap_package_raises_install_error_if_snap_installation_fails(
     mock_snap_cache = mocker.patch.object(snap, "SnapCache")
     mock_snap_package = MagicMock()
     mock_snap_package.present = False
-    mock_snap_cache.return_value = {"matrix-appservice-irc": mock_snap_package}
+    mock_snap_cache.return_value = {IRC_BRIDGE_SNAP_NAME: mock_snap_package}
     mock_ensure = mocker.patch.object(mock_snap_package, "ensure", side_effect=snap.SnapError)
 
     with pytest.raises(InstallError):
         irc_bridge_service._install_snap_package(  # pylint: disable=protected-access
-            snap_name="matrix-appservice-irc", snap_channel="edge"
+            snap_name=IRC_BRIDGE_SNAP_NAME, snap_channel="edge"
         )
 
     mock_snap_cache.assert_called_once()
@@ -259,9 +266,9 @@ def test_configure_generates_pem_file_local(irc_bridge_service, mocker):
         [
             "/bin/bash",
             "-c",
-            f"[[ -f {IRC_BRIDGE_CONFIG_PATH}/irc_passkey.pem ]] || "
-            + "openssl genpkey -out {IRC_BRIDGE_CONFIG_PATH}/irc_passkey.pem "
-            + "-outform PEM -algorithm RSA -pkeyopt rsa_keygen_bits:2048",
+            f"[[ -f {IRC_BRIDGE_PEM_FILE_PATH} ]] || "
+            f"openssl genpkey -out {IRC_BRIDGE_PEM_FILE_PATH} "
+            f"-outform PEM -algorithm {IRC_BRIDGE_KEY_ALGO} -pkeyopt {IRC_BRIDGE_KEY_OPTS}",
         ],
         shell=True,  # nosec
         check=True,
@@ -295,10 +302,10 @@ def test_configure_generates_app_registration_local(irc_bridge_service, mocker):
         [
             "/bin/bash",
             "-c",
-            f"[[ -f {IRC_BRIDGE_CONFIG_PATH}/appservice-registration-irc.yaml ]] || "
-            f"matrix-appservice-irc -r -f {IRC_BRIDGE_CONFIG_PATH}/appservice-registration-irc.yaml"
-            f" -u http://{matrix.host}:{IRC_BRIDGE_HEALTH_PORT} "
-            f"-c {IRC_BRIDGE_CONFIG_PATH}/config.yaml -l {config.bot_nickname}",
+            f"[[ -f {IRC_BRIDGE_REGISTRATION_FILE_PATH} ]] || "
+            f"matrix-appservice-irc -r -f {IRC_BRIDGE_REGISTRATION_FILE_PATH}"
+            f" -u https://{matrix.host}:{IRC_BRIDGE_HEALTH_PORT} "
+            f"-c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
         ],
         shell=True,  # nosec
         check=True,
@@ -335,8 +342,8 @@ def test_configure_evaluates_configuration_file_local(irc_bridge_service, mocker
     irc_bridge_service._eval_conf_local(db, matrix, config)  # pylint: disable=protected-access
 
     calls = [
-        mocker.call(f"{IRC_BRIDGE_CONFIG_PATH}/config.yaml", "r", encoding="utf-8"),
-        mocker.call(f"{IRC_BRIDGE_CONFIG_PATH}/config.yaml", "w", encoding="utf-8"),
+        mocker.call(f"{IRC_BRIDGE_CONFIG_FILE_PATH.absolute()}", "r", encoding="utf-8"),
+        mocker.call(f"{IRC_BRIDGE_CONFIG_FILE_PATH.absolute()}", "w", encoding="utf-8"),
     ]
 
     mock_open.assert_has_calls(calls, any_order=True)
@@ -359,7 +366,7 @@ def test_reload_reloads_matrix_appservice_irc_service(irc_bridge_service, mocker
 
     irc_bridge_service.reload()
 
-    mock_service_reload.assert_called_once_with("matrix-appservice-irc")
+    mock_service_reload.assert_called_once_with(IRC_BRIDGE_SNAP_NAME)
 
 
 def test_reload_raises_reload_error_if_reload_fails(irc_bridge_service, mocker):
@@ -376,7 +383,7 @@ def test_reload_raises_reload_error_if_reload_fails(irc_bridge_service, mocker):
     with pytest.raises(ReloadError):
         irc_bridge_service.reload()
 
-    mock_service_reload.assert_called_once_with("matrix-appservice-irc")
+    mock_service_reload.assert_called_once_with(IRC_BRIDGE_SNAP_NAME)
 
 
 def test_start_starts_matrix_appservice_irc_service(irc_bridge_service, mocker):
@@ -390,7 +397,7 @@ def test_start_starts_matrix_appservice_irc_service(irc_bridge_service, mocker):
 
     irc_bridge_service.start()
 
-    mock_service_start.assert_called_once_with("matrix-appservice-irc")
+    mock_service_start.assert_called_once_with(IRC_BRIDGE_SNAP_NAME)
 
 
 def test_start_raises_start_error_if_start_fails(irc_bridge_service, mocker):
@@ -407,7 +414,7 @@ def test_start_raises_start_error_if_start_fails(irc_bridge_service, mocker):
     with pytest.raises(StartError):
         irc_bridge_service.start()
 
-    mock_service_start.assert_called_once_with("matrix-appservice-irc")
+    mock_service_start.assert_called_once_with(IRC_BRIDGE_SNAP_NAME)
 
 
 def test_stop_stops_matrix_appservice_irc_service(irc_bridge_service, mocker):
@@ -421,7 +428,7 @@ def test_stop_stops_matrix_appservice_irc_service(irc_bridge_service, mocker):
 
     irc_bridge_service.stop()
 
-    mock_service_stop.assert_called_once_with("matrix-appservice-irc")
+    mock_service_stop.assert_called_once_with(IRC_BRIDGE_SNAP_NAME)
 
 
 def test_stop_raises_stop_error_if_stop_fails(irc_bridge_service, mocker):
@@ -436,4 +443,4 @@ def test_stop_raises_stop_error_if_stop_fails(irc_bridge_service, mocker):
     with pytest.raises(StopError):
         irc_bridge_service.stop()
 
-    mock_service_stop.assert_called_once_with("matrix-appservice-irc")
+    mock_service_stop.assert_called_once_with(IRC_BRIDGE_SNAP_NAME)

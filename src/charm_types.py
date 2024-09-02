@@ -8,6 +8,7 @@
 import re
 import typing
 
+import ops
 from pydantic import BaseModel, Field, ValidationError, validator
 
 
@@ -27,6 +28,27 @@ class DatasourcePostgreSQL(BaseModel):
     host: str = Field(min_length=1, description="Host")
     port: str = Field(min_length=1, description="Port")
     db: str = Field(min_length=1, description="Database name")
+
+    @classmethod
+    def from_relation(cls, relation: ops.Relation) -> "DatasourcePostgreSQL":
+        """Create a DatasourcePostgreSQL from a relation.
+
+        Args:
+            relation: The relation to get the data from.
+
+        Returns:
+            A DatasourcePostgreSQL instance.
+        """
+        relation_data = relation.data[relation.app]
+        host, port = relation_data.get("endpoints", ":").split(":")
+
+        return DatasourcePostgreSQL(
+            user=relation_data.get("username", ""),
+            password=relation_data.get("password", ""),
+            host=host,
+            port=port,
+            db=relation_data.get("database", ""),
+        )
 
 
 class DatasourceMatrix(BaseModel):

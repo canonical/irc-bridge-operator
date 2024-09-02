@@ -191,7 +191,7 @@ class IRCBridgeService:
         db_conn = data["database"]["connectionString"]
         db_string = f"postgres://{db.user}:{db.password}@{db.host}/{db.db}"
         if db_conn == "" or db_conn != db_string:
-            db_conn = db_string
+            db_conn = data["database"]["connectionString"]
         data["homeserver"]["url"] = f"https://{matrix.host}"
         data["ircService"]["ident"] = config.ident_enabled
         data["ircService"]["permissions"] = {}

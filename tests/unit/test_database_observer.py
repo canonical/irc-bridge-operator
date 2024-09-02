@@ -56,11 +56,11 @@ def test_database_created_calls_reconcile():
         assert mock_reconcile.called
 
 
-def test_uri():
+def test_get_db():
     """
     arrange: set up a charm and a database relation with an empty databag.
     act: populate the relation databag.
-    assert: the uri matches the databag content.
+    assert: the db matches the databag content.
     """
     password = token_hex(16)
     harness = Harness(ObservedCharm, meta=REQUIRER_METADATA)
@@ -76,7 +76,7 @@ def test_uri():
         },
     )
 
-    assert harness.charm.database.uri == (
+    assert harness.charm.database.get_db() == (
         DatasourcePostgreSQL(
             user="user1",
             password=password,
@@ -87,15 +87,15 @@ def test_uri():
     )
 
 
-def test_uri_when_no_relation_data():
+def test_get_db_when_no_relation_data():
     """
     arrange: set up a charm and a database relation with an empty databag.
     act:.
-    assert: the uri is None.
+    assert: the db is None.
     """
     harness = Harness(ObservedCharm, meta=REQUIRER_METADATA)
     harness.begin()
     harness.add_relation("database", "database-provider")
 
     with pytest.raises(ValidationError):
-        harness.charm.database.uri  # pylint: disable=pointless-statement
+        harness.charm.database.get_db()  # pylint: disable=pointless-statement

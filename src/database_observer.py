@@ -43,23 +43,16 @@ class DatabaseObserver(Object):
         """Handle database created."""
         self._charm.reconcile()  # type: ignore
 
-    @property
-    def uri(self) -> typing.Optional[DatasourcePostgreSQL]:
-        """Reconcile the database relation."""
+    def get_db(self) -> typing.Optional[DatasourcePostgreSQL]:
+        """Return a postgresql datasource model."""
         # not using get_relation due this issue
         # https://github.com/canonical/operator/issues/1153
         if not self.model.relations.get(self.database.relation_name):
             return None
 
+        relation = self.model.get_relation(self.relation_name)
+        return DatasourcePostgreSQL.from_relation(relation)
+
         relation_id = self.database.relations[0].id
         relation_data = self.database.fetch_relation_data(relation_ids=[relation_id])[0]
 
-        host, port = relation_data.get("endpoints", ":").split(":")
-
-        return DatasourcePostgreSQL(
-            user=relation_data.get("username", ""),
-            password=relation_data.get("password", ""),
-            host=host,
-            port=port,
-            db=DATABASE_NAME,
-        )

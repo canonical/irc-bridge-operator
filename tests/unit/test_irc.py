@@ -28,8 +28,7 @@ from constants import (
     IRC_BRIDGE_TEMPLATE_CONFIG_FILE_PATH,
     IRC_BRIDGE_TEMPLATE_TARGET_FILE_PATH,
     IRC_BRIDGE_TEMPLATE_UNIT_FILE_PATH,
-    IRC_BRIDGE_TEMPLATE_DIR_PATH,
-    SYSTEMD_DIR_PATH
+    SYSTEMD_DIR_PATH,
 )
 from irc import InstallError, IRCBridgeService, ReloadError, StartError, StopError
 
@@ -268,8 +267,8 @@ def test_configure_generates_pem_file_local(irc_bridge_service, mocker):
             "/bin/bash",
             "-c",
             f"[[ -f {IRC_BRIDGE_PEM_FILE_PATH} ]] || "
-            + "openssl genpkey -out {IRC_BRIDGE_PEM_FILE_PATH} "
-            + "-outform PEM -algorithm {IRC_BRIDGE_KEY_ALGO} -pkeyopt {IRC_BRIDGE_KEY_OPTS}",
+            f"openssl genpkey -out {IRC_BRIDGE_PEM_FILE_PATH} "
+            f"-outform PEM -algorithm {IRC_BRIDGE_KEY_ALGO} -pkeyopt {IRC_BRIDGE_KEY_OPTS}",
         ],
         shell=True,  # nosec
         check=True,

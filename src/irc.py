@@ -4,7 +4,6 @@
 """IRC Bridge charm business logic."""
 
 import logging
-import pathlib
 import shutil
 import subprocess  # nosec
 
@@ -15,21 +14,21 @@ from charms.operator_libs_linux.v2 import snap
 import exceptions
 from charm_types import CharmConfig, DatasourceMatrix, DatasourcePostgreSQL
 from constants import (
+    IRC_BRIDGE_CONFIG_DIR_PATH,
+    IRC_BRIDGE_CONFIG_FILE_PATH,
     IRC_BRIDGE_HEALTH_PORT,
     IRC_BRIDGE_KEY_ALGO,
     IRC_BRIDGE_KEY_OPTS,
-    IRC_BRIDGE_CONFIG_DIR_PATH,
-    IRC_BRIDGE_CONFIG_FILE_PATH,
     IRC_BRIDGE_PEM_FILE_PATH,
     IRC_BRIDGE_REGISTRATION_FILE_PATH,
+    IRC_BRIDGE_SNAP_NAME,
+    IRC_BRIDGE_TARGET_FILE_PATH,
     IRC_BRIDGE_TEMPLATE_CONFIG_FILE_PATH,
     IRC_BRIDGE_TEMPLATE_TARGET_FILE_PATH,
     IRC_BRIDGE_TEMPLATE_UNIT_FILE_PATH,
-    IRC_BRIDGE_TARGET_FILE_PATH,
     IRC_BRIDGE_UNIT_FILE_PATH,
-    IRC_BRIDGE_SNAP_NAME,
     SNAP_PACKAGES,
-    SYSTEMD_DIR_PATH
+    SYSTEMD_DIR_PATH,
 )
 
 logger = logging.getLogger(__name__)
@@ -148,8 +147,8 @@ class IRCBridgeService:
             "/bin/bash",
             "-c",
             f"[[ -f {IRC_BRIDGE_PEM_FILE_PATH} ]] || "
-            + "openssl genpkey -out {IRC_BRIDGE_PEM_FILE_PATH} "
-            + "-outform PEM -algorithm {IRC_BRIDGE_KEY_ALGO} -pkeyopt {IRC_BRIDGE_KEY_OPTS}",
+            f"openssl genpkey -out {IRC_BRIDGE_PEM_FILE_PATH} "
+            f"-outform PEM -algorithm {IRC_BRIDGE_KEY_ALGO} -pkeyopt {IRC_BRIDGE_KEY_OPTS}",
         ]
         logger.info("Creating PEM file for IRC bridge.")
         subprocess.run(pem_create_command, shell=True, check=True, capture_output=True)  # nosec

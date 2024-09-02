@@ -19,7 +19,6 @@ class DatabaseObserver(Object):
     Attributes:
         relation_name: The name of the relation to observe.
         database: The database relation interface.
-        uri: The database uri.
     """
 
     def __init__(self, charm: CharmBase, relation_name: str):
@@ -44,7 +43,11 @@ class DatabaseObserver(Object):
         self._charm.reconcile()  # type: ignore
 
     def get_db(self) -> typing.Optional[DatasourcePostgreSQL]:
-        """Return a postgresql datasource model."""
+        """Return a postgresql datasource model.
+
+        Returns:
+            DatasourcePostgreSQL: The datasource model.
+        """
         # not using get_relation due this issue
         # https://github.com/canonical/operator/issues/1153
         if not self.model.relations.get(self.database.relation_name):
@@ -52,7 +55,3 @@ class DatabaseObserver(Object):
 
         relation = self.model.get_relation(self.relation_name)
         return DatasourcePostgreSQL.from_relation(relation)
-
-        relation_id = self.database.relations[0].id
-        relation_data = self.database.fetch_relation_data(relation_ids=[relation_id])[0]
-

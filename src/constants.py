@@ -2,7 +2,7 @@
 # See LICENSE file for licensing details.
 
 """File containing constants to be used in the charm."""
- 
+
 import pathlib
 
 # App
@@ -23,7 +23,9 @@ IRC_BRIDGE_TEMPLATE_CONFIG_FILE_PATH = IRC_BRIDGE_TEMPLATE_DIR_PATH / "config.ya
 IRC_BRIDGE_UNIT_FILE_PATH = SYSTEMD_DIR_PATH / "matrix-appservice-irc.service"
 IRC_BRIDGE_TARGET_FILE_PATH = SYSTEMD_DIR_PATH / "matrix-appservice-irc.target"
 IRC_BRIDGE_TEMPLATE_UNIT_FILE_PATH = IRC_BRIDGE_TEMPLATE_DIR_PATH / "matrix-appservice-irc.service"
-IRC_BRIDGE_TEMPLATE_TARGET_FILE_PATH = IRC_BRIDGE_TEMPLATE_DIR_PATH / "matrix-appservice-irc.target"
+IRC_BRIDGE_TEMPLATE_TARGET_FILE_PATH = (
+    IRC_BRIDGE_TEMPLATE_DIR_PATH / "matrix-appservice-irc.target"
+)
 IRC_BRIDGE_PEM_FILE_PATH = IRC_BRIDGE_CONFIG_DIR_PATH / "irc_passkey.pem"
 IRC_BRIDGE_REGISTRATION_FILE_PATH = IRC_BRIDGE_CONFIG_DIR_PATH / "appservice-registration-irc.yaml"
 

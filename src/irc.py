@@ -168,7 +168,7 @@ class IRCBridgeService:
             "-c",
             f"[[ -f {IRC_BRIDGE_REGISTRATION_FILE_PATH} ]] || "
             f"matrix-appservice-irc -r -f {IRC_BRIDGE_REGISTRATION_FILE_PATH}"
-            f" -u http://{matrix.host}:{IRC_BRIDGE_HEALTH_PORT} "
+            f" -u https://{matrix.host}:{IRC_BRIDGE_HEALTH_PORT} "
             f"-c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
         ]
         logger.info("Creating an app registration file for IRC bridge.")

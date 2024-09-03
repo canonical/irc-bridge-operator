@@ -24,6 +24,9 @@ async def test_lifecycle(app: ops.model.Application, ops_test: OpsTest):
     act: nothing.
     assert: that the charm ends up in an active state.
     """
+    # Set config so the charm can start
+    config = {"bridge_admins": "admin:example.com", "bot_nickname": "bot"}
+    await tests.integration.helpers.set_config(ops_test, app.name, config)
     # Application actually does have units
     unit = app.units[0]  # type: ignore
 

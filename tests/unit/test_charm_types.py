@@ -20,11 +20,15 @@ def test_datasource_postgresql():
     host = "localhost"
     port = "5432"
     db = "test_db"
+    uri = f"postgres://{user}:{password}@{host}:{port}/{db}"
 
-    datasource = DatasourcePostgreSQL(user=user, password=password, host=host, port=port, db=db)
+    datasource = DatasourcePostgreSQL(
+        user=user, password=password, host=host, port=port, db=db, uri=uri
+    )
 
     assert datasource.user == user
     assert datasource.password == password
     assert datasource.host == host
     assert datasource.port == port
     assert datasource.db == db
+    assert datasource.uri == uri

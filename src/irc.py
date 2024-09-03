@@ -188,8 +188,7 @@ class IRCBridgeService:
         with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "r", encoding="utf-8") as config_file:
             data = yaml.safe_load(config_file)
         db_conn = data["database"]["connectionString"]
-        db_string = f"postgres://{db.user}:{db.password}@{db.host}/{db.db}"
-        if db_conn == "" or db_conn != db_string:
+        if db_conn == "" or db_conn != db.uri:
             db_conn = data["database"]["connectionString"]
         data["homeserver"]["url"] = f"https://{matrix.host}"
         data["ircService"]["ident"] = config.ident_enabled

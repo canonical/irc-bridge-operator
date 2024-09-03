@@ -51,12 +51,14 @@ def test_reconcile_calls_prepare_configure_and_reload_methods(irc_bridge_service
     mock_configure = mocker.patch.object(irc_bridge_service, "configure")
     mock_reload = mocker.patch.object(irc_bridge_service, "reload")
 
+    password = token_hex(16)
     db = DatasourcePostgreSQL(
         user="test_user",
-        password=token_hex(16),
+        password=password,
         host="localhost",
         port="5432",
         db="test_db",
+        uri=f"postgres://test_user:{password}@localhost:5432/test_db",
     )
     matrix = DatasourceMatrix(host="matrix.example.com")
     config = CharmConfig(
@@ -325,12 +327,14 @@ def test_configure_evaluates_configuration_file_local(irc_bridge_service, mocker
     mock_safe_load = mocker.patch.object(yaml, "safe_load")
     mock_dump = mocker.patch.object(yaml, "dump")
 
+    password = token_hex(16)
     db = DatasourcePostgreSQL(
         user="test_user",
-        password=token_hex(16),
+        password=password,
         host="localhost",
         port="5432",
         db="test_db",
+        uri=f"postgres://test_user:{password}@localhost:5432/test_db",
     )
     matrix = DatasourceMatrix(host="matrix.example.com")
     config = CharmConfig(

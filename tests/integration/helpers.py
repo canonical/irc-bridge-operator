@@ -128,11 +128,14 @@ async def dispatch_to_unit(
         f"export JUJU_DISPATCH_PATH=hooks/{hook_name}; ./dispatch",
     )
 
+
 async def set_config(ops_test: OpsTest, app_name: str, config: dict):
     """Set the charm configuration.
 
     Args:
         ops_test: The ops test framework instance
+        app_name: the name of the application to set the configuration
         config: the configuration to set
     """
+    assert ops_test.model
     await ops_test.model.applications[app_name].set_config(config=config)

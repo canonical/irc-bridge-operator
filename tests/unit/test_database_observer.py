@@ -83,6 +83,7 @@ def test_get_db():
             host="postgresql-k8s-primary.local",
             port="5432",
             db="ircbridge",
+            uri=f"postgres://user1:{password}@postgresql-k8s-primary.local:5432/ircbridge",
         )
     )
 

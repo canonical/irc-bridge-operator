@@ -58,16 +58,6 @@ class DatasourcePostgreSQL(BaseModel):
         )
 
 
-class DatasourceMatrix(BaseModel):
-    """A named tuple representing a Datasource Matrix.
-
-    Attributes:
-        host: Host (IP or DNS without port or protocol).
-    """
-
-    host: str
-
-
 class CharmConfig(BaseModel):
     """A named tuple representing an IRC configuration.
 

@@ -10,9 +10,10 @@ import subprocess  # nosec
 import yaml
 from charms.operator_libs_linux.v1 import systemd
 from charms.operator_libs_linux.v2 import snap
+from lib.charms.synapse.v0.matrix_auth import MatrixAuthProviderData
 
 import exceptions
-from charm_types import CharmConfig, DatasourceMatrix, DatasourcePostgreSQL
+from charm_types import CharmConfig, DatasourcePostgreSQL
 from constants import (
     IRC_BRIDGE_CONFIG_DIR_PATH,
     IRC_BRIDGE_CONFIG_FILE_PATH,
@@ -63,7 +64,7 @@ class IRCBridgeService:
     """
 
     def reconcile(
-        self, db: DatasourcePostgreSQL, matrix: DatasourceMatrix, config: CharmConfig
+        self, db: DatasourcePostgreSQL, matrix: MatrixAuthProviderData, config: CharmConfig
     ) -> None:
         """Reconcile the service.
 
@@ -128,7 +129,7 @@ class IRCBridgeService:
             raise InstallError(error_msg) from e
 
     def configure(
-        self, db: DatasourcePostgreSQL, matrix: DatasourceMatrix, config: CharmConfig
+        self, db: DatasourcePostgreSQL, matrix: MatrixAuthProviderData, config: CharmConfig
     ) -> None:
         """Configure the service.
 
@@ -154,7 +155,7 @@ class IRCBridgeService:
         subprocess.run(pem_create_command, shell=True, check=True, capture_output=True)  # nosec
 
     def _generate_app_registration_local(
-        self, matrix: DatasourceMatrix, config: CharmConfig
+        self, matrix: MatrixAuthProviderData, config: CharmConfig
     ) -> None:
         """Generate the content of the app registration file.
 
@@ -167,7 +168,7 @@ class IRCBridgeService:
             "-c",
             f"[[ -f {IRC_BRIDGE_REGISTRATION_FILE_PATH} ]] || "
             f"matrix-appservice-irc -r -f {IRC_BRIDGE_REGISTRATION_FILE_PATH}"
-            f" -u https://{matrix.host}:{IRC_BRIDGE_HEALTH_PORT} "
+            f" -u https://{matrix.homeserver}:{IRC_BRIDGE_HEALTH_PORT} "
             f"-c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
         ]
         logger.info("Creating an app registration file for IRC bridge.")
@@ -176,7 +177,7 @@ class IRCBridgeService:
         )  # nosec
 
     def _eval_conf_local(
-        self, db: DatasourcePostgreSQL, matrix: DatasourceMatrix, config: CharmConfig
+        self, db: DatasourcePostgreSQL, matrix: MatrixAuthProviderData, config: CharmConfig
     ) -> None:
         """Generate the content of the irc configuration file.
 
@@ -190,13 +191,18 @@ class IRCBridgeService:
         db_conn = data["database"]["connectionString"]
         if db_conn == "" or db_conn != db.uri:
             db_conn = data["database"]["connectionString"]
-        data["homeserver"]["url"] = f"https://{matrix.host}"
+        data["homeserver"]["url"] = f"https://{matrix.homeserver}"
         data["ircService"]["ident"] = config.ident_enabled
         data["ircService"]["permissions"] = {}
         for admin in config.bridge_admins:
             data["ircService"]["permissions"][admin] = "admin"
         with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "w", encoding="utf-8") as config_file:
             yaml.dump(data, config_file)
+
+    def get_registration(self) -> str:
+        """Return the app registration file content."""
+        with open(IRC_BRIDGE_REGISTRATION_FILE_PATH, "r") as registration_file:
+            return registration_file.read()
 
     def reload(self) -> None:
         """Reload the matrix-appservice-irc service.

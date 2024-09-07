@@ -9,6 +9,7 @@ from ops.charm import CharmBase
 from ops.framework import Object
 
 from charm_types import DatasourceMatrix
+from lib.charms.synapse.v0.matrix_auth import MatrixAuthRequires, MatrixAuthProviderData
 
 
 class MatrixObserver(Object):
@@ -24,19 +25,23 @@ class MatrixObserver(Object):
         super().__init__(charm, "matrix-observer")
         self._charm = charm
         self.relation_name = relation_name
+        self.matrix = MatrixAuthRequires(
+            self._charm,
+            relation_name=relation_name,
+        )
 
-    def _get_relation_data(self) -> typing.Optional[DatasourceMatrix]:
-        """Get matrix data from relation.
-
-        Returns:
-            Dict: Information needed for setting environment variables.
-        """
-        return DatasourceMatrix(host="localhost")
-
-    def reconcile(self) -> typing.Optional[DatasourceMatrix]:
-        """Reconcile the database relation.
+    def get_matrix(self) -> typing.Optional[MatrixAuthProviderData]:
+        """Return a Matrix authentication datasource model.
 
         Returns:
-            Dict: Information needed for setting environment variables.
+            MatrixAuthProviderData: The datasource model.
         """
-        return self._get_relation_data()
+        return self.matrix.get_remote_relation_data()
+
+    def set_irc_registration(self, content: str) -> None:
+        """Set the IRC registration details."""
+        irc_data = MatrixAuthRequirerData(
+            registration=content
+        )
+        registration_id = self.matrix.set_registration_id(model=self.model, relation=self.matrix.relation_name)
+        self.matrix.update_relation_data(relation=self.matrix.relation_name, matrix_auth_requirer_data=irc_data)

@@ -7,9 +7,13 @@ import typing
 
 from ops.charm import CharmBase
 from ops.framework import Object
+from pydantic import SecretStr
 
-from charm_types import DatasourceMatrix
-from lib.charms.synapse.v0.matrix_auth import MatrixAuthRequires, MatrixAuthProviderData
+from lib.charms.synapse.v0.matrix_auth import (
+    MatrixAuthProviderData,
+    MatrixAuthRequirerData,
+    MatrixAuthRequires,
+)
 
 
 class MatrixObserver(Object):
@@ -39,9 +43,14 @@ class MatrixObserver(Object):
         return self.matrix.get_remote_relation_data()
 
     def set_irc_registration(self, content: str) -> None:
-        """Set the IRC registration details."""
-        irc_data = MatrixAuthRequirerData(
-            registration=content
-        )
-        registration_id = self.matrix.set_registration_id(model=self.model, relation=self.matrix.relation_name)
-        self.matrix.update_relation_data(relation=self.matrix.relation_name, matrix_auth_requirer_data=irc_data)
+        """Set the IRC registration details.
+
+        Args:
+            content: The registration content.
+        """
+        registration = typing.cast(SecretStr, content)
+        irc_data = MatrixAuthRequirerData(registration=registration)
+        relation = self.model.get_relation(self.matrix.relation_name)
+        if relation:
+            irc_data.set_registration_id(model=self.model, relation=relation)
+            self.matrix.update_relation_data(relation=relation, matrix_auth_requirer_data=irc_data)

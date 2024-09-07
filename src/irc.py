@@ -10,7 +10,6 @@ import subprocess  # nosec
 import yaml
 from charms.operator_libs_linux.v1 import systemd
 from charms.operator_libs_linux.v2 import snap
-from lib.charms.synapse.v0.matrix_auth import MatrixAuthProviderData
 
 import exceptions
 from charm_types import CharmConfig, DatasourcePostgreSQL
@@ -31,6 +30,7 @@ from constants import (
     SNAP_PACKAGES,
     SYSTEMD_DIR_PATH,
 )
+from lib.charms.synapse.v0.matrix_auth import MatrixAuthProviderData
 
 logger = logging.getLogger(__name__)
 
@@ -200,8 +200,12 @@ class IRCBridgeService:
             yaml.dump(data, config_file)
 
     def get_registration(self) -> str:
-        """Return the app registration file content."""
-        with open(IRC_BRIDGE_REGISTRATION_FILE_PATH, "r") as registration_file:
+        """Return the app registration file content.
+
+        Returns:
+            str: the content of the app registration file
+        """
+        with open(IRC_BRIDGE_REGISTRATION_FILE_PATH, "r", encoding="utf-8") as registration_file:
             return registration_file.read()
 
     def reload(self) -> None:

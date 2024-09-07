@@ -5,7 +5,6 @@
 """Integration tests."""
 
 import logging
-import time
 
 import ops
 import pytest

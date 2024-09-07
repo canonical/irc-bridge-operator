@@ -75,11 +75,7 @@ import logging
 from typing import Dict, List, Optional, Tuple, cast
 
 import ops
-from pydantic import (
-    BaseModel,
-    Field,
-    SecretStr,
-)
+from pydantic import BaseModel, Field, SecretStr
 
 logger = logging.getLogger(__name__)
 

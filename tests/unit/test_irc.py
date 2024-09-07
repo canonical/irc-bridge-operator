@@ -15,7 +15,7 @@ import yaml
 from charms.operator_libs_linux.v1 import systemd
 from charms.operator_libs_linux.v2 import snap
 
-from charm_types import CharmConfig, DatasourceMatrix, DatasourcePostgreSQL
+from charm_types import CharmConfig, DatasourcePostgreSQL
 from constants import (
     IRC_BRIDGE_CONFIG_DIR_PATH,
     IRC_BRIDGE_CONFIG_FILE_PATH,
@@ -31,6 +31,7 @@ from constants import (
     SYSTEMD_DIR_PATH,
 )
 from irc import InstallError, IRCBridgeService, ReloadError, StartError, StopError
+from lib.charms.synapse.v0.matrix_auth import MatrixAuthProviderData
 
 
 @pytest.fixture(name="irc_bridge_service")
@@ -60,7 +61,7 @@ def test_reconcile_calls_prepare_configure_and_reload_methods(irc_bridge_service
         db="test_db",
         uri=f"postgres://test_user:{password}@localhost:5432/test_db",
     )
-    matrix = DatasourceMatrix(host="matrix.example.com")
+    matrix = MatrixAuthProviderData(homeserver="matrix.example.com")
     config = CharmConfig(
         ident_enabled=True,
         bot_nickname="my_bot",
@@ -288,7 +289,7 @@ def test_configure_generates_app_registration_local(irc_bridge_service, mocker):
     """
     mock_run = mocker.patch.object(subprocess, "run")
 
-    matrix = DatasourceMatrix(host="matrix.example.com")
+    matrix = MatrixAuthProviderData(homeserver="matrix.example.com")
     config = CharmConfig(
         ident_enabled=True,
         bot_nickname="my_bot",
@@ -306,7 +307,7 @@ def test_configure_generates_app_registration_local(irc_bridge_service, mocker):
             "-c",
             f"[[ -f {IRC_BRIDGE_REGISTRATION_FILE_PATH} ]] || "
             f"matrix-appservice-irc -r -f {IRC_BRIDGE_REGISTRATION_FILE_PATH}"
-            f" -u https://{matrix.host}:{IRC_BRIDGE_HEALTH_PORT} "
+            f" -u https://{matrix.homeserver}:{IRC_BRIDGE_HEALTH_PORT} "
             f"-c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
         ],
         shell=True,  # nosec
@@ -336,7 +337,7 @@ def test_configure_evaluates_configuration_file_local(irc_bridge_service, mocker
         db="test_db",
         uri=f"postgres://test_user:{password}@localhost:5432/test_db",
     )
-    matrix = DatasourceMatrix(host="matrix.example.com")
+    matrix = MatrixAuthProviderData(homeserver="matrix.example.com")
     config = CharmConfig(
         ident_enabled=True,
         bot_nickname="my_bot",

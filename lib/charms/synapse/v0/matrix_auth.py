@@ -10,7 +10,7 @@ between an application and a charm providing the `matrix_plugin` integration.
 
 ```python
 
-from charms.matrix_plugins_lib.v0.matrix_auth import MatrixAuthRequires
+from charms.synapse.v0.matrix_auth import MatrixAuthRequires
 
 class MatrixAuthRequirerCharm(ops.CharmBase):
     def __init__(self, *args):
@@ -35,7 +35,7 @@ passing a `MatrixAuthRequirerData` data object, requesting a new authentication.
 Following the previous example, this is an example of the provider charm.
 
 ```python
-from charms.matrix_plugins_lib.v0.matrix_auth import MatrixAuthProvides
+from charms.synapse.v0.matrix_auth import MatrixAuthProvides
 
 class MatrixAuthProviderCharm(ops.CharmBase):
     def __init__(self, *args):
@@ -60,14 +60,14 @@ class MatrixAuthProviderCharm(ops.CharmBase):
 """
 
 # The unique Charmhub library identifier, never change it
-LIBID = "TODO"
+LIBID = "ff6788c89b204448b3b62ba6f93e2768"
 
 # Increment this major API version when introducing breaking changes
 LIBAPI = 0
 
 # Increment this PATCH version before using `charmcraft publish-lib` or reset
 # to 0 if you are raising the major API version
-LIBPATCH = 0
+LIBPATCH = 1
 
 # pylint: disable=wrong-import-position
 import json

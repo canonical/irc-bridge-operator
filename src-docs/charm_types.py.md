@@ -47,7 +47,7 @@ Returns the set of fields that have been explicitly set on this model instance.
 
 ---
 
-<a href="../src/charm_types.py#L55"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/charm_types.py#L74"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>classmethod</kbd> `userids_to_list`
 
@@ -77,43 +77,6 @@ Convert a comma separated list of users to list.
 
 ---
 
-## <kbd>class</kbd> `DatasourceMatrix`
-A named tuple representing a Datasource Matrix. 
-
-
-
-**Attributes:**
- 
- - <b>`host`</b>:  Host (IP or DNS without port or protocol). 
-
-
----
-
-#### <kbd>property</kbd> model_extra
-
-Get extra fields set during validation. 
-
-
-
-**Returns:**
-  A dictionary of extra fields, or `None` if `config.extra` is not set to `"allow"`. 
-
----
-
-#### <kbd>property</kbd> model_fields_set
-
-Returns the set of fields that have been explicitly set on this model instance. 
-
-
-
-**Returns:**
-  A set of strings representing the fields that have been set,  i.e. that were not filled from defaults. 
-
-
-
-
----
-
 ## <kbd>class</kbd> `DatasourcePostgreSQL`
 A named tuple representing a Datasource PostgreSQL. 
 
@@ -126,6 +89,7 @@ A named tuple representing a Datasource PostgreSQL.
  - <b>`host`</b>:  Host (IP or DNS without port or protocol). 
  - <b>`port`</b>:  Port. 
  - <b>`db`</b>:  Database name. 
+ - <b>`uri`</b>:  Database connection URI. 
 
 
 ---
@@ -151,5 +115,28 @@ Returns the set of fields that have been explicitly set on this model instance.
   A set of strings representing the fields that have been set,  i.e. that were not filled from defaults. 
 
 
+
+---
+
+<a href="../src/charm_types.py#L34"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+### <kbd>classmethod</kbd> `from_relation`
+
+```python
+from_relation(relation: Relation) → DatasourcePostgreSQL
+```
+
+Create a DatasourcePostgreSQL from a relation. 
+
+
+
+**Args:**
+ 
+ - <b>`relation`</b>:  The relation to get the data from. 
+
+
+
+**Returns:**
+ A DatasourcePostgreSQL instance. 
 
 

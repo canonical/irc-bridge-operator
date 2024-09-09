@@ -7,13 +7,13 @@ File containing constants to be used in the charm.
 
 **Global Variables**
 ---------------
+- **IRC_BRIDGE_HEALTH_PORT**
+- **IRC_BRIDGE_KEY_ALGO**
+- **IRC_BRIDGE_KEY_OPTS**
 - **DATABASE_NAME**
 - **DATABASE_RELATION_NAME**
-- **IRC_BRIDGE_SNAP_NAME**
-- **IRC_BRIDGE_CONFIG_PATH**
-- **IRC_BRIDGE_CONFIG_TEMPLATE_PATH**
-- **IRC_BRIDGE_HEALTH_PORT**
 - **MATRIX_RELATION_NAME**
+- **IRC_BRIDGE_SNAP_NAME**
 - **SNAP_PACKAGES**
 
 

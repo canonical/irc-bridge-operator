@@ -21,9 +21,8 @@ The Database relation observer.
  
  - <b>`relation_name`</b>:  The name of the relation to observe. 
  - <b>`database`</b>:  The database relation interface. 
- - <b>`uri`</b>:  The database uri. 
 
-<a href="../src/database_observer.py#L25"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/database_observer.py#L24"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `__init__`
 
@@ -47,12 +46,24 @@ Initialize the oserver and register event handlers.
 
 Shortcut for more simple access the model. 
 
+
+
 ---
 
-#### <kbd>property</kbd> uri
+<a href="../src/database_observer.py#L45"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
-Reconcile the database relation. 
+### <kbd>function</kbd> `get_db`
+
+```python
+get_db() → Optional[DatasourcePostgreSQL]
+```
+
+Return a postgresql datasource model. 
 
 
+
+**Returns:**
+ 
+ - <b>`DatasourcePostgreSQL`</b>:  The datasource model. 
 
 

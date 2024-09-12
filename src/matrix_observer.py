@@ -5,15 +5,14 @@
 
 import typing
 
-from ops.charm import CharmBase
-from ops.framework import Object
-from pydantic import SecretStr
-
 from charms.synapse.v0.matrix_auth import (
     MatrixAuthProviderData,
     MatrixAuthRequirerData,
     MatrixAuthRequires,
 )
+from ops.charm import CharmBase
+from ops.framework import Object
+from pydantic import SecretStr
 
 
 class MatrixObserver(Object):

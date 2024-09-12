@@ -11,7 +11,7 @@ import ops
 from pydantic import ValidationError
 
 from charm_types import CharmConfig
-from constants import DATABASE_RELATION_NAME, MATRIX_RELATION_NAME
+from constants import DATABASE_RELATION_NAME
 from database_observer import DatabaseObserver
 from irc import IRCBridgeService
 from matrix_observer import MatrixObserver

@@ -10,6 +10,7 @@ import subprocess  # nosec
 import yaml
 from charms.operator_libs_linux.v1 import systemd
 from charms.operator_libs_linux.v2 import snap
+from charms.synapse.v0.matrix_auth import MatrixAuthProviderData
 
 import exceptions
 from charm_types import CharmConfig, DatasourcePostgreSQL
@@ -30,7 +31,6 @@ from constants import (
     SNAP_PACKAGES,
     SYSTEMD_DIR_PATH,
 )
-from lib.charms.synapse.v0.matrix_auth import MatrixAuthProviderData
 
 logger = logging.getLogger(__name__)
 

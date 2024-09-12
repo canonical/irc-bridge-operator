@@ -9,7 +9,7 @@ from ops.charm import CharmBase
 from ops.framework import Object
 from pydantic import SecretStr
 
-from lib.charms.synapse.v0.matrix_auth import (
+from charms.synapse.v0.matrix_auth import (
     MatrixAuthProviderData,
     MatrixAuthRequirerData,
     MatrixAuthRequires,

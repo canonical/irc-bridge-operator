@@ -22,6 +22,6 @@ requires:
   database:
     interface: postgresql_client
     limit: 1
-  irc-bridge:
+  require-irc-bridge:
     interface: irc_bridge
     limit: 1

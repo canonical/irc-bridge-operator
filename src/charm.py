@@ -11,7 +11,7 @@ import ops
 from pydantic import ValidationError
 
 from charm_types import CharmConfig
-from constants import DATABASE_RELATION_NAME
+from constants import DATABASE_RELATION_NAME, MATRIX_RELATION_NAME
 from database_observer import DatabaseObserver
 from irc import IRCBridgeService
 from matrix_observer import MatrixObserver
@@ -31,7 +31,7 @@ class IRCCharm(ops.CharmBase):
         super().__init__(*args)
         self._irc = IRCBridgeService()
         self._database = DatabaseObserver(self, DATABASE_RELATION_NAME)
-        self._matrix = MatrixObserver(self, "provide-irc-bridge")
+        self._matrix = MatrixObserver(self, MATRIX_RELATION_NAME)
         self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(self.on.install, self._on_install)
         self.framework.observe(self.on.upgrade_charm, self._on_upgrade_charm)

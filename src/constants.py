@@ -30,7 +30,7 @@ IRC_BRIDGE_PEM_FILE_PATH = IRC_BRIDGE_CONFIG_DIR_PATH / "irc_passkey.pem"
 IRC_BRIDGE_REGISTRATION_FILE_PATH = IRC_BRIDGE_CONFIG_DIR_PATH / "appservice-registration-irc.yaml"
 
 # Charm
-MATRIX_RELATION_NAME = "matrix-plugins"
+MATRIX_RELATION_NAME = "require-irc-bridge"
 
 # Snap
 IRC_BRIDGE_SNAP_NAME = "matrix-appservice-irc"

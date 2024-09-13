@@ -152,7 +152,7 @@ async def generate_anycharm_relation(
     """Deploy any-charm with a wanted matrix auth config and integrate it to the bridge app.
 
     Args:
-        app: Deployed bind-operator app
+        app: Deployed irc-bridge app
         ops_test: The ops test framework instance
         any_charm_name: Name of the to be deployed any-charm
         machine: The machine to deploy the any-charm onto

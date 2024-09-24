@@ -22,6 +22,6 @@ requires:
   database:
     interface: postgresql_client
     limit: 1
-  require-irc-bridge:
+  matrix-auth:
     interface: irc_bridge
     limit: 1

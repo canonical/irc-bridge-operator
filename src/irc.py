@@ -80,7 +80,7 @@ class IRCBridgeService:
         """
         self.prepare()
         self.configure(db, matrix, config)
-        self.reload()
+        #self.reload()
 
     def prepare(self) -> None:
         """Prepare the machine.
@@ -152,7 +152,8 @@ class IRCBridgeService:
             f"-outform PEM -algorithm {IRC_BRIDGE_KEY_ALGO} -pkeyopt {IRC_BRIDGE_KEY_OPTS}",
         ]
         logger.info("Creating PEM file for IRC bridge.")
-        subprocess.run(pem_create_command, shell=True, check=True, capture_output=True)  # nosec
+        result = subprocess.run(pem_create_command, check=True, capture_output=True)  # nosec
+        logger.info("PEM file creation result: %s", result)
 
     def _generate_app_registration_local(
         self, matrix: MatrixAuthProviderData, config: CharmConfig
@@ -172,9 +173,10 @@ class IRCBridgeService:
             f"-c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
         ]
         logger.info("Creating an app registration file for IRC bridge.")
-        subprocess.run(
-            app_reg_create_command, shell=True, check=True, capture_output=True
+        result = subprocess.run(
+            app_reg_create_command, check=True, capture_output=True
         )  # nosec
+        logger.info("App registration file creation result: %s", result)
 
     def _eval_conf_local(
         self, db: DatasourcePostgreSQL, matrix: MatrixAuthProviderData, config: CharmConfig

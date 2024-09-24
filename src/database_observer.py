@@ -54,4 +54,4 @@ class DatabaseObserver(Object):
             return None
 
         relation = self.model.get_relation(self.relation_name)
-        return DatasourcePostgreSQL.from_relation(relation)
+        return DatasourcePostgreSQL.from_relation(self.model, relation)

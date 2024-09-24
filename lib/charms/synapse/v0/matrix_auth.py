@@ -79,7 +79,7 @@ from pydantic import BaseModel, Field, SecretStr
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_RELATION_NAME = "matrix-plugin-auth"
+DEFAULT_RELATION_NAME = "matrix-auth"
 
 
 #### Data models for Provider and Requirer ####
@@ -397,7 +397,7 @@ class MatrixAuthRequires(ops.Object):
             _ = self._get_remote_relation_data(relation)
             return True
         except ValueError as ex:
-            logger.warning("Error validation the relation data %s", ex)
+            logger.warning("Error validating the relation data %s", ex)
             return False
 
     def _on_relation_changed(self, event: ops.RelationChangedEvent) -> None:

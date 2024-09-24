@@ -4,6 +4,7 @@
 """Provide the DatabaseObserver class to handle database relation and state."""
 
 import typing
+import logging
 
 from charms.synapse.v0.matrix_auth import (
     MatrixAuthProviderData,
@@ -13,6 +14,8 @@ from charms.synapse.v0.matrix_auth import (
 from ops.charm import CharmBase
 from ops.framework import Object
 from pydantic import SecretStr
+
+logger = logging.getLogger(__name__)
 
 
 class MatrixObserver(Object):
@@ -32,6 +35,14 @@ class MatrixObserver(Object):
             self._charm,
             relation_name=relation_name,
         )
+        self.framework.observe(
+            self.matrix.on.matrix_auth_request_processed,
+            self._on_matrix_auth_request_processed,
+        )
+
+    def _on_matrix_auth_request_processed(self, event: Object) -> None:
+        logger.info("Matrix auth request processed")
+        self._charm.reconcile()  # type: ignore
 
     def get_matrix(self) -> typing.Optional[MatrixAuthProviderData]:
         """Return a Matrix authentication datasource model.

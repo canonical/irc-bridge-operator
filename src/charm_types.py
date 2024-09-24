@@ -7,9 +7,12 @@
 
 import re
 import typing
+import logging
 
 import ops
 from pydantic import BaseModel, Field, ValidationError, validator
+
+logger = logging.getLogger(__name__)
 
 
 class DatasourcePostgreSQL(BaseModel):
@@ -32,7 +35,7 @@ class DatasourcePostgreSQL(BaseModel):
     uri: str = Field(min_length=1, description="Database connection URI")
 
     @classmethod
-    def from_relation(cls, relation: ops.Relation) -> "DatasourcePostgreSQL":
+    def from_relation(cls, model: ops.Model, relation: ops.Relation) -> "DatasourcePostgreSQL":
         """Create a DatasourcePostgreSQL from a relation.
 
         Args:
@@ -42,11 +45,23 @@ class DatasourcePostgreSQL(BaseModel):
             A DatasourcePostgreSQL instance.
         """
         relation_data = relation.data[relation.app]
+        logger.info(f"Relation data: {relation_data}")
         user = relation_data.get("username", "")
         password = relation_data.get("password", "")
+        secret_user = relation_data.get("secret-user", "")
+        if user == "" and secret_user != "":
+            logger.info(f"Getting user and password from secret: {secret_user}")
+            secret = model.get_secret(id=secret_user)
+            secret_fields = ops.Secret.get_content(secret)
+            logger.info(f"Secret fields: {secret_fields}")
+            user = secret_fields["username"]
+            password = secret_fields["password"]
+            logger.info(f"User: {user}")
+            logger.info(f"Password: {password}")
         host, port = relation_data.get("endpoints", ":").split(":")
         db = relation_data.get("database", "")
         uri = f"postgres://{user}:{password}@{host}:{port}/{db}"
+        logger.info(f"DatasourcePostgreSQL: {uri}")
 
         return DatasourcePostgreSQL(
             user=user,

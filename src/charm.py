@@ -92,7 +92,9 @@ class IRCCharm(ops.CharmBase):
                 self.unit.status = ops.BlockedStatus("Database relation not found")
                 return
         except ValidationError:
-            self.unit.status = ops.MaintenanceStatus("Database configuration missing username, password or URI")
+            self.unit.status = ops.MaintenanceStatus(
+                "Database configuration missing username, password or URI"
+            )
             return
         logger.info("Matrix Reconciling charm")
         matrix = self._matrix.reconcile()
@@ -101,7 +103,7 @@ class IRCCharm(ops.CharmBase):
             config = self._charm_config
         except ValidationError as e:
             self.unit.status = ops.MaintenanceStatus(f"Invalid configuration: {e}")
-            logger.exception(f"Invalid configuration: {e}")
+            logger.exception("Invalid configuration: {%s}", e)
             return
         logger.info("IRC Reconciling charm")
         self._irc.reconcile(db, matrix, config)

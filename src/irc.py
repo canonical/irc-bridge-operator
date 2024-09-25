@@ -201,7 +201,9 @@ class IRCBridgeService:
                 data["ircService"]["permissions"][admin] = "admin"
         except KeyError as e:
             logger.exception("KeyError: {%s}", e)
-            raise exceptions.SynapseConfigurationFileError(f"KeyError in configuration file: {e}") from e
+            raise exceptions.SynapseConfigurationFileError(
+                f"KeyError in configuration file: {e}"
+            ) from e
         with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "w", encoding="utf-8") as config_file:
             yaml.dump(data, config_file)
 

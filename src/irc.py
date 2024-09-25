@@ -187,14 +187,18 @@ class IRCBridgeService:
         """
         with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "r", encoding="utf-8") as config_file:
             data = yaml.safe_load(config_file)
-        db_conn = data["database"]["connectionString"]
-        if db_conn == "" or db_conn != db.uri:
+        try:
             db_conn = data["database"]["connectionString"]
-        data["homeserver"]["url"] = f"https://{matrix.host}"
-        data["ircService"]["ident"] = config.ident_enabled
-        data["ircService"]["permissions"] = {}
-        for admin in config.bridge_admins:
-            data["ircService"]["permissions"][admin] = "admin"
+            if db_conn == "" or db_conn != db.uri:
+                db_conn = data["database"]["connectionString"]
+            data["homeserver"]["url"] = f"https://{matrix.host}"
+            data["ircService"]["ident"] = config.ident_enabled
+            data["ircService"]["permissions"] = {}
+            for admin in config.bridge_admins:
+                data["ircService"]["permissions"][admin] = "admin"
+        except KeyError as e:
+            logger.exception(f"KeyError: {e}")
+            raise
         with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "w", encoding="utf-8") as config_file:
             yaml.dump(data, config_file)
 

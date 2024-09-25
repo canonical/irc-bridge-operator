@@ -92,7 +92,7 @@ class IRCCharm(ops.CharmBase):
                 self.unit.status = ops.BlockedStatus("Database relation not found")
                 return
         except ValidationError:
-            self.unit.status = ops.BlockedStatus("Database configuration not correct")
+            self.unit.status = ops.MaintenanceStatus("Database configuration not correct")
             return
         logger.info("Matrix Reconciling charm")
         matrix = self._matrix.reconcile()

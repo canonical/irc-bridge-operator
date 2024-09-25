@@ -184,6 +184,9 @@ class IRCBridgeService:
             db: the database configuration
             matrix: the matrix configuration
             config: the charm configuration
+
+        Raises:
+            KeyError: when encountering a KeyError from the configuration file
         """
         with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "r", encoding="utf-8") as config_file:
             data = yaml.safe_load(config_file)
@@ -197,7 +200,7 @@ class IRCBridgeService:
             for admin in config.bridge_admins:
                 data["ircService"]["permissions"][admin] = "admin"
         except KeyError as e:
-            logger.exception(f"KeyError: {e}")
+            logger.exception("KeyError: {%s}", e)
             raise
         with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "w", encoding="utf-8") as config_file:
             yaml.dump(data, config_file)

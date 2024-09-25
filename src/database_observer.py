@@ -5,7 +5,11 @@
 
 import typing
 
-from charms.data_platform_libs.v0.data_interfaces import DatabaseCreatedEvent, DatabaseRequires
+from charms.data_platform_libs.v0.data_interfaces import (
+    DatabaseCreatedEvent,
+    DatabaseEndpointsChangedEvent,
+    DatabaseRequires,
+)
 from ops.charm import CharmBase
 from ops.framework import Object
 
@@ -43,9 +47,9 @@ class DatabaseObserver(Object):
         """Handle database created."""
         self._charm.reconcile()  # type: ignore
 
-    def _on_endpoints_changed(self, _) -> None:
+    def _on_endpoints_changed(self, _: DatabaseEndpointsChangedEvent) -> None:
         """Handle endpoints changed."""
-        self._charm.reconcile()
+        self._charm.reconcile()  # type: ignore
 
     def get_db(self) -> typing.Optional[DatasourcePostgreSQL]:
         """Return a postgresql datasource model.

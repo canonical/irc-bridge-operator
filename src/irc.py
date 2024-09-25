@@ -216,7 +216,7 @@ class IRCBridgeService:
         try:
             systemd.service_reload(IRC_BRIDGE_SNAP_NAME)
         except systemd.SystemdError as e:
-            error_msg = f"An exception occurred when reloading {IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
+            error_msg = f"An exception occurred when reloading {IRC_BRIDGE_SNAP_NAME}."
             logger.exception(error_msg)
             raise ReloadError(error_msg) from e
 
@@ -229,7 +229,7 @@ class IRCBridgeService:
         try:
             systemd.service_start(IRC_BRIDGE_SNAP_NAME)
         except systemd.SystemdError as e:
-            error_msg = f"An exception occurred when starting {IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
+            error_msg = f"An exception occurred when starting {IRC_BRIDGE_SNAP_NAME}."
             logger.exception(error_msg)
             raise StartError(error_msg) from e
 
@@ -242,6 +242,6 @@ class IRCBridgeService:
         try:
             systemd.service_stop(IRC_BRIDGE_SNAP_NAME)
         except snap.SnapError as e:
-            error_msg = f"An exception occurred when stopping {IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
+            error_msg = f"An exception occurred when stopping {IRC_BRIDGE_SNAP_NAME}."
             logger.exception(error_msg)
             raise StopError(error_msg) from e

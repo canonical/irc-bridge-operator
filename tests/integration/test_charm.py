@@ -30,6 +30,7 @@ async def test_lifecycle_before_relations(app: ops.model.Application, ops_test: 
     unit = app.units[0]  # type: ignore
 
     # Mypy has difficulty with ActiveStatus
+<<<<<<< HEAD
     assert unit.workload_status == ops.model.WaitingStatus.name  # type: ignore
 
 
@@ -68,4 +69,6 @@ async def test_lifecycle_after_relations(app: ops.model.Application, ops_test: O
     )
 
     # Mypy has difficulty with ActiveStatus
-    assert unit.workload_status == ops.model.ActiveStatus.name  # type: ignore
+    assert unit.workload_status == ops.model.BlockedStatus.name  # type: ignore
+    # Assert part of the message
+    assert ops.BlockedStatus("Database relation not found") == app.status

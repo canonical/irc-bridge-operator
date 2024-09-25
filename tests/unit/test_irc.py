@@ -89,6 +89,7 @@ def test_prepare_installs_snap_package_and_creates_configuration_files(irc_bridg
     mock_mkdir = mocker.patch.object(pathlib.Path, "mkdir")
     mock_daemon_reload = mocker.patch.object(systemd, "daemon_reload")
     mock_service_enable = mocker.patch.object(systemd, "service_enable")
+    mocker.patch.object(pathlib.Path, "exists", return_value=False)
 
     irc_bridge_service.prepare()
 
@@ -141,7 +142,7 @@ def test_prepare_does_not_copy_files_if_already_exist(irc_bridge_service, mocker
     mock_mkdir.assert_not_called()
     mock_copy.assert_not_called()
     mock_daemon_reload.assert_not_called()
-    mock_service_enable.assert_not_called()
+    mock_service_enable.assert_called_once_with(IRC_BRIDGE_SNAP_NAME)
 
 
 def test_prepare_raises_install_error_if_snap_installation_fails(irc_bridge_service, mocker):

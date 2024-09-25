@@ -74,7 +74,7 @@ async def run_on_unit(ops_test: OpsTest, unit_name: str, command: str) -> str:
     return stdout
 
 
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-positional-arguments,too-many-arguments
 async def push_to_unit(
     ops_test: OpsTest,
     unit: ops.model.Unit,

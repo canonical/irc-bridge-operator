@@ -5,7 +5,11 @@
 
 import typing
 
-from charms.data_platform_libs.v0.data_interfaces import DatabaseCreatedEvent, DatabaseRequires
+from charms.data_platform_libs.v0.data_interfaces import (
+    DatabaseCreatedEvent,
+    DatabaseEndpointsChangedEvent,
+    DatabaseRequires,
+)
 from ops.charm import CharmBase
 from ops.framework import Object
 
@@ -37,9 +41,14 @@ class DatabaseObserver(Object):
             database_name=DATABASE_NAME,
         )
         self.framework.observe(self.database.on.database_created, self._on_database_created)
+        self.framework.observe(self.database.on.endpoints_changed, self._on_endpoints_changed)
 
     def _on_database_created(self, _: DatabaseCreatedEvent) -> None:
         """Handle database created."""
+        self._charm.reconcile()  # type: ignore
+
+    def _on_endpoints_changed(self, _: DatabaseEndpointsChangedEvent) -> None:
+        """Handle endpoints changed."""
         self._charm.reconcile()  # type: ignore
 
     def get_db(self) -> typing.Optional[DatasourcePostgreSQL]:

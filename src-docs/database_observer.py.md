@@ -22,7 +22,7 @@ The Database relation observer.
  - <b>`relation_name`</b>:  The name of the relation to observe. 
  - <b>`database`</b>:  The database relation interface. 
 
-<a href="../src/database_observer.py#L24"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/database_observer.py#L28"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `__init__`
 
@@ -50,7 +50,7 @@ Shortcut for more simple access the model.
 
 ---
 
-<a href="../src/database_observer.py#L45"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/database_observer.py#L54"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `get_db`
 

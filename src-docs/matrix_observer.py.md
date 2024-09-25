@@ -12,7 +12,7 @@ Provide the DatabaseObserver class to handle database relation and state.
 ## <kbd>class</kbd> `MatrixObserver`
 The Matrix relation observer. 
 
-<a href="../src/matrix_observer.py#L22"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/matrix_observer.py#L24"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `__init__`
 
@@ -40,7 +40,7 @@ Shortcut for more simple access the model.
 
 ---
 
-<a href="../src/matrix_observer.py#L37"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/matrix_observer.py#L47"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `get_matrix`
 
@@ -58,7 +58,7 @@ Return a Matrix authentication datasource model.
 
 ---
 
-<a href="../src/matrix_observer.py#L45"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/matrix_observer.py#L55"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `set_irc_registration`
 

@@ -101,7 +101,7 @@ class IRCBridgeService:
             shutil.copy(IRC_BRIDGE_TEMPLATE_UNIT_FILE_PATH, SYSTEMD_DIR_PATH)
             shutil.copy(IRC_BRIDGE_TEMPLATE_TARGET_FILE_PATH, SYSTEMD_DIR_PATH)
             systemd.daemon_reload()
-            systemd.service_enable(IRC_BRIDGE_SNAP_NAME)
+        systemd.service_enable(IRC_BRIDGE_SNAP_NAME)
 
     def _install_snap_package(
         self, snap_name: str, snap_channel: str, refresh: bool = False
@@ -187,17 +187,24 @@ class IRCBridgeService:
             db: the database configuration
             matrix: the matrix configuration
             config: the charm configuration
+
+        Raises:
+            KeyError: when encountering a KeyError from the configuration file
         """
         with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "r", encoding="utf-8") as config_file:
             data = yaml.safe_load(config_file)
-        db_conn = data["database"]["connectionString"]
-        if db_conn == "" or db_conn != db.uri:
+        try:
             db_conn = data["database"]["connectionString"]
-        data["homeserver"]["url"] = f"https://{matrix.homeserver}"
-        data["ircService"]["ident"] = config.ident_enabled
-        data["ircService"]["permissions"] = {}
-        for admin in config.bridge_admins:
-            data["ircService"]["permissions"][admin] = "admin"
+            if db_conn == "" or db_conn != db.uri:
+                data["database"]["connectionString"] = db.uri
+            data["homeserver"]["url"] = f"https://{matrix.host}"
+            data["ircService"]["ident"] = config.ident_enabled
+            data["ircService"]["permissions"] = {}
+            for admin in config.bridge_admins:
+                data["ircService"]["permissions"][admin] = "admin"
+        except KeyError as e:
+            logger.exception("KeyError: {%s}", e)
+            raise
         with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "w", encoding="utf-8") as config_file:
             yaml.dump(data, config_file)
 

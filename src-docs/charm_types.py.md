@@ -47,7 +47,7 @@ Returns the set of fields that have been explicitly set on this model instance.
 
 ---
 
-<a href="../src/charm_types.py#L74"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/charm_types.py#L89"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>classmethod</kbd> `userids_to_list`
 
@@ -118,12 +118,12 @@ Returns the set of fields that have been explicitly set on this model instance.
 
 ---
 
-<a href="../src/charm_types.py#L34"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/charm_types.py#L37"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>classmethod</kbd> `from_relation`
 
 ```python
-from_relation(relation: Relation) → DatasourcePostgreSQL
+from_relation(model: Model, relation: Relation) → DatasourcePostgreSQL
 ```
 
 Create a DatasourcePostgreSQL from a relation. 

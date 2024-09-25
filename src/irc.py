@@ -100,7 +100,7 @@ class IRCBridgeService:
             shutil.copy(IRC_BRIDGE_TEMPLATE_UNIT_FILE_PATH, SYSTEMD_DIR_PATH)
             shutil.copy(IRC_BRIDGE_TEMPLATE_TARGET_FILE_PATH, SYSTEMD_DIR_PATH)
             systemd.daemon_reload()
-            systemd.service_enable(IRC_BRIDGE_SNAP_NAME)
+        systemd.service_enable(IRC_BRIDGE_SNAP_NAME)
 
     def _install_snap_package(
         self, snap_name: str, snap_channel: str, refresh: bool = False

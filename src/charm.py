@@ -100,7 +100,8 @@ class IRCCharm(ops.CharmBase):
             logger.info("Config Reconciling charm")
             config = self._charm_config
         except ValidationError as e:
-            self.unit.status = ops.BlockedStatus(f"Invalid configuration: {e}")
+            self.unit.status = ops.MaintenanceStatus(f"Invalid configuration: {e}")
+            logger.exception(f"Invalid configuration: {e}")
             return
         logger.info("IRC Reconciling charm")
         self._irc.reconcile(db, matrix, config)

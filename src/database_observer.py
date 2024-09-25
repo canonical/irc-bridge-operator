@@ -37,10 +37,15 @@ class DatabaseObserver(Object):
             database_name=DATABASE_NAME,
         )
         self.framework.observe(self.database.on.database_created, self._on_database_created)
+        self.framework.observe(self.database.on.endpoints_changed, self._on_endpoints_changed)
 
     def _on_database_created(self, _: DatabaseCreatedEvent) -> None:
         """Handle database created."""
         self._charm.reconcile()  # type: ignore
+
+    def _on_endpoints_changed(self, _) -> None:
+        """Handle endpoints changed."""
+        self._charm.reconcile()
 
     def get_db(self) -> typing.Optional[DatasourcePostgreSQL]:
         """Return a postgresql datasource model.

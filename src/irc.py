@@ -189,7 +189,7 @@ class IRCBridgeService:
             config: the charm configuration
 
         Raises:
-            KeyError: when encountering a KeyError from the configuration file
+            SynapseConfigurationFileError: when encountering a KeyError from the configuration file
         """
         with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "r", encoding="utf-8") as config_file:
             data = yaml.safe_load(config_file)
@@ -204,7 +204,9 @@ class IRCBridgeService:
                 data["ircService"]["permissions"][admin] = "admin"
         except KeyError as e:
             logger.exception("KeyError: {%s}", e)
-            raise
+            raise exceptions.SynapseConfigurationFileError(
+                f"KeyError in configuration file: {e}"
+            ) from e
         with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "w", encoding="utf-8") as config_file:
             yaml.dump(data, config_file)
 
@@ -228,7 +230,7 @@ class IRCBridgeService:
         try:
             systemd.service_reload(IRC_BRIDGE_SNAP_NAME)
         except systemd.SystemdError as e:
-            error_msg = f"An exception occurred when reloading {IRC_BRIDGE_SNAP_NAME}"
+            error_msg = f"An exception occurred when reloading {IRC_BRIDGE_SNAP_NAME}."
             logger.exception(error_msg)
             raise ReloadError(error_msg) from e
 
@@ -241,7 +243,7 @@ class IRCBridgeService:
         try:
             systemd.service_start(IRC_BRIDGE_SNAP_NAME)
         except systemd.SystemdError as e:
-            error_msg = f"An exception occurred when starting {IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
+            error_msg = f"An exception occurred when starting {IRC_BRIDGE_SNAP_NAME}."
             logger.exception(error_msg)
             raise StartError(error_msg) from e
 
@@ -254,6 +256,6 @@ class IRCBridgeService:
         try:
             systemd.service_stop(IRC_BRIDGE_SNAP_NAME)
         except snap.SnapError as e:
-            error_msg = f"An exception occurred when stopping {IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
+            error_msg = f"An exception occurred when stopping {IRC_BRIDGE_SNAP_NAME}."
             logger.exception(error_msg)
             raise StopError(error_msg) from e

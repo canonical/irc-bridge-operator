@@ -228,7 +228,7 @@ class IRCBridgeService:
         try:
             systemd.service_reload(IRC_BRIDGE_SNAP_NAME)
         except systemd.SystemdError as e:
-            error_msg = f"An exception occurred when reloading {IRC_BRIDGE_SNAP_NAME}. Reason: {e}"
+            error_msg = f"An exception occurred when reloading {IRC_BRIDGE_SNAP_NAME}"
             logger.exception(error_msg)
             raise ReloadError(error_msg) from e
 

@@ -50,3 +50,19 @@ class RelationDataError(Exception):
             msg (str): Explanation of the error.
         """
         self.msg = msg
+
+
+class SynapseConfigurationFileError(Exception):
+    """Exception raised when we can't parse the synapse configuration file.
+
+    Attrs:
+        msg (str): Explanation of the error.
+    """
+
+    def __init__(self, msg: str):
+        """Initialize a new instance of the SynapseConfigurationFileError exception.
+
+        Args:
+            msg (str): Explanation of the error.
+        """
+        self.msg = msg

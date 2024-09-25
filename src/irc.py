@@ -186,7 +186,7 @@ class IRCBridgeService:
             config: the charm configuration
 
         Raises:
-            KeyError: when encountering a KeyError from the configuration file
+            SynapseConfigurationFileError: when encountering a KeyError from the configuration file
         """
         with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "r", encoding="utf-8") as config_file:
             data = yaml.safe_load(config_file)
@@ -201,7 +201,7 @@ class IRCBridgeService:
                 data["ircService"]["permissions"][admin] = "admin"
         except KeyError as e:
             logger.exception("KeyError: {%s}", e)
-            raise
+            raise exceptions.SynapseConfigurationFileError(f"KeyError in configuration file: {e}") from e
         with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "w", encoding="utf-8") as config_file:
             yaml.dump(data, config_file)
 

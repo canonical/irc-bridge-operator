@@ -40,7 +40,7 @@ Shortcut for more simple access the model.
 
 ---
 
-<a href="../src/matrix_observer.py#L47"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/matrix_observer.py#L48"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `get_matrix`
 
@@ -58,7 +58,7 @@ Return a Matrix authentication datasource model.
 
 ---
 
-<a href="../src/matrix_observer.py#L55"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/matrix_observer.py#L56"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `set_irc_registration`
 

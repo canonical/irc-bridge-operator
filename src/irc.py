@@ -80,7 +80,7 @@ class IRCBridgeService:
         """
         self.prepare()
         self.configure(db, matrix, config)
-        #self.reload()
+        self.reload()
 
     def prepare(self) -> None:
         """Prepare the machine.
@@ -173,9 +173,7 @@ class IRCBridgeService:
             f"-c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
         ]
         logger.info("Creating an app registration file for IRC bridge.")
-        result = subprocess.run(
-            app_reg_create_command, check=True, capture_output=True
-        )  # nosec
+        result = subprocess.run(app_reg_create_command, check=True, capture_output=True)  # nosec
         logger.info("App registration file creation result: %s", result)
 
     def _eval_conf_local(
@@ -197,7 +195,7 @@ class IRCBridgeService:
             db_conn = data["database"]["connectionString"]
             if db_conn == "" or db_conn != db.uri:
                 data["database"]["connectionString"] = db.uri
-            data["homeserver"]["url"] = f"https://{matrix.host}"
+            data["homeserver"]["url"] = f"https://{matrix.homeserver}"
             data["ircService"]["ident"] = config.ident_enabled
             data["ircService"]["permissions"] = {}
             for admin in config.bridge_admins:

@@ -3,8 +3,8 @@
 
 """Provide the DatabaseObserver class to handle database relation and state."""
 
-import typing
 import logging
+import typing
 
 from charms.synapse.v0.matrix_auth import (
     MatrixAuthProviderData,
@@ -40,7 +40,8 @@ class MatrixObserver(Object):
             self._on_matrix_auth_request_processed,
         )
 
-    def _on_matrix_auth_request_processed(self, event: Object) -> None:
+    def _on_matrix_auth_request_processed(self, _: Object) -> None:
+        """Handle the matrix auth request processed event."""
         logger.info("Matrix auth request processed")
         self._charm.reconcile()  # type: ignore
 

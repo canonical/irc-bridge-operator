@@ -31,7 +31,7 @@ class AnyCharm(AnyCharmBase):
         """
         super().__init__(*args, **kwargs)
         self.on.define_event("reload_data", ReloadDataEvent)
-        self.matrix = MatrixAuthProvides(self,"provide-irc-bridge")
+        self.matrix = MatrixAuthProvides(self, "provide-irc-bridge")
         self.framework.observe(self.on.reload_data, self._on_reload_data)
 
     def _on_reload_data(self, _: ReloadDataEvent) -> None:

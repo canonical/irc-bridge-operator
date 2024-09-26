@@ -274,7 +274,6 @@ def test_configure_generates_pem_file_local(irc_bridge_service, mocker):
             f"openssl genpkey -out {IRC_BRIDGE_PEM_FILE_PATH} "
             f"-outform PEM -algorithm {IRC_BRIDGE_KEY_ALGO} -pkeyopt {IRC_BRIDGE_KEY_OPTS}",
         ],
-        shell=True,  # nosec
         check=True,
         capture_output=True,
     )
@@ -311,7 +310,6 @@ def test_configure_generates_app_registration_local(irc_bridge_service, mocker):
             f" -u https://{matrix.homeserver}:{IRC_BRIDGE_HEALTH_PORT} "
             f"-c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
         ],
-        shell=True,  # nosec
         check=True,
         capture_output=True,
     )

@@ -30,7 +30,6 @@ async def test_lifecycle_before_relations(app: ops.model.Application, ops_test: 
     unit = app.units[0]  # type: ignore
 
     # Mypy has difficulty with ActiveStatus
-<<<<<<< HEAD
     assert unit.workload_status == ops.model.WaitingStatus.name  # type: ignore
 
 

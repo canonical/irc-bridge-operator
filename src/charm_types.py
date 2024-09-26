@@ -46,7 +46,7 @@ class DatasourcePostgreSQL(BaseModel):
         user = relation_data.get("username", "")
         password = relation_data.get("password", "")
         secret_user = relation_data.get("secret-user", "")
-        if user == "" and secret_user != "":
+        if user == "" and secret_user != "":  # nosec
             secret = model.get_secret(id=secret_user)
             secret_fields = ops.Secret.get_content(secret)
             user = secret_fields["username"]

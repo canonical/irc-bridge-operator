@@ -50,7 +50,7 @@ async def test_lifecycle_after_relations(app: ops.model.Application, ops_test: O
 
     # Deploy postgresql charm
     assert ops_test.model
-    await ops_test.model.deploy("postgresql")
+    await ops_test.model.deploy("postgresql", channel="14/stable")
 
     # Deploy any charm that provides the matrix homeserver interface
     await tests.integration.helpers.generate_anycharm_relation(

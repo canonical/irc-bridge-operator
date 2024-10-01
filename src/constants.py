@@ -15,7 +15,7 @@ DATABASE_NAME = "ircbridge"
 DATABASE_RELATION_NAME = "database"
 
 # Paths
-IRC_BRIDGE_CONFIG_DIR_PATH = pathlib.Path("/etc/matrix-appservice-irc")
+IRC_BRIDGE_CONFIG_DIR_PATH = pathlib.Path("/home/ubuntu/matrix-appservice-irc")
 IRC_BRIDGE_TEMPLATE_DIR_PATH = pathlib.Path("templates")
 SYSTEMD_DIR_PATH = pathlib.Path("/etc/systemd/system")
 IRC_BRIDGE_CONFIG_FILE_PATH = IRC_BRIDGE_CONFIG_DIR_PATH / "config.yaml"

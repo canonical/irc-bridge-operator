@@ -28,6 +28,7 @@ header:
     - 'lib/**'
     - 'LICENSE'
     - '.licenserc.yaml'
+    - 'templates/**'
     - '.trivyignore'
     - 'trivy.yaml'
     - '.wokeignore'

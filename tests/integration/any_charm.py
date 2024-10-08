@@ -6,6 +6,7 @@
 """This code should be loaded into any-charm which is used for integration tests."""
 
 import logging
+from secrets import token_hex
 
 from any_charm_base import AnyCharmBase
 from matrix_auth import MatrixAuthProviderData, MatrixAuthProvides
@@ -38,10 +39,11 @@ class AnyCharm(AnyCharmBase):
     def _on_relation_created(self, _):
         """Create the relation and set the relation data."""
         relation = self.model.get_relation("provide-irc-bridge")
+        secret = token_hex(16)
         if relation is not None:
             logger.info("Setting relation data")
             matrix_auth_data = MatrixAuthProviderData(
-                homeserver="https://example.com", shared_secret="foobar"
+                homeserver="https://example.com", shared_secret=secret
             )
             matrix_auth_data.set_shared_secret_id(model=self.model, relation=relation)
             self.plugin_auth.update_relation_data(relation, matrix_auth_data)
@@ -66,11 +68,12 @@ class AnyCharm(AnyCharmBase):
                 matrix_auth_data = MatrixAuthProviderData.from_relation(
                     model=self.model, relation=relation
                 )
-            except Exception as e:
+            except ValueError as e:
                 logger.error("Failed to get relation data: %s", e)
                 logger.info("Setting relation data")
+                secret = token_hex(16)
                 matrix_auth_data = MatrixAuthProviderData(
-                    homeserver="https://example.com", shared_secret="foobar"
+                    homeserver="https://example.com", shared_secret=secret
                 )
             matrix_auth_data.set_shared_secret_id(model=self.model, relation=relation)
             self.plugin_auth.update_relation_data(relation, matrix_auth_data)

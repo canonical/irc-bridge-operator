@@ -67,7 +67,7 @@ LIBAPI = 0
 
 # Increment this PATCH version before using `charmcraft publish-lib` or reset
 # to 0 if you are raising the major API version
-LIBPATCH = 2
+LIBPATCH = 3
 
 # pylint: disable=wrong-import-position
 import json
@@ -299,7 +299,7 @@ class MatrixAuthRequestProcessed(ops.RelationEvent):
         Returns:
             the MatrixAuthProviderData for the relation data.
         """
-        return MatrixAuthProviderData.from_relation(self.model, self.relation)
+        return MatrixAuthProviderData.from_relation(self.framework.model, self.relation)
 
 
 class MatrixAuthRequestReceived(ops.RelationEvent):
@@ -370,7 +370,7 @@ class MatrixAuthProvides(ops.Object):
             true: if the relation data is valid.
         """
         try:
-            _ = self.MatrixAuthRequirerData.from_relation(self.model, relation=relation)
+            _ = MatrixAuthRequirerData.from_relation(self.model, relation=relation)
             return True
         except ValueError as ex:
             logger.warning("Error validating the relation data %s", ex)
@@ -442,7 +442,7 @@ class MatrixAuthRequires(ops.Object):
             true: if the relation data is valid.
         """
         try:
-            _ = self.MatrixAuthProviderData.from_relation(self.model, relation=relation)
+            _ = MatrixAuthProviderData.from_relation(self.model, relation=relation)
             return True
         except ValueError as ex:
             logger.warning("Error validating the relation data %s", ex)

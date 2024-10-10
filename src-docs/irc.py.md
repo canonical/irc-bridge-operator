@@ -10,7 +10,9 @@ IRC Bridge charm business logic.
 - **IRC_BRIDGE_HEALTH_PORT**
 - **IRC_BRIDGE_KEY_ALGO**
 - **IRC_BRIDGE_KEY_OPTS**
+- **IRC_BRIDGE_SERVICE_NAME**
 - **IRC_BRIDGE_SNAP_NAME**
+- **SNAP_MATRIX_APPSERVICE_ARGS**
 - **SNAP_PACKAGES**
 
 
@@ -26,7 +28,7 @@ This class provides the necessary methods to manage the matrix-appservice-irc se
 
 ---
 
-<a href="../src/irc.py#L131"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/irc.py#L129"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `configure`
 
@@ -50,7 +52,7 @@ Configure the service.
 
 ---
 
-<a href="../src/irc.py#L212"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/irc.py#L210"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `get_registration`
 
@@ -68,7 +70,7 @@ Return the app registration file content.
 
 ---
 
-<a href="../src/irc.py#L85"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/irc.py#L83"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `prepare`
 
@@ -82,7 +84,7 @@ Install the snap package and create the configuration directory and file.
 
 ---
 
-<a href="../src/irc.py#L66"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/irc.py#L64"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `reconcile`
 
@@ -111,7 +113,7 @@ Simple flow:
 
 ---
 
-<a href="../src/irc.py#L221"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/irc.py#L219"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `reload`
 
@@ -131,7 +133,7 @@ Check if the service is running and reload it.
 
 ---
 
-<a href="../src/irc.py#L236"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/irc.py#L237"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `start`
 
@@ -149,7 +151,7 @@ Start the matrix-appservice-irc service.
 
 ---
 
-<a href="../src/irc.py#L249"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/irc.py#L250"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `stop`
 

@@ -14,6 +14,8 @@ File containing constants to be used in the charm.
 - **DATABASE_RELATION_NAME**
 - **MATRIX_RELATION_NAME**
 - **IRC_BRIDGE_SNAP_NAME**
+- **IRC_BRIDGE_SERVICE_NAME**
 - **SNAP_PACKAGES**
+- **SNAP_MATRIX_APPSERVICE_ARGS**
 
 

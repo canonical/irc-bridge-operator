@@ -5,7 +5,6 @@
 
 import logging
 import os
-import pwd
 import shutil
 import subprocess  # nosec
 
@@ -26,14 +25,9 @@ from constants import (
     IRC_BRIDGE_REGISTRATION_FILE_PATH,
     IRC_BRIDGE_SERVICE_NAME,
     IRC_BRIDGE_SNAP_NAME,
-    IRC_BRIDGE_TARGET_FILE_PATH,
     IRC_BRIDGE_TEMPLATE_CONFIG_FILE_PATH,
-    IRC_BRIDGE_TEMPLATE_TARGET_FILE_PATH,
-    IRC_BRIDGE_TEMPLATE_UNIT_FILE_PATH,
-    IRC_BRIDGE_UNIT_FILE_PATH,
     SNAP_MATRIX_APPSERVICE_ARGS,
     SNAP_PACKAGES,
-    SYSTEMD_DIR_PATH,
 )
 
 logger = logging.getLogger(__name__)
@@ -101,11 +95,11 @@ class IRCBridgeService:
             logger.info("Created directory %s", IRC_BRIDGE_CONFIG_DIR_PATH)
             shutil.copy(IRC_BRIDGE_TEMPLATE_CONFIG_FILE_PATH, IRC_BRIDGE_CONFIG_DIR_PATH)
 
-        with open("/etc/environment", "r+") as env_file:
+        with open("/etc/environment", "r+", encoding="utf-8") as env_file:
             lines = env_file.read()
             if "SNAP_MATRIX_APPSERVICE_ARGS" not in lines:
                 env_file.seek(0, os.SEEK_END)
-                env_file.write(f"SNAP_MATRIX_APPSERVICE_ARGS=\"{SNAP_MATRIX_APPSERVICE_ARGS}\"\n")
+                env_file.write(f'SNAP_MATRIX_APPSERVICE_ARGS="{SNAP_MATRIX_APPSERVICE_ARGS}"\n')
 
     def _install_snap_package(
         self, snap_name: str, snap_channel: str, refresh: bool = False

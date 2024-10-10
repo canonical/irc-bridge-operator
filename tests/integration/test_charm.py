@@ -68,6 +68,4 @@ async def test_lifecycle_after_relations(app: ops.model.Application, ops_test: O
     )
 
     # Mypy has difficulty with ActiveStatus
-    assert unit.workload_status == ops.model.BlockedStatus.name  # type: ignore
-    # Assert part of the message
-    assert ops.BlockedStatus("Database relation not found") == app.status
+    assert unit.workload_status == ops.model.ActiveStatus.name  # type: ignore

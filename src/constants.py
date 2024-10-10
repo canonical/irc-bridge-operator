@@ -17,15 +17,8 @@ DATABASE_RELATION_NAME = "database"
 # Paths
 IRC_BRIDGE_CONFIG_DIR_PATH = pathlib.Path("/etc/matrix-appservice-irc")
 IRC_BRIDGE_TEMPLATE_DIR_PATH = pathlib.Path("templates")
-SYSTEMD_DIR_PATH = pathlib.Path("/etc/systemd/system")
 IRC_BRIDGE_CONFIG_FILE_PATH = IRC_BRIDGE_CONFIG_DIR_PATH / "config.yaml"
 IRC_BRIDGE_TEMPLATE_CONFIG_FILE_PATH = IRC_BRIDGE_TEMPLATE_DIR_PATH / "config.yaml"
-IRC_BRIDGE_UNIT_FILE_PATH = SYSTEMD_DIR_PATH / "matrix-appservice-irc.service"
-IRC_BRIDGE_TARGET_FILE_PATH = SYSTEMD_DIR_PATH / "matrix-appservice-irc.target"
-IRC_BRIDGE_TEMPLATE_UNIT_FILE_PATH = IRC_BRIDGE_TEMPLATE_DIR_PATH / "matrix-appservice-irc.service"
-IRC_BRIDGE_TEMPLATE_TARGET_FILE_PATH = (
-    IRC_BRIDGE_TEMPLATE_DIR_PATH / "matrix-appservice-irc.target"
-)
 IRC_BRIDGE_PEM_FILE_PATH = IRC_BRIDGE_CONFIG_DIR_PATH / "irc_passkey.pem"
 IRC_BRIDGE_REGISTRATION_FILE_PATH = IRC_BRIDGE_CONFIG_DIR_PATH / "appservice-registration-irc.yaml"
 
@@ -34,6 +27,8 @@ MATRIX_RELATION_NAME = "matrix-auth"
 
 # Snap
 IRC_BRIDGE_SNAP_NAME = "matrix-appservice-irc"
+IRC_BRIDGE_SERVICE_NAME = "snap.matrix-appservice-irc.matrix-appservice-irc"
 SNAP_PACKAGES = {
     IRC_BRIDGE_SNAP_NAME: {"channel": "edge"},
 }
+SNAP_MATRIX_APPSERVICE_ARGS = f"-c {IRC_BRIDGE_CONFIG_FILE_PATH} -f {IRC_BRIDGE_REGISTRATION_FILE_PATH} -p {IRC_BRIDGE_HEALTH_PORT}"

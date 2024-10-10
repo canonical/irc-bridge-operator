@@ -4,6 +4,8 @@
 """IRC Bridge charm business logic."""
 
 import logging
+import os
+import pwd
 import shutil
 import subprocess  # nosec
 
@@ -22,12 +24,14 @@ from constants import (
     IRC_BRIDGE_KEY_OPTS,
     IRC_BRIDGE_PEM_FILE_PATH,
     IRC_BRIDGE_REGISTRATION_FILE_PATH,
+    IRC_BRIDGE_SERVICE_NAME,
     IRC_BRIDGE_SNAP_NAME,
     IRC_BRIDGE_TARGET_FILE_PATH,
     IRC_BRIDGE_TEMPLATE_CONFIG_FILE_PATH,
     IRC_BRIDGE_TEMPLATE_TARGET_FILE_PATH,
     IRC_BRIDGE_TEMPLATE_UNIT_FILE_PATH,
     IRC_BRIDGE_UNIT_FILE_PATH,
+    SNAP_MATRIX_APPSERVICE_ARGS,
     SNAP_PACKAGES,
     SYSTEMD_DIR_PATH,
 )
@@ -97,11 +101,11 @@ class IRCBridgeService:
             logger.info("Created directory %s", IRC_BRIDGE_CONFIG_DIR_PATH)
             shutil.copy(IRC_BRIDGE_TEMPLATE_CONFIG_FILE_PATH, IRC_BRIDGE_CONFIG_DIR_PATH)
 
-        if not IRC_BRIDGE_UNIT_FILE_PATH.exists() or not IRC_BRIDGE_TARGET_FILE_PATH.exists():
-            shutil.copy(IRC_BRIDGE_TEMPLATE_UNIT_FILE_PATH, SYSTEMD_DIR_PATH)
-            shutil.copy(IRC_BRIDGE_TEMPLATE_TARGET_FILE_PATH, SYSTEMD_DIR_PATH)
-            systemd.daemon_reload()
-        systemd.service_enable(IRC_BRIDGE_SNAP_NAME)
+        with open("/etc/environment", "r+") as env_file:
+            lines = env_file.read()
+            if "SNAP_MATRIX_APPSERVICE_ARGS" not in lines:
+                env_file.seek(0, os.SEEK_END)
+                env_file.write(f"SNAP_MATRIX_APPSERVICE_ARGS=\"{SNAP_MATRIX_APPSERVICE_ARGS}\"\n")
 
     def _install_snap_package(
         self, snap_name: str, snap_channel: str, refresh: bool = False
@@ -168,7 +172,7 @@ class IRCBridgeService:
             "/bin/bash",
             "-c",
             f"[[ -f {IRC_BRIDGE_REGISTRATION_FILE_PATH} ]] || "
-            f"matrix-appservice-irc -r -f {IRC_BRIDGE_REGISTRATION_FILE_PATH}"
+            f"snap run matrix-appservice-irc -r -f {IRC_BRIDGE_REGISTRATION_FILE_PATH}"
             f" -u https://{matrix.homeserver}:{IRC_BRIDGE_HEALTH_PORT} "
             f"-c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
         ]
@@ -227,7 +231,10 @@ class IRCBridgeService:
             ReloadError: when encountering a SnapError
         """
         try:
-            systemd.service_reload(IRC_BRIDGE_SNAP_NAME)
+            systemd.daemon_reload()
+            systemd.service_enable(IRC_BRIDGE_SERVICE_NAME)
+            if not systemd.service_running(IRC_BRIDGE_SERVICE_NAME):
+                systemd.service_start(IRC_BRIDGE_SERVICE_NAME)
         except systemd.SystemdError as e:
             error_msg = f"An exception occurred when reloading {IRC_BRIDGE_SNAP_NAME}."
             logger.exception(error_msg)
@@ -240,7 +247,7 @@ class IRCBridgeService:
             StartError: when encountering a SnapError
         """
         try:
-            systemd.service_start(IRC_BRIDGE_SNAP_NAME)
+            systemd.service_start(IRC_BRIDGE_SERVICE_NAME)
         except systemd.SystemdError as e:
             error_msg = f"An exception occurred when starting {IRC_BRIDGE_SNAP_NAME}."
             logger.exception(error_msg)

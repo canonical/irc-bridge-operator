@@ -59,7 +59,7 @@ class IRCCharm(ops.CharmBase):
         self.unit.status = ops.MaintenanceStatus("Stopping charm")
         self._irc.stop()
 
-    def _charm_config(self) -> CharmConfig:
+    def _get_charm_config(self) -> CharmConfig:
         """Reconcile the charm.
 
         Returns:
@@ -96,17 +96,25 @@ class IRCCharm(ops.CharmBase):
                 "Database configuration missing username, password or URI"
             )
             return
-        logger.info("Matrix Reconciling charm")
-        matrix = self._matrix.reconcile()
+        try:
+            logger.info("Matrix Reconciling charm")
+            matrix = self._matrix.get_matrix()
+            if matrix is None:
+                self.unit.status = ops.BlockedStatus("Matrix relation not found")
+                return
+        except ValidationError:
+            self.unit.status = ops.MaintenanceStatus("Matrix configuration not correct")
+            return
         try:
             logger.info("Config Reconciling charm")
-            config = self._charm_config
+            config = self._get_charm_config()
         except ValidationError as e:
             self.unit.status = ops.MaintenanceStatus(f"Invalid configuration: {e}")
             logger.exception("Invalid configuration: {%s}", e)
             return
         logger.info("IRC Reconciling charm")
         self._irc.reconcile(db, matrix, config)
+        self._matrix.set_irc_registration(self._irc.get_registration())
         self.unit.status = ops.ActiveStatus()
 
 

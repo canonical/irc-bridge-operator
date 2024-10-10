@@ -32,11 +32,12 @@ class DatasourcePostgreSQL(BaseModel):
     uri: str = Field(min_length=1, description="Database connection URI")
 
     @classmethod
-    def from_relation(cls, relation: ops.Relation) -> "DatasourcePostgreSQL":
+    def from_relation(cls, model: ops.Model, relation: ops.Relation) -> "DatasourcePostgreSQL":
         """Create a DatasourcePostgreSQL from a relation.
 
         Args:
             relation: The relation to get the data from.
+            model: The model to get the secret from.
 
         Returns:
             A DatasourcePostgreSQL instance.
@@ -44,6 +45,12 @@ class DatasourcePostgreSQL(BaseModel):
         relation_data = relation.data[relation.app]
         user = relation_data.get("username", "")
         password = relation_data.get("password", "")
+        secret_user = relation_data.get("secret-user", "")
+        if user == "" and secret_user != "":  # nosec
+            secret = model.get_secret(id=secret_user)
+            secret_fields = ops.Secret.get_content(secret)
+            user = secret_fields["username"]
+            password = secret_fields["password"]
         host, port = relation_data.get("endpoints", ":").split(":")
         db = relation_data.get("database", "")
         uri = f"postgres://{user}:{password}@{host}:{port}/{db}"
@@ -56,16 +63,6 @@ class DatasourcePostgreSQL(BaseModel):
             db=db,
             uri=uri,
         )
-
-
-class DatasourceMatrix(BaseModel):
-    """A named tuple representing a Datasource Matrix.
-
-    Attributes:
-        host: Host (IP or DNS without port or protocol).
-    """
-
-    host: str
 
 
 class CharmConfig(BaseModel):

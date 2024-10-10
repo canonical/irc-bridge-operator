@@ -63,6 +63,33 @@ Initialize a new instance of the SnapError exception.
 
 ---
 
+## <kbd>class</kbd> `SynapseConfigurationFileError`
+Exception raised when we can't parse the synapse configuration file. 
+
+Attrs:  msg (str): Explanation of the error. 
+
+<a href="../src/exceptions.py#L62"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+### <kbd>function</kbd> `__init__`
+
+```python
+__init__(msg: str)
+```
+
+Initialize a new instance of the SynapseConfigurationFileError exception. 
+
+
+
+**Args:**
+ 
+ - <b>`msg`</b> (str):  Explanation of the error. 
+
+
+
+
+
+---
+
 ## <kbd>class</kbd> `SystemdError`
 Exception raised when an action on the systemd service fails. 
 

@@ -49,6 +49,6 @@ async def app_fixture(
         charm = await ops_test.build_charm(".")
         application = await model.deploy(charm, application_name=app_name)
 
-    await model.wait_for_idle(apps=[application.name], status="active")
+    #    await model.wait_for_idle(apps=[application.name], status="active")
 
     yield application

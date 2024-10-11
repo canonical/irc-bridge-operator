@@ -7,9 +7,22 @@
 
 import re
 import typing
+from abc import ABC, abstractmethod
 
 import ops
 from pydantic import BaseModel, Field, ValidationError, validator
+
+
+class ReconcilingCharm(ops.CharmBase, ABC):
+    """An abstract class for a charm that supports reconciliation."""
+
+    @abstractmethod
+    def reconcile(self, event: ops.charm.EventBase) -> None:
+        """Reconcile the charm state.
+
+        Args:
+            event: The event that triggered the reconciliation.
+        """
 
 
 class DatasourcePostgreSQL(BaseModel):

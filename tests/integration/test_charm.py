@@ -8,6 +8,7 @@ import logging
 
 import ops
 import pytest
+from juju.application import Application
 from pytest_operator.plugin import OpsTest
 
 import tests.integration.helpers
@@ -17,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 @pytest.mark.asyncio
 @pytest.mark.abort_on_fail
-async def test_lifecycle_before_relations(app: ops.model.Application, ops_test: OpsTest):
+async def test_lifecycle_before_relations(app: Application, ops_test: OpsTest):
     """
     arrange: build and deploy the charm.
     act: nothing.
@@ -26,8 +27,7 @@ async def test_lifecycle_before_relations(app: ops.model.Application, ops_test: 
     # Set config so the charm can start
     config = {"bridge_admins": "admin:example.com", "bot_nickname": "bot"}
     await tests.integration.helpers.set_config(ops_test, app.name, config)
-    # Application actually does have units
-    unit = app.units[0]  # type: ignore
+    unit = app.units[0]
 
     # Mypy has difficulty with ActiveStatus
     assert unit.workload_status == ops.model.WaitingStatus.name  # type: ignore
@@ -35,7 +35,7 @@ async def test_lifecycle_before_relations(app: ops.model.Application, ops_test: 
 
 @pytest.mark.asyncio
 @pytest.mark.abort_on_fail
-async def test_lifecycle_after_relations(app: ops.model.Application, ops_test: OpsTest):
+async def test_lifecycle_after_relations(app: Application, ops_test: OpsTest):
     """
     arrange: build and deploy the charm.
     act: relate to a db and a matrix homeserver.
@@ -43,10 +43,8 @@ async def test_lifecycle_after_relations(app: ops.model.Application, ops_test: O
     """
     # Set config so the charm can start
     config = {"bridge_admins": "admin:example.com", "bot_nickname": "bot"}
-    await tests.integration.helpers.set_config(ops_test, app.name, config)
-    # await ops_test.model.wait_for_idle(apps=[app.name], status="waiting", timeout=60 * 60)
-    # Application actually does have units
-    unit = app.units[0]  # type: ignore
+    app.set_config(config)
+    unit = app.units[0]
 
     # Deploy postgresql charm
     assert ops_test.model

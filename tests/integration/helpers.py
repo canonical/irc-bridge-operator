@@ -11,6 +11,7 @@ import string
 import tempfile
 
 import ops
+from juju.application import Application
 from pytest_operator.plugin import OpsTest
 
 
@@ -144,7 +145,7 @@ async def set_config(ops_test: OpsTest, app_name: str, config: dict):
 
 
 async def generate_anycharm_relation(
-    app: ops.model.Application,
+    app: Application,
     ops_test: OpsTest,
     any_charm_name: str,
     machine: str | None,

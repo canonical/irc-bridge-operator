@@ -11,9 +11,10 @@ from charms.synapse.v0.matrix_auth import (
     MatrixAuthRequirerData,
     MatrixAuthRequires,
 )
-from ops.charm import CharmBase
 from ops.framework import Object
 from pydantic import SecretStr
+
+from charm_types import ReconcilingCharm
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ logger = logging.getLogger(__name__)
 class MatrixObserver(Object):
     """The Matrix relation observer."""
 
-    def __init__(self, charm: CharmBase, relation_name: str):
+    def __init__(self, charm: ReconcilingCharm, relation_name: str):
         """Initialize the oserver and register event handlers.
 
         Args:
@@ -43,7 +44,7 @@ class MatrixObserver(Object):
     def _on_matrix_auth_request_processed(self, _: Object) -> None:
         """Handle the matrix auth request processed event."""
         logger.info("Matrix auth request processed")
-        self._charm.reconcile()  # type: ignore
+        self._charm.reconcile()
 
     def get_matrix(self) -> typing.Optional[MatrixAuthProviderData]:
         """Return a Matrix authentication datasource model.

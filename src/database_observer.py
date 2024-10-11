@@ -10,10 +10,9 @@ from charms.data_platform_libs.v0.data_interfaces import (
     DatabaseEndpointsChangedEvent,
     DatabaseRequires,
 )
-from ops.charm import CharmBase
 from ops.framework import Object
 
-from charm_types import DatasourcePostgreSQL
+from charm_types import DatasourcePostgreSQL, ReconcilingCharm
 from constants import DATABASE_NAME
 
 
@@ -25,7 +24,7 @@ class DatabaseObserver(Object):
         database: The database relation interface.
     """
 
-    def __init__(self, charm: CharmBase, relation_name: str):
+    def __init__(self, charm: ReconcilingCharm, relation_name: str):
         """Initialize the oserver and register event handlers.
 
         Args:
@@ -45,11 +44,11 @@ class DatabaseObserver(Object):
 
     def _on_database_created(self, _: DatabaseCreatedEvent) -> None:
         """Handle database created."""
-        self._charm.reconcile()  # type: ignore
+        self._charm.reconcile()
 
     def _on_endpoints_changed(self, _: DatabaseEndpointsChangedEvent) -> None:
         """Handle endpoints changed."""
-        self._charm.reconcile()  # type: ignore
+        self._charm.reconcile()
 
     def get_db(self) -> typing.Optional[DatasourcePostgreSQL]:
         """Return a postgresql datasource model.

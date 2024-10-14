@@ -1,7 +1,7 @@
 # Copyright 2024 Canonical Ltd.
 # See LICENSE file for licensing details.
 
-"""Provide the DatabaseObserver class to handle database relation and state."""
+"""Provide the MatrixObserver class that handles authentication with a Matrix homeserver."""
 
 import logging
 import typing

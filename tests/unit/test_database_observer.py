@@ -96,7 +96,28 @@ def test_get_db_when_no_relation_data():
     """
     harness = Harness(ObservedCharm, meta=REQUIRER_METADATA)
     harness.begin()
-    harness.add_relation("database", "database-provider")
+    harness.add_relation("database", "database-provider", app_data={})
 
-    with pytest.raises(ValidationError):
-        harness.charm.database.get_db()  # pylint: disable=pointless-statement
+    assert harness.charm.database.get_db() is None
+
+
+def test_get_db_when_invalid_relation_data():
+    """
+    arrange: set up a charm and a database relation with invalid databag.
+    act:.
+    assert: it raises a validation error.
+    """
+    harness = Harness(ObservedCharm, meta=REQUIRER_METADATA)
+    harness.begin()
+    harness.add_relation(
+        "database",
+        "database-provider",
+        app_data={
+            "database": "ircbridge",
+            "endpoints": "postgresql-k8s-primary.local:5432",
+            "password": "",
+            "username": "", 
+        },
+    )
+
+    assert harness.charm.database.get_db() is None

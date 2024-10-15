@@ -44,39 +44,6 @@ class DatasourcePostgreSQL(BaseModel):
     db: str = Field(min_length=1, description="Database name")
     uri: str = Field(min_length=1, description="Database connection URI")
 
-    @classmethod
-    def from_relation(cls, model: ops.Model, relation: ops.Relation) -> "DatasourcePostgreSQL":
-        """Create a DatasourcePostgreSQL from a relation.
-
-        Args:
-            relation: The relation to get the data from.
-            model: The model to get the secret from.
-
-        Returns:
-            A DatasourcePostgreSQL instance.
-        """
-        relation_data = relation.data[relation.app]
-        user = relation_data.get("username", "")
-        password = relation_data.get("password", "")
-        secret_user = relation_data.get("secret-user", "")
-        if user == "" and secret_user != "":  # nosec
-            secret = model.get_secret(id=secret_user)
-            secret_fields = ops.Secret.get_content(secret)
-            user = secret_fields["username"]
-            password = secret_fields["password"]
-        host, port = relation_data.get("endpoints", ":").split(":")
-        db = relation_data.get("database", "")
-        uri = f"postgres://{user}:{password}@{host}:{port}/{db}"
-
-        return DatasourcePostgreSQL(
-            user=user,
-            password=password,
-            host=host,
-            port=port,
-            db=db,
-            uri=uri,
-        )
-
 
 class CharmConfig(BaseModel):
     """A named tuple representing an IRC configuration.

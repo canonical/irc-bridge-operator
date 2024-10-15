@@ -7,9 +7,7 @@ from secrets import token_hex
 from unittest.mock import patch
 
 import ops
-import pytest
 from ops.testing import Harness
-from pydantic import ValidationError
 
 from charm_types import DatasourcePostgreSQL
 from database_observer import DatabaseObserver
@@ -116,7 +114,7 @@ def test_get_db_when_invalid_relation_data():
             "database": "ircbridge",
             "endpoints": "postgresql-k8s-primary.local:5432",
             "password": "",
-            "username": "", 
+            "username": "",
         },
     )
 

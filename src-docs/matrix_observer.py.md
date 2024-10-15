@@ -12,7 +12,7 @@ Provide the DatabaseObserver class to handle database relation and state.
 ## <kbd>class</kbd> `MatrixObserver`
 The Matrix relation observer. 
 
-<a href="../src/matrix_observer.py#L17"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/matrix_observer.py#L24"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `__init__`
 
@@ -40,20 +40,38 @@ Shortcut for more simple access the model.
 
 ---
 
-<a href="../src/matrix_observer.py#L36"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/matrix_observer.py#L48"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
-### <kbd>function</kbd> `reconcile`
+### <kbd>function</kbd> `get_matrix`
 
 ```python
-reconcile() → Optional[DatasourceMatrix]
+get_matrix() → Optional[MatrixAuthProviderData]
 ```
 
-Reconcile the database relation. 
+Return a Matrix authentication datasource model. 
 
 
 
 **Returns:**
  
- - <b>`Dict`</b>:  Information needed for setting environment variables. 
+ - <b>`MatrixAuthProviderData`</b>:  The datasource model. 
+
+---
+
+<a href="../src/matrix_observer.py#L56"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+### <kbd>function</kbd> `set_irc_registration`
+
+```python
+set_irc_registration(content: str) → None
+```
+
+Set the IRC registration details. 
+
+
+
+**Args:**
+ 
+ - <b>`content`</b>:  The registration content. 
 
 

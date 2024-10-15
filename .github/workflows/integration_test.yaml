@@ -10,5 +10,5 @@ jobs:
     with:
       self-hosted-runner: true
       self-hosted-runner-label: "edge"
-      juju-channel: 3.1/stable
+      juju-channel: 3.4/stable
       provider: lxd

@@ -4,11 +4,14 @@
 
 """Helper functions for the integration tests."""
 
+import json
+import pathlib
 import random
 import string
 import tempfile
 
 import ops
+from juju.application import Application
 from pytest_operator.plugin import OpsTest
 
 
@@ -139,3 +142,46 @@ async def set_config(ops_test: OpsTest, app_name: str, config: dict):
     """
     assert ops_test.model
     await ops_test.model.applications[app_name].set_config(config=config)
+
+
+async def generate_anycharm_relation(
+    app: Application,
+    ops_test: OpsTest,
+    any_charm_name: str,
+    machine: str | None,
+):
+    """Deploy any-charm with a wanted matrix auth config and integrate it to the bridge app.
+
+    Args:
+        app: Deployed irc-bridge app
+        ops_test: The ops test framework instance
+        any_charm_name: Name of the to be deployed any-charm
+        machine: The machine to deploy the any-charm onto
+    """
+    any_app_name = any_charm_name
+    any_charm_content = pathlib.Path("tests/integration/any_charm.py").read_text(encoding="utf-8")
+    matrix_auth_content = pathlib.Path("lib/charms/synapse/v0/matrix_auth.py").read_text(
+        encoding="utf-8"
+    )
+
+    any_charm_src_overwrite = {
+        "any_charm.py": any_charm_content,
+        "matrix_auth.py": matrix_auth_content,
+    }
+
+    # We deploy https://charmhub.io/any-charm and inject the any_charm.py behavior
+    # See https://github.com/canonical/any-charm on how to use any-charm
+    assert ops_test.model
+    args = {
+        "application_name": any_app_name,
+        "channel": "beta",
+        "config": {
+            "src-overwrite": json.dumps(any_charm_src_overwrite),
+            "python-packages": "pydantic",
+        },
+    }
+    if machine is not None:
+        args["to"] = machine
+    any_charm = await ops_test.model.deploy("any-charm", **args)
+    await ops_test.model.wait_for_idle(apps=[any_charm.name])
+    await ops_test.model.add_relation(f"{any_charm.name}", f"{app.name}")

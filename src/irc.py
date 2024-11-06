@@ -18,7 +18,6 @@ from charm_types import CharmConfig, DatasourcePostgreSQL
 from constants import (
     IRC_BRIDGE_CONFIG_DIR_PATH,
     IRC_BRIDGE_CONFIG_FILE_PATH,
-    IRC_BRIDGE_HEALTH_PORT,
     IRC_BRIDGE_KEY_ALGO,
     IRC_BRIDGE_KEY_OPTS,
     IRC_BRIDGE_PEM_FILE_PATH,
@@ -167,8 +166,8 @@ class IRCBridgeService:
             "-c",
             f"[[ -f {IRC_BRIDGE_REGISTRATION_FILE_PATH} ]] || "
             f"snap run matrix-appservice-irc -r -f {IRC_BRIDGE_REGISTRATION_FILE_PATH}"
-            f" -u https://{matrix.homeserver}:{IRC_BRIDGE_HEALTH_PORT} "
-            f"-c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
+            f" -u {matrix.homeserver}"
+            f" -c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
         ]
         logger.info("Creating an app registration file for IRC bridge.")
         result = subprocess.run(app_reg_create_command, check=True, capture_output=True)  # nosec

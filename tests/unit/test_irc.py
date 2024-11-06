@@ -19,7 +19,6 @@ from charm_types import CharmConfig, DatasourcePostgreSQL
 from constants import (
     IRC_BRIDGE_CONFIG_DIR_PATH,
     IRC_BRIDGE_CONFIG_FILE_PATH,
-    IRC_BRIDGE_HEALTH_PORT,
     IRC_BRIDGE_KEY_ALGO,
     IRC_BRIDGE_KEY_OPTS,
     IRC_BRIDGE_PEM_FILE_PATH,
@@ -290,7 +289,7 @@ def test_configure_generates_app_registration_local(irc_bridge_service, mocker):
             "-c",
             f"[[ -f {IRC_BRIDGE_REGISTRATION_FILE_PATH} ]] || "
             f"snap run matrix-appservice-irc -r -f {IRC_BRIDGE_REGISTRATION_FILE_PATH}"
-            f" -u https://{matrix.homeserver}:{IRC_BRIDGE_HEALTH_PORT} "
+            f" -u {matrix.homeserver} "
             f"-c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
         ],
         check=True,
@@ -352,12 +351,14 @@ def test_reload_reloads_matrix_appservice_irc_service(irc_bridge_service, mocker
     """
     mock_systemd_daemon_reload = mocker.patch.object(systemd, "daemon_reload")
     mock_service_enable = mocker.patch.object(systemd, "service_enable")
-    mock_service_reload = mocker.patch.object(systemd, "service_start")
+    mock_service_start = mocker.patch.object(systemd, "service_start")
+    mock_service_reload = mocker.patch.object(systemd, "service_reload")
 
     irc_bridge_service.reload()
 
     mock_systemd_daemon_reload.assert_called_once()
     mock_service_enable.assert_called_once_with(IRC_BRIDGE_SERVICE_NAME)
+    mock_service_start.assert_called_once_with(IRC_BRIDGE_SERVICE_NAME)
     mock_service_reload.assert_called_once_with(IRC_BRIDGE_SERVICE_NAME)
 
 

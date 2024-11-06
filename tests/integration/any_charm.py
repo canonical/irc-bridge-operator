@@ -33,8 +33,6 @@ class AnyCharm(AnyCharmBase):
         self.framework.observe(
             self.plugin_auth.on.matrix_auth_request_received, self._on_matrix_auth_request_received
         )
-        # self.framework.observe(
-        # self.on.provide_irc_bridge_relation_changed, self._on_relation_changed)
 
     def _on_relation_created(self, _):
         """Create the relation and set the relation data."""

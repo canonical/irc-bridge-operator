@@ -1,0 +1,18 @@
+[Unit]
+Description=Synapse main
+
+# This service should be restarted when the synapse target is restarted.
+PartOf=matrix-appservice-irc.target
+ReloadPropagatedFrom=matrix-appservice-irc.target
+
+[Service]
+Type=notify
+NotifyAccess=main
+ExecStart=matrix-appservice-irc -c /etc/matrix-appservice-irc/config.yaml -f /etc/matrix-appservice-irc/appservice-registration-irc.yaml -p 5446
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=3
+SyslogIdentifier=matrix-appservice-irc
+
+[Install]
+WantedBy=matrix-appservice-irc.target

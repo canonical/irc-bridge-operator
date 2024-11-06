@@ -229,6 +229,7 @@ class IRCBridgeService:
             systemd.service_enable(IRC_BRIDGE_SERVICE_NAME)
             if not systemd.service_running(IRC_BRIDGE_SERVICE_NAME):
                 systemd.service_start(IRC_BRIDGE_SERVICE_NAME)
+            systemd.service_reload(IRC_BRIDGE_SERVICE_NAME)
         except systemd.SystemdError as e:
             error_msg = f"An exception occurred when reloading {IRC_BRIDGE_SNAP_NAME}."
             logger.exception(error_msg)

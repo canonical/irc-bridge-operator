@@ -4,12 +4,9 @@
 
 """Helper functions for the integration tests."""
 
-import json
-import pathlib
 import random
 import string
 import tempfile
-import typing
 
 import ops
 from pytest_operator.plugin import OpsTest
@@ -75,7 +72,7 @@ async def run_on_unit(ops_test: OpsTest, unit_name: str, command: str) -> str:
     return stdout
 
 
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-positional-arguments,too-many-arguments
 async def push_to_unit(
     ops_test: OpsTest,
     unit: ops.model.Unit,
@@ -130,3 +127,15 @@ async def dispatch_to_unit(
         "--",
         f"export JUJU_DISPATCH_PATH=hooks/{hook_name}; ./dispatch",
     )
+
+
+async def set_config(ops_test: OpsTest, app_name: str, config: dict):
+    """Set the charm configuration.
+
+    Args:
+        ops_test: The ops test framework instance
+        app_name: the name of the application to set the configuration
+        config: the configuration to set
+    """
+    assert ops_test.model
+    await ops_test.model.applications[app_name].set_config(config=config)

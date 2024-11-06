@@ -9,6 +9,7 @@ import logging
 import ops
 import pytest
 from juju.application import Application
+from juju.model import Model
 from pytest_operator.plugin import OpsTest
 
 import tests.integration.helpers
@@ -35,7 +36,7 @@ async def test_lifecycle_before_relations(app: Application, ops_test: OpsTest):
 
 @pytest.mark.asyncio
 @pytest.mark.abort_on_fail
-async def test_lifecycle_after_relations(app: Application, ops_test: OpsTest):
+async def test_lifecycle_after_relations(app: Application, ops_test: OpsTest, model: Model):
     """
     arrange: build and deploy the charm.
     act: relate to a db and a matrix homeserver.
@@ -47,8 +48,7 @@ async def test_lifecycle_after_relations(app: Application, ops_test: OpsTest):
     unit = app.units[0]
 
     # Deploy postgresql charm
-    assert ops_test.model
-    await ops_test.model.deploy("postgresql", channel="14/stable")
+    await model.deploy("postgresql", channel="14/stable")
 
     # Deploy any charm that provides the matrix homeserver interface
     await tests.integration.helpers.generate_anycharm_relation(
@@ -56,12 +56,12 @@ async def test_lifecycle_after_relations(app: Application, ops_test: OpsTest):
     )
 
     # Add relations
-    await ops_test.model.wait_for_idle(
+    await model.wait_for_idle(
         apps=["postgresql", "matrix-homeserver"], status="active", timeout=60 * 60
     )
-    await ops_test.model.add_relation(app.name, "postgresql")
+    await model.add_relation(app.name, "postgresql")
 
-    await ops_test.model.wait_for_idle(
+    await model.wait_for_idle(
         apps=[f"{app.name}", "postgresql", "matrix-homeserver"], status="active", timeout=60 * 60
     )
 

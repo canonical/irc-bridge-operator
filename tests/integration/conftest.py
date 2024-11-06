@@ -7,8 +7,9 @@ from pathlib import Path
 
 import pytest_asyncio
 import yaml
+from juju.model import Model
 from pytest import Config, fixture
-from pytest_operator.plugin import Model, OpsTest
+from pytest_operator.plugin import OpsTest
 
 
 @fixture(scope="module", name="metadata")

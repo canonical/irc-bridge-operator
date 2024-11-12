@@ -47,20 +47,16 @@ async def test_lifecycle_after_relations(app: Application, ops_test: OpsTest, mo
     app.set_config(config)
     unit = app.units[0]
 
-    # Deploy postgresql charm
+    # Deploy postgresql charm and relate with the charm
     await model.deploy("postgresql", channel="14/stable")
+    await model.wait_for_idle(apps=["postgresql"], status="active", timeout=60 * 60)
+    await model.add_relation(app.name, "postgresql")
 
     # Deploy any charm that provides the matrix homeserver interface
+    # and relate with the charm
     await tests.integration.helpers.generate_anycharm_relation(
         app, ops_test, "matrix-homeserver", None
     )
-
-    # Add relations
-    await model.wait_for_idle(
-        apps=["postgresql", "matrix-homeserver"], status="active", timeout=60 * 60
-    )
-    await model.add_relation(app.name, "postgresql")
-
     await model.wait_for_idle(
         apps=[f"{app.name}", "postgresql", "matrix-homeserver"], status="active", timeout=60 * 60
     )

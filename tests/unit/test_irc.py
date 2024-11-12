@@ -82,6 +82,9 @@ def test_prepare_installs_snap_package_and_creates_configuration_files(irc_bridg
     systemd.daemon_reload, and systemd.service_enable methods were called exactly once.
     """
     mock_install_snap_package = mocker.patch.object(irc_bridge_service, "_install_snap_package")
+    mock_generate_media_proxy_key = mocker.patch.object(
+        irc_bridge_service, "_generate_media_proxy_key"
+    )
     mock_copy = mocker.patch.object(shutil, "copy")
     mock_mkdir = mocker.patch.object(pathlib.Path, "mkdir")
     mocker.patch.object(pathlib.Path, "exists", return_value=False)
@@ -91,6 +94,7 @@ def test_prepare_installs_snap_package_and_creates_configuration_files(irc_bridg
     mock_install_snap_package.assert_called_once_with(
         snap_name=IRC_BRIDGE_SNAP_NAME, snap_channel="edge"
     )
+    mock_generate_media_proxy_key.assert_called_once()
     mock_mkdir.assert_called_once_with(parents=True)
     copy_calls = [
         mocker.call(
@@ -112,6 +116,9 @@ def test_prepare_does_not_copy_files_if_already_exist(irc_bridge_service, mocker
     systemd.daemon_reload, and systemd.service_enable methods were called exactly once.
     """
     mock_install_snap_package = mocker.patch.object(irc_bridge_service, "_install_snap_package")
+    mock_generate_media_proxy_key = mocker.patch.object(
+        irc_bridge_service, "_generate_media_proxy_key"
+    )
     mock_copy = mocker.patch.object(shutil, "copy")
     mock_mkdir = mocker.patch.object(pathlib.Path, "mkdir")
 
@@ -123,6 +130,7 @@ def test_prepare_does_not_copy_files_if_already_exist(irc_bridge_service, mocker
     mock_install_snap_package.assert_called_once_with(
         snap_name=IRC_BRIDGE_SNAP_NAME, snap_channel="edge"
     )
+    mock_generate_media_proxy_key.assert_called_once()
     mock_mkdir.assert_not_called()
     mock_copy.assert_not_called()
 
@@ -342,24 +350,22 @@ def test_configure_evaluates_configuration_file_local(irc_bridge_service, mocker
     )
 
 
-def test_reload_reloads_matrix_appservice_irc_service(irc_bridge_service, mocker):
+def test_reload_restarts_matrix_appservice_irc_service(irc_bridge_service, mocker):
     """Test that the reload method reloads the matrix-appservice-irc service.
 
-    arrange: Prepare a mock for the systemd.service_reload method.
+    arrange: Prepare a mock for the systemd.service_restart method.
     act: Call the reload method.
-    assert: Ensure that the systemd.service_reload method was called with the correct arguments.
+    assert: Ensure that the systemd.service_restart method was called with the correct arguments.
     """
     mock_systemd_daemon_reload = mocker.patch.object(systemd, "daemon_reload")
     mock_service_enable = mocker.patch.object(systemd, "service_enable")
-    mock_service_start = mocker.patch.object(systemd, "service_start")
-    mock_service_reload = mocker.patch.object(systemd, "service_reload")
+    mock_service_restart = mocker.patch.object(systemd, "service_restart")
 
     irc_bridge_service.reload()
 
     mock_systemd_daemon_reload.assert_called_once()
     mock_service_enable.assert_called_once_with(IRC_BRIDGE_SERVICE_NAME)
-    mock_service_start.assert_called_once_with(IRC_BRIDGE_SERVICE_NAME)
-    mock_service_reload.assert_called_once_with(IRC_BRIDGE_SERVICE_NAME)
+    mock_service_restart.assert_called_once_with(IRC_BRIDGE_SERVICE_NAME)
 
 
 def test_reload_raises_reload_error_if_reload_fails(irc_bridge_service, mocker):
@@ -371,8 +377,8 @@ def test_reload_raises_reload_error_if_reload_fails(irc_bridge_service, mocker):
     """
     mock_systemd_daemon_reload = mocker.patch.object(systemd, "daemon_reload")
     mock_service_enable = mocker.patch.object(systemd, "service_enable")
-    mock_service_reload = mocker.patch.object(
-        systemd, "service_start", side_effect=systemd.SystemdError
+    mock_service_restart = mocker.patch.object(
+        systemd, "service_restart", side_effect=systemd.SystemdError
     )
 
     with pytest.raises(ReloadError):
@@ -380,7 +386,7 @@ def test_reload_raises_reload_error_if_reload_fails(irc_bridge_service, mocker):
 
     mock_systemd_daemon_reload.assert_called_once()
     mock_service_enable.assert_called_once_with(IRC_BRIDGE_SERVICE_NAME)
-    mock_service_reload.assert_called_once_with(IRC_BRIDGE_SERVICE_NAME)
+    mock_service_restart.assert_called_once_with(IRC_BRIDGE_SERVICE_NAME)
 
 
 def test_start_starts_matrix_appservice_irc_service(irc_bridge_service, mocker):

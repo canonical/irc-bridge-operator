@@ -94,6 +94,8 @@ class IRCBridgeService:
             logger.info("Created directory %s", IRC_BRIDGE_CONFIG_DIR_PATH)
             shutil.copy(IRC_BRIDGE_TEMPLATE_CONFIG_FILE_PATH, IRC_BRIDGE_CONFIG_DIR_PATH)
 
+        self._generate_media_proxy_key()
+
         with open("/etc/environment", "r+", encoding="utf-8") as env_file:
             lines = env_file.read()
             if "SNAP_MATRIX_APPSERVICE_ARGS" not in lines:
@@ -173,6 +175,20 @@ class IRCBridgeService:
         result = subprocess.run(app_reg_create_command, check=True, capture_output=True)  # nosec
         logger.info("App registration file creation result: %s", result)
 
+    def _generate_media_proxy_key(self) -> None:
+        """Generate the content of the media proxy key."""
+        media_proxy_key_command = [
+            "/bin/bash",
+            "-c",
+            "/snap/matrix-appservice-irc/11/bin/node",
+            "/snap/matrix-appservice-irc/11/app/lib/generate-signing-key.js",
+            ">",
+            "/data/config/signingkey.jwk",
+        ]
+        logger.info("Creating an media proxy key for IRC bridge.")
+        result = subprocess.run(media_proxy_key_command, check=True, capture_output=True)  # nosec
+        logger.info("Media proxy key file creation result: %s", result)
+
     def _eval_conf_local(
         self, db: DatasourcePostgreSQL, matrix: MatrixAuthProviderData, config: CharmConfig
     ) -> None:
@@ -226,9 +242,7 @@ class IRCBridgeService:
         try:
             systemd.daemon_reload()
             systemd.service_enable(IRC_BRIDGE_SERVICE_NAME)
-            if not systemd.service_running(IRC_BRIDGE_SERVICE_NAME):
-                systemd.service_start(IRC_BRIDGE_SERVICE_NAME)
-            systemd.service_reload(IRC_BRIDGE_SERVICE_NAME)
+            systemd.service_restart(IRC_BRIDGE_SERVICE_NAME)
         except systemd.SystemdError as e:
             error_msg = f"An exception occurred when reloading {IRC_BRIDGE_SNAP_NAME}."
             logger.exception(error_msg)

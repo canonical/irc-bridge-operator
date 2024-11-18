@@ -16,6 +16,7 @@ from charms.synapse.v0.matrix_auth import MatrixAuthProviderData
 import exceptions
 from charm_types import CharmConfig, DatasourcePostgreSQL
 from constants import (
+    ENVIRONMENT_OS_FILE,
     IRC_BRIDGE_CONFIG_DIR_PATH,
     IRC_BRIDGE_CONFIG_FILE_PATH,
     IRC_BRIDGE_KEY_ALGO,
@@ -88,7 +89,6 @@ class IRCBridgeService:
             snap_name=IRC_BRIDGE_SNAP_NAME,
             snap_channel=SNAP_PACKAGES[IRC_BRIDGE_SNAP_NAME]["channel"],
         )
-
         if not IRC_BRIDGE_CONFIG_DIR_PATH.exists():
             IRC_BRIDGE_CONFIG_DIR_PATH.mkdir(parents=True)
             logger.info("Created directory %s", IRC_BRIDGE_CONFIG_DIR_PATH)
@@ -96,7 +96,7 @@ class IRCBridgeService:
 
         self._generate_media_proxy_key()
 
-        with open("/etc/environment", "r+", encoding="utf-8") as env_file:
+        with open(ENVIRONMENT_OS_FILE, "r+", encoding="utf-8") as env_file:
             lines = env_file.read()
             if "SNAP_MATRIX_APPSERVICE_ARGS" not in lines:
                 env_file.seek(0, os.SEEK_END)

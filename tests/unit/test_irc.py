@@ -4,11 +4,10 @@
 """Tests for the IRC bridge service."""
 
 import builtins
-import pathlib
-import shutil
 import subprocess  # nosec
+from pathlib import Path
 from secrets import token_hex
-from unittest.mock import MagicMock, mock_open, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
@@ -17,7 +16,6 @@ from charms.operator_libs_linux.v2 import snap
 
 from charm_types import CharmConfig, DatasourcePostgreSQL
 from constants import (
-    IRC_BRIDGE_CONFIG_DIR_PATH,
     IRC_BRIDGE_CONFIG_FILE_PATH,
     IRC_BRIDGE_KEY_ALGO,
     IRC_BRIDGE_KEY_OPTS,
@@ -25,7 +23,6 @@ from constants import (
     IRC_BRIDGE_REGISTRATION_FILE_PATH,
     IRC_BRIDGE_SERVICE_NAME,
     IRC_BRIDGE_SNAP_NAME,
-    IRC_BRIDGE_TEMPLATE_CONFIG_FILE_PATH,
 )
 from irc import InstallError, IRCBridgeService, ReloadError, StartError, StopError
 from lib.charms.synapse.v0.matrix_auth import MatrixAuthProviderData
@@ -72,37 +69,40 @@ def test_reconcile_calls_prepare_configure_and_reload_methods(irc_bridge_service
     mock_reload.assert_called_once()
 
 
-def test_prepare_installs_snap_package_and_creates_configuration_files(irc_bridge_service, mocker):
+def test_prepare_installs_snap_package_and_creates_configuration_files(mocker, tmp_path: Path):
     """Test that the prepare method installs the snap package and creates configuration files.
 
     arrange: Prepare mocks for the _install_snap_package, shutil.copy, pathlib.Path.mkdir,
     systemd.daemon_reload, and systemd.service_enable methods.
     act: Call the prepare method.
-    assert: Ensure that the _install_snap_package, shutil.copy, pathlib.Path.mkdir,
-    systemd.daemon_reload, and systemd.service_enable methods were called exactly once.
+    assert: Ensure that the SNAP_MATRIX_APPSERVICE_ARGS was added to environment
+        and config.yaml exists.
     """
-    mock_install_snap_package = mocker.patch.object(irc_bridge_service, "_install_snap_package")
-    mock_generate_media_proxy_key = mocker.patch.object(
-        irc_bridge_service, "_generate_media_proxy_key"
-    )
-    mock_copy = mocker.patch.object(shutil, "copy")
-    mock_mkdir = mocker.patch.object(pathlib.Path, "mkdir")
-    mocker.patch.object(pathlib.Path, "exists", return_value=False)
-    with patch("builtins.open", mock_open(read_data="config")):
+    config_file_path = tmp_path / "config"
+    environment_file_path = tmp_path / "environment"
+    environment_file_path.touch()
+    with patch("irc.IRC_BRIDGE_CONFIG_DIR_PATH", config_file_path), patch(
+        "irc.ENVIRONMENT_OS_FILE", environment_file_path
+    ):
+        irc_bridge_service = IRCBridgeService()
+        mock_install_snap_package = mocker.patch.object(
+            irc_bridge_service, "_install_snap_package"
+        )
+        mock_generate_media_proxy_key = mocker.patch.object(
+            irc_bridge_service, "_generate_media_proxy_key"
+        )
+
         irc_bridge_service.prepare()
 
-    mock_install_snap_package.assert_called_once_with(
-        snap_name=IRC_BRIDGE_SNAP_NAME, snap_channel="edge"
-    )
-    mock_generate_media_proxy_key.assert_called_once()
-    mock_mkdir.assert_called_once_with(parents=True)
-    copy_calls = [
-        mocker.call(
-            IRC_BRIDGE_TEMPLATE_CONFIG_FILE_PATH,
-            IRC_BRIDGE_CONFIG_DIR_PATH,
-        ),
-    ]
-    mock_copy.assert_has_calls(copy_calls)
+        mock_install_snap_package.assert_called_once_with(
+            snap_name=IRC_BRIDGE_SNAP_NAME, snap_channel="edge"
+        )
+        mock_generate_media_proxy_key.assert_called_once()
+        with open(environment_file_path, "r", encoding="utf-8") as env_file:
+            content = env_file.read()
+        assert "SNAP_MATRIX_APPSERVICE_ARGS" in content
+        config_yaml_file = config_file_path / "config.yaml"
+        assert config_yaml_file.exists()
 
 
 def test_prepare_raises_install_error_if_snap_installation_fails(irc_bridge_service, mocker):

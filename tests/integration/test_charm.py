@@ -30,8 +30,7 @@ async def test_lifecycle_before_relations(app: Application, ops_test: OpsTest):
     await tests.integration.helpers.set_config(ops_test, app.name, config)
     unit = app.units[0]
 
-    # Mypy has difficulty with ActiveStatus
-    assert unit.workload_status == ops.model.WaitingStatus.name  # type: ignore
+    assert unit.workload_status == ops.model.WaitingStatus.name
 
 
 @pytest.mark.asyncio
@@ -61,5 +60,4 @@ async def test_lifecycle_after_relations(app: Application, ops_test: OpsTest, mo
         apps=[f"{app.name}", "postgresql", "matrix-homeserver"], status="active", timeout=60 * 60
     )
 
-    # Mypy has difficulty with ActiveStatus
-    assert unit.workload_status == ops.model.ActiveStatus.name  # type: ignore
+    assert unit.workload_status == ops.model.ActiveStatus.name

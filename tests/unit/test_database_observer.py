@@ -89,7 +89,7 @@ def test_get_db():
 def test_get_db_when_no_relation_data():
     """
     arrange: set up a charm and a database relation with an empty databag.
-    act:.
+    act: get db information.
     assert: the db is None.
     """
     harness = Harness(ObservedCharm, meta=REQUIRER_METADATA)
@@ -102,8 +102,8 @@ def test_get_db_when_no_relation_data():
 def test_get_db_when_invalid_relation_data():
     """
     arrange: set up a charm and a database relation with invalid databag.
-    act:.
-    assert: it raises a validation error.
+    act: get db information.
+    assert: the db is None.
     """
     harness = Harness(ObservedCharm, meta=REQUIRER_METADATA)
     harness.begin()

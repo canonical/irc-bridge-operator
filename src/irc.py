@@ -143,10 +143,12 @@ class IRCBridgeService:
 
     def _generate_pem_file_local(self) -> None:
         """Generate the PEM file content."""
+        if os.path.exists(IRC_BRIDGE_PEM_FILE_PATH):
+            logger.info("PEM file already exists. Skipping generation.")
+            return
         pem_create_command = [
             "/bin/bash",
             "-c",
-            f"[[ -f {IRC_BRIDGE_PEM_FILE_PATH} ]] || "
             f"openssl genpkey -out {IRC_BRIDGE_PEM_FILE_PATH} "
             f"-outform PEM -algorithm {IRC_BRIDGE_KEY_ALGO} -pkeyopt {IRC_BRIDGE_KEY_OPTS}",
         ]

@@ -260,7 +260,6 @@ def test_configure_generates_pem_file_local(irc_bridge_service, mocker):
         [
             "/bin/bash",
             "-c",
-            f"[[ -f {IRC_BRIDGE_PEM_FILE_PATH} ]] || "
             f"openssl genpkey -out {IRC_BRIDGE_PEM_FILE_PATH} "
             f"-outform PEM -algorithm {IRC_BRIDGE_KEY_ALGO} -pkeyopt {IRC_BRIDGE_KEY_OPTS}",
         ],

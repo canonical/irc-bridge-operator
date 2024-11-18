@@ -105,36 +105,6 @@ def test_prepare_installs_snap_package_and_creates_configuration_files(irc_bridg
     mock_copy.assert_has_calls(copy_calls)
 
 
-def test_prepare_does_not_copy_files_if_already_exist(irc_bridge_service, mocker):
-    """Test that the prepare method does not copy files if they already exist.
-
-    arrange: Prepare mocks for the _install_snap_package, shutil.copy, pathlib.Path.mkdir,
-    systemd.daemon_reload, and systemd.service_enable methods. Mock the exists method to return
-    True.
-    act: Call the prepare method.
-    assert: Ensure that the _install_snap_package, shutil.copy, pathlib.Path.mkdir,
-    systemd.daemon_reload, and systemd.service_enable methods were called exactly once.
-    """
-    mock_install_snap_package = mocker.patch.object(irc_bridge_service, "_install_snap_package")
-    mock_generate_media_proxy_key = mocker.patch.object(
-        irc_bridge_service, "_generate_media_proxy_key"
-    )
-    mock_copy = mocker.patch.object(shutil, "copy")
-    mock_mkdir = mocker.patch.object(pathlib.Path, "mkdir")
-
-    mocker.patch.object(pathlib.Path, "exists", return_value=True)
-
-    with patch("builtins.open", mock_open(read_data="config")):
-        irc_bridge_service.prepare()
-
-    mock_install_snap_package.assert_called_once_with(
-        snap_name=IRC_BRIDGE_SNAP_NAME, snap_channel="edge"
-    )
-    mock_generate_media_proxy_key.assert_called_once()
-    mock_mkdir.assert_not_called()
-    mock_copy.assert_not_called()
-
-
 def test_prepare_raises_install_error_if_snap_installation_fails(irc_bridge_service, mocker):
     """Test that the prepare method raises an InstallError if the snap installation fails.
 

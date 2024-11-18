@@ -70,7 +70,7 @@ class DatabaseObserver(Object):
         data = relation_data[0]
 
         # Check that the relation data is well formed according to the following json_schema:
-        # https://github.com/canonical/charm-relation-interfaces/blob/main/interfaces/mysql_client/v0/schemas/provider.json
+        # https://github.com/canonical/charm-relation-interfaces/blob/main/interfaces/postgresql_client/v0/schemas/provider.json
         if not all(data.get(key) for key in ("endpoints", "username", "password")):
             return None
 

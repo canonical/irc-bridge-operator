@@ -143,7 +143,7 @@ class IRCBridgeService:
 
     def _generate_pem_file_local(self) -> None:
         """Generate the PEM file content."""
-        if os.path.exists(IRC_BRIDGE_PEM_FILE_PATH):
+        if IRC_BRIDGE_PEM_FILE_PATH.exists():
             logger.info("PEM file already exists. Skipping generation.")
             return
         pem_create_command = [

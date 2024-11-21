@@ -4,7 +4,6 @@
 """IRC Bridge charm business logic."""
 
 import logging
-import os
 import shutil
 import subprocess  # nosec
 
@@ -99,8 +98,7 @@ class IRCBridgeService:
         with open(ENVIRONMENT_OS_FILE, "r+", encoding="utf-8") as env_file:
             lines = env_file.read()
             if "SNAP_MATRIX_APPSERVICE_ARGS" not in lines:
-                env_file.seek(0, os.SEEK_END)
-                env_file.write(f'SNAP_MATRIX_APPSERVICE_ARGS="{SNAP_MATRIX_APPSERVICE_ARGS}"\n')
+                env_file.write(f'\nSNAP_MATRIX_APPSERVICE_ARGS="{SNAP_MATRIX_APPSERVICE_ARGS}"\n')
 
     def _install_snap_package(
         self, snap_name: str, snap_channel: str, refresh: bool = False

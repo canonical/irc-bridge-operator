@@ -7,9 +7,22 @@
 
 import re
 import typing
+from abc import ABC, abstractmethod
 
 import ops
 from pydantic import BaseModel, Field, ValidationError, validator
+
+
+class ReconcilingCharm(ops.CharmBase, ABC):
+    """An abstract class for a charm that supports reconciliation."""
+
+    @abstractmethod
+    def reconcile(self, event: ops.charm.EventBase) -> None:
+        """Reconcile the charm state.
+
+        Args:
+            event: The event that triggered the reconciliation.
+        """
 
 
 class DatasourcePostgreSQL(BaseModel):
@@ -30,42 +43,6 @@ class DatasourcePostgreSQL(BaseModel):
     port: str = Field(min_length=1, description="Port")
     db: str = Field(min_length=1, description="Database name")
     uri: str = Field(min_length=1, description="Database connection URI")
-
-    @classmethod
-    def from_relation(cls, relation: ops.Relation) -> "DatasourcePostgreSQL":
-        """Create a DatasourcePostgreSQL from a relation.
-
-        Args:
-            relation: The relation to get the data from.
-
-        Returns:
-            A DatasourcePostgreSQL instance.
-        """
-        relation_data = relation.data[relation.app]
-        user = relation_data.get("username", "")
-        password = relation_data.get("password", "")
-        host, port = relation_data.get("endpoints", ":").split(":")
-        db = relation_data.get("database", "")
-        uri = f"postgres://{user}:{password}@{host}:{port}/{db}"
-
-        return DatasourcePostgreSQL(
-            user=user,
-            password=password,
-            host=host,
-            port=port,
-            db=db,
-            uri=uri,
-        )
-
-
-class DatasourceMatrix(BaseModel):
-    """A named tuple representing a Datasource Matrix.
-
-    Attributes:
-        host: Host (IP or DNS without port or protocol).
-    """
-
-    host: str
 
 
 class CharmConfig(BaseModel):

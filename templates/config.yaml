@@ -120,6 +120,11 @@ ircService:
     shortReplyTemplate: "$NICK: $REPLY"
     longReplyTemplate: "<$NICK> \"$ORIGINAL\" <- $REPLY"
     shortReplyTresholdSeconds: 300
+  mediaProxy:
+    signingKeyPath: "/data/config/signingkey.jwk"
+    ttlSeconds: 3600
+    bindPort: 11111
+    publicUrl: "https://irc.bridge/media"
   userActivity:
     minUserActiveDays: 1
     inactiveAfterDays: 30

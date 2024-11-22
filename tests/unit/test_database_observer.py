@@ -7,9 +7,7 @@ from secrets import token_hex
 from unittest.mock import patch
 
 import ops
-import pytest
 from ops.testing import Harness
-from pydantic import ValidationError
 
 from charm_types import DatasourcePostgreSQL
 from database_observer import DatabaseObserver
@@ -91,12 +89,33 @@ def test_get_db():
 def test_get_db_when_no_relation_data():
     """
     arrange: set up a charm and a database relation with an empty databag.
-    act:.
+    act: get db information.
     assert: the db is None.
     """
     harness = Harness(ObservedCharm, meta=REQUIRER_METADATA)
     harness.begin()
-    harness.add_relation("database", "database-provider")
+    harness.add_relation("database", "database-provider", app_data={})
 
-    with pytest.raises(ValidationError):
-        harness.charm.database.get_db()  # pylint: disable=pointless-statement
+    assert harness.charm.database.get_db() is None
+
+
+def test_get_db_when_invalid_relation_data():
+    """
+    arrange: set up a charm and a database relation with invalid databag.
+    act: get db information.
+    assert: the db is None.
+    """
+    harness = Harness(ObservedCharm, meta=REQUIRER_METADATA)
+    harness.begin()
+    harness.add_relation(
+        "database",
+        "database-provider",
+        app_data={
+            "database": "ircbridge",
+            "endpoints": "postgresql-k8s-primary.local:5432",
+            "password": "",
+            "username": "",
+        },
+    )
+
+    assert harness.charm.database.get_db() is None

@@ -10,10 +10,9 @@ from charms.data_platform_libs.v0.data_interfaces import (
     DatabaseEndpointsChangedEvent,
     DatabaseRequires,
 )
-from ops.charm import CharmBase
 from ops.framework import Object
 
-from charm_types import DatasourcePostgreSQL
+from charm_types import DatasourcePostgreSQL, ReconcilingCharm
 from constants import DATABASE_NAME
 
 
@@ -25,7 +24,7 @@ class DatabaseObserver(Object):
         database: The database relation interface.
     """
 
-    def __init__(self, charm: CharmBase, relation_name: str):
+    def __init__(self, charm: ReconcilingCharm, relation_name: str):
         """Initialize the oserver and register event handlers.
 
         Args:
@@ -45,11 +44,11 @@ class DatabaseObserver(Object):
 
     def _on_database_created(self, _: DatabaseCreatedEvent) -> None:
         """Handle database created."""
-        self._charm.reconcile()  # type: ignore
+        self._charm.reconcile()
 
     def _on_endpoints_changed(self, _: DatabaseEndpointsChangedEvent) -> None:
         """Handle endpoints changed."""
-        self._charm.reconcile()  # type: ignore
+        self._charm.reconcile()
 
     def get_db(self) -> typing.Optional[DatasourcePostgreSQL]:
         """Return a postgresql datasource model.
@@ -57,10 +56,40 @@ class DatabaseObserver(Object):
         Returns:
             DatasourcePostgreSQL: The datasource model.
         """
-        # not using get_relation due this issue
-        # https://github.com/canonical/operator/issues/1153
-        if not self.model.relations.get(self.database.relation_name):
+        relation_data = list(
+            self.database.fetch_relation_data(
+                fields=["uris", "endpoints", "username", "password", "database"]
+            ).values()
+        )
+
+        if not relation_data:
             return None
 
-        relation = self.model.get_relation(self.relation_name)
-        return DatasourcePostgreSQL.from_relation(relation)
+        # There can be only one database integrated at a time
+        # with the same interface name. See: metadata.yaml
+        data = relation_data[0]
+
+        # Check that the relation data is well formed according to the following json_schema:
+        # https://github.com/canonical/charm-relation-interfaces/blob/main/interfaces/postgresql_client/v0/schemas/provider.json
+        if not all(data.get(key) for key in ("endpoints", "username", "password")):
+            return None
+
+        database_name = data.get("database", self.database.database)
+        endpoint = data["endpoints"].split(",")[0]
+        user = data["username"]
+        password = data["password"]
+        host, port = endpoint.split(":")
+
+        if "uris" in data:
+            uri = data["uris"].split(",")[0]
+        else:
+            uri = f"postgres://{user}:{password}@{endpoint}/{database_name}"
+
+        return DatasourcePostgreSQL(
+            user=user,
+            password=password,
+            host=host,
+            port=port,
+            db=database_name,
+            uri=uri,
+        )

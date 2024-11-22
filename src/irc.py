@@ -10,25 +10,23 @@ import subprocess  # nosec
 import yaml
 from charms.operator_libs_linux.v1 import systemd
 from charms.operator_libs_linux.v2 import snap
+from charms.synapse.v0.matrix_auth import MatrixAuthProviderData
 
 import exceptions
-from charm_types import CharmConfig, DatasourceMatrix, DatasourcePostgreSQL
+from charm_types import CharmConfig, DatasourcePostgreSQL
 from constants import (
+    ENVIRONMENT_OS_FILE,
     IRC_BRIDGE_CONFIG_DIR_PATH,
     IRC_BRIDGE_CONFIG_FILE_PATH,
-    IRC_BRIDGE_HEALTH_PORT,
     IRC_BRIDGE_KEY_ALGO,
     IRC_BRIDGE_KEY_OPTS,
     IRC_BRIDGE_PEM_FILE_PATH,
     IRC_BRIDGE_REGISTRATION_FILE_PATH,
+    IRC_BRIDGE_SERVICE_NAME,
     IRC_BRIDGE_SNAP_NAME,
-    IRC_BRIDGE_TARGET_FILE_PATH,
     IRC_BRIDGE_TEMPLATE_CONFIG_FILE_PATH,
-    IRC_BRIDGE_TEMPLATE_TARGET_FILE_PATH,
-    IRC_BRIDGE_TEMPLATE_UNIT_FILE_PATH,
-    IRC_BRIDGE_UNIT_FILE_PATH,
+    SNAP_MATRIX_APPSERVICE_ARGS,
     SNAP_PACKAGES,
-    SYSTEMD_DIR_PATH,
 )
 
 logger = logging.getLogger(__name__)
@@ -63,7 +61,7 @@ class IRCBridgeService:
     """
 
     def reconcile(
-        self, db: DatasourcePostgreSQL, matrix: DatasourceMatrix, config: CharmConfig
+        self, db: DatasourcePostgreSQL, matrix: MatrixAuthProviderData, config: CharmConfig
     ) -> None:
         """Reconcile the service.
 
@@ -90,17 +88,17 @@ class IRCBridgeService:
             snap_name=IRC_BRIDGE_SNAP_NAME,
             snap_channel=SNAP_PACKAGES[IRC_BRIDGE_SNAP_NAME]["channel"],
         )
-
         if not IRC_BRIDGE_CONFIG_DIR_PATH.exists():
             IRC_BRIDGE_CONFIG_DIR_PATH.mkdir(parents=True)
             logger.info("Created directory %s", IRC_BRIDGE_CONFIG_DIR_PATH)
             shutil.copy(IRC_BRIDGE_TEMPLATE_CONFIG_FILE_PATH, IRC_BRIDGE_CONFIG_DIR_PATH)
 
-        if not IRC_BRIDGE_UNIT_FILE_PATH.exists() or not IRC_BRIDGE_TARGET_FILE_PATH.exists():
-            shutil.copy(IRC_BRIDGE_TEMPLATE_UNIT_FILE_PATH, SYSTEMD_DIR_PATH)
-            shutil.copy(IRC_BRIDGE_TEMPLATE_TARGET_FILE_PATH, SYSTEMD_DIR_PATH)
-            systemd.daemon_reload()
-        systemd.service_enable(IRC_BRIDGE_SNAP_NAME)
+        self._generate_media_proxy_key()
+
+        with open(ENVIRONMENT_OS_FILE, "r+", encoding="utf-8") as env_file:
+            lines = env_file.read()
+            if "SNAP_MATRIX_APPSERVICE_ARGS" not in lines:
+                env_file.write(f'\nSNAP_MATRIX_APPSERVICE_ARGS="{SNAP_MATRIX_APPSERVICE_ARGS}"\n')
 
     def _install_snap_package(
         self, snap_name: str, snap_channel: str, refresh: bool = False
@@ -128,7 +126,7 @@ class IRCBridgeService:
             raise InstallError(error_msg) from e
 
     def configure(
-        self, db: DatasourcePostgreSQL, matrix: DatasourceMatrix, config: CharmConfig
+        self, db: DatasourcePostgreSQL, matrix: MatrixAuthProviderData, config: CharmConfig
     ) -> None:
         """Configure the service.
 
@@ -143,18 +141,21 @@ class IRCBridgeService:
 
     def _generate_pem_file_local(self) -> None:
         """Generate the PEM file content."""
+        if IRC_BRIDGE_PEM_FILE_PATH.exists():
+            logger.info("PEM file already exists. Skipping generation.")
+            return
         pem_create_command = [
             "/bin/bash",
             "-c",
-            f"[[ -f {IRC_BRIDGE_PEM_FILE_PATH} ]] || "
             f"openssl genpkey -out {IRC_BRIDGE_PEM_FILE_PATH} "
             f"-outform PEM -algorithm {IRC_BRIDGE_KEY_ALGO} -pkeyopt {IRC_BRIDGE_KEY_OPTS}",
         ]
         logger.info("Creating PEM file for IRC bridge.")
-        subprocess.run(pem_create_command, shell=True, check=True, capture_output=True)  # nosec
+        result = subprocess.run(pem_create_command, check=True, capture_output=True)  # nosec
+        logger.info("PEM file creation result: %s", result)
 
     def _generate_app_registration_local(
-        self, matrix: DatasourceMatrix, config: CharmConfig
+        self, matrix: MatrixAuthProviderData, config: CharmConfig
     ) -> None:
         """Generate the content of the app registration file.
 
@@ -166,17 +167,30 @@ class IRCBridgeService:
             "/bin/bash",
             "-c",
             f"[[ -f {IRC_BRIDGE_REGISTRATION_FILE_PATH} ]] || "
-            f"matrix-appservice-irc -r -f {IRC_BRIDGE_REGISTRATION_FILE_PATH}"
-            f" -u https://{matrix.host}:{IRC_BRIDGE_HEALTH_PORT} "
-            f"-c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
+            f"snap run matrix-appservice-irc -r -f {IRC_BRIDGE_REGISTRATION_FILE_PATH}"
+            f" -u {matrix.homeserver}"
+            f" -c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
         ]
         logger.info("Creating an app registration file for IRC bridge.")
-        subprocess.run(
-            app_reg_create_command, shell=True, check=True, capture_output=True
-        )  # nosec
+        result = subprocess.run(app_reg_create_command, check=True, capture_output=True)  # nosec
+        logger.info("App registration file creation result: %s", result)
+
+    def _generate_media_proxy_key(self) -> None:
+        """Generate the content of the media proxy key."""
+        media_proxy_key_command = [
+            "/bin/bash",
+            "-c",
+            "/snap/matrix-appservice-irc/11/bin/node",
+            "/snap/matrix-appservice-irc/11/app/lib/generate-signing-key.js",
+            ">",
+            "/data/config/signingkey.jwk",
+        ]
+        logger.info("Creating an media proxy key for IRC bridge.")
+        result = subprocess.run(media_proxy_key_command, check=True, capture_output=True)  # nosec
+        logger.info("Media proxy key file creation result: %s", result)
 
     def _eval_conf_local(
-        self, db: DatasourcePostgreSQL, matrix: DatasourceMatrix, config: CharmConfig
+        self, db: DatasourcePostgreSQL, matrix: MatrixAuthProviderData, config: CharmConfig
     ) -> None:
         """Generate the content of the irc configuration file.
 
@@ -193,9 +207,10 @@ class IRCBridgeService:
         try:
             db_conn = data["database"]["connectionString"]
             if db_conn == "" or db_conn != db.uri:
-                db_conn = data["database"]["connectionString"]
-            data["homeserver"]["url"] = f"https://{matrix.host}"
-            data["ircService"]["ident"] = config.ident_enabled
+                data["database"]["connectionString"] = db.uri
+            data["homeserver"]["url"] = f"https://{matrix.homeserver}"
+            data["ircService"]["passwordEncryptionKeyPath"] = f"{IRC_BRIDGE_PEM_FILE_PATH}"
+            data["ircService"]["ident"]["enabled"] = config.ident_enabled
             data["ircService"]["permissions"] = {}
             for admin in config.bridge_admins:
                 data["ircService"]["permissions"][admin] = "admin"
@@ -207,6 +222,15 @@ class IRCBridgeService:
         with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "w", encoding="utf-8") as config_file:
             yaml.dump(data, config_file)
 
+    def get_registration(self) -> str:
+        """Return the app registration file content.
+
+        Returns:
+            str: the content of the app registration file
+        """
+        with open(IRC_BRIDGE_REGISTRATION_FILE_PATH, "r", encoding="utf-8") as registration_file:
+            return registration_file.read()
+
     def reload(self) -> None:
         """Reload the matrix-appservice-irc service.
 
@@ -216,7 +240,9 @@ class IRCBridgeService:
             ReloadError: when encountering a SnapError
         """
         try:
-            systemd.service_reload(IRC_BRIDGE_SNAP_NAME)
+            systemd.daemon_reload()
+            systemd.service_enable(IRC_BRIDGE_SERVICE_NAME)
+            systemd.service_restart(IRC_BRIDGE_SERVICE_NAME)
         except systemd.SystemdError as e:
             error_msg = f"An exception occurred when reloading {IRC_BRIDGE_SNAP_NAME}."
             logger.exception(error_msg)
@@ -229,7 +255,7 @@ class IRCBridgeService:
             StartError: when encountering a SnapError
         """
         try:
-            systemd.service_start(IRC_BRIDGE_SNAP_NAME)
+            systemd.service_start(IRC_BRIDGE_SERVICE_NAME)
         except systemd.SystemdError as e:
             error_msg = f"An exception occurred when starting {IRC_BRIDGE_SNAP_NAME}."
             logger.exception(error_msg)

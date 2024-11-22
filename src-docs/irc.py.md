@@ -10,7 +10,9 @@ IRC Bridge charm business logic.
 - **IRC_BRIDGE_HEALTH_PORT**
 - **IRC_BRIDGE_KEY_ALGO**
 - **IRC_BRIDGE_KEY_OPTS**
+- **IRC_BRIDGE_SERVICE_NAME**
 - **IRC_BRIDGE_SNAP_NAME**
+- **SNAP_MATRIX_APPSERVICE_ARGS**
 - **SNAP_PACKAGES**
 
 
@@ -26,14 +28,14 @@ This class provides the necessary methods to manage the matrix-appservice-irc se
 
 ---
 
-<a href="../src/irc.py#L130"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/irc.py#L129"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `configure`
 
 ```python
 configure(
     db: DatasourcePostgreSQL,
-    matrix: DatasourceMatrix,
+    matrix: MatrixAuthProviderData,
     config: CharmConfig
 ) → None
 ```
@@ -50,7 +52,25 @@ Configure the service.
 
 ---
 
-<a href="../src/irc.py#L84"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/irc.py#L210"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+### <kbd>function</kbd> `get_registration`
+
+```python
+get_registration() → str
+```
+
+Return the app registration file content. 
+
+
+
+**Returns:**
+ 
+ - <b>`str`</b>:  the content of the app registration file 
+
+---
+
+<a href="../src/irc.py#L83"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `prepare`
 
@@ -64,14 +84,14 @@ Install the snap package and create the configuration directory and file.
 
 ---
 
-<a href="../src/irc.py#L65"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/irc.py#L64"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `reconcile`
 
 ```python
 reconcile(
     db: DatasourcePostgreSQL,
-    matrix: DatasourceMatrix,
+    matrix: MatrixAuthProviderData,
     config: CharmConfig
 ) → None
 ```
@@ -93,7 +113,7 @@ Simple flow:
 
 ---
 
-<a href="../src/irc.py#L208"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/irc.py#L219"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `reload`
 
@@ -113,7 +133,7 @@ Check if the service is running and reload it.
 
 ---
 
-<a href="../src/irc.py#L223"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/irc.py#L237"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `start`
 
@@ -131,7 +151,7 @@ Start the matrix-appservice-irc service.
 
 ---
 
-<a href="../src/irc.py#L236"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/irc.py#L250"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>function</kbd> `stop`
 

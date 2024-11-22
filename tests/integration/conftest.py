@@ -7,8 +7,9 @@ from pathlib import Path
 
 import pytest_asyncio
 import yaml
+from juju.model import Model
 from pytest import Config, fixture
-from pytest_operator.plugin import Model, OpsTest
+from pytest_operator.plugin import OpsTest
 
 
 @fixture(scope="module", name="metadata")
@@ -48,7 +49,5 @@ async def app_fixture(
     else:
         charm = await ops_test.build_charm(".")
         application = await model.deploy(charm, application_name=app_name)
-
-    await model.wait_for_idle(apps=[application.name], status="active")
 
     yield application

@@ -4,6 +4,7 @@
 
 """Helper functions for the integration tests."""
 
+import ipaddress
 import json
 import pathlib
 import random
@@ -12,6 +13,7 @@ import tempfile
 
 import ops
 from juju.application import Application
+from juju.client._definitions import FullStatus, UnitStatus
 from pytest_operator.plugin import OpsTest
 
 
@@ -182,6 +184,31 @@ async def generate_anycharm_relation(
     }
     if machine is not None:
         args["to"] = machine
-    any_charm = await ops_test.model.deploy("any-charm", **args)
+    any_charm = await ops_test.model.deploy("any-charm", args)
     await ops_test.model.wait_for_idle(apps=[any_charm.name])
     await ops_test.model.add_relation(f"{any_charm.name}", f"{app.name}")
+
+
+async def get_unit_address(application: Application) -> str:
+    """Get the unit address to make HTTP requests.
+
+    Args:
+        application: The deployed application
+
+    Returns:
+        The unit address
+    """
+    status: FullStatus = await application.model.get_status([application.name])
+    unit_status: UnitStatus = next(iter(status.applications[application.name].units.values()))
+    assert unit_status.public_address, "Invalid unit address"
+    address = (
+        unit_status.public_address
+        if isinstance(unit_status.public_address, str)
+        else unit_status.public_address.decode()
+    )
+
+    unit_ip_address = ipaddress.ip_address(address)
+    url = f"http://{str(unit_ip_address)}"
+    if isinstance(unit_ip_address, ipaddress.IPv6Address):
+        url = f"http://[{str(unit_ip_address)}]"
+    return url

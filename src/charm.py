@@ -8,6 +8,7 @@ import logging
 import typing
 
 import ops
+from charms.traefik_k8s.v2.ingress import IngressPerAppRequirer
 from pydantic import ValidationError
 
 from charm_types import CharmConfig
@@ -32,6 +33,8 @@ class IRCCharm(ops.CharmBase):
         self._irc = IRCBridgeService()
         self._database = DatabaseObserver(self, DATABASE_RELATION_NAME)
         self._matrix = MatrixObserver(self, MATRIX_RELATION_NAME)
+        # 8090 is used for Synapse -> IRC Bridge communication
+        self.ingress = IngressPerAppRequirer(self, port=8090)
         self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(self.on.install, self._on_install)
         self.framework.observe(self.on.upgrade_charm, self._on_upgrade_charm)

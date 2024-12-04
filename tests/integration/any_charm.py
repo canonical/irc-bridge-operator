@@ -26,7 +26,7 @@ class AnyCharm(AnyCharmBase):
         """
         super().__init__(*args, **kwargs)
 
-        self.plugin_auth = MatrixAuthProvides(self, relation_name="provide-irc-bridge")
+        self.plugin_auth = MatrixAuthProvides(self, relation_name="provide-matrix-auth")
         self.framework.observe(
             self.on.provide_irc_bridge_relation_created, self._on_relation_created
         )
@@ -36,7 +36,7 @@ class AnyCharm(AnyCharmBase):
 
     def _on_relation_created(self, _):
         """Create the relation and set the relation data."""
-        relation = self.model.get_relation("provide-irc-bridge")
+        relation = self.model.get_relation("provide-matrix-auth")
         secret = token_hex(16)
         if relation is not None:
             logger.info("Setting relation data")
@@ -48,7 +48,7 @@ class AnyCharm(AnyCharmBase):
 
     def _on_matrix_auth_request_received(self, _):
         """Get the relation data and log it."""
-        relation = self.model.get_relation("provide-irc-bridge")
+        relation = self.model.get_relation("provide-matrix-auth")
         if relation is not None:
             logger.info("Getting relation data")
             remote_data = self.plugin_auth.get_remote_relation_data()
@@ -56,9 +56,9 @@ class AnyCharm(AnyCharmBase):
 
     def _on_relation_changed(self, _):
         """Get the relation data and log it."""
-        relation = self.model.get_relation("provide-irc-bridge")
+        relation = self.model.get_relation("provide-matrix-auth")
         logger.info("Relation: %s", relation)
-        relation = self.model.get_relation("provide-irc-bridge")
+        relation = self.model.get_relation("provide-matrix-auth")
         logger.info("Relation: %s", relation)
         if relation is not None:
             try:

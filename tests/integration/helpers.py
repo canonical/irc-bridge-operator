@@ -163,25 +163,20 @@ async def generate_anycharm_relation(
     matrix_auth_content = pathlib.Path("lib/charms/synapse/v0/matrix_auth.py").read_text(
         encoding="utf-8"
     )
-
     any_charm_src_overwrite = {
         "any_charm.py": any_charm_content,
         "matrix_auth.py": matrix_auth_content,
     }
-
-    # We deploy https://charmhub.io/any-charm and inject the any_charm.py behavior
-    # See https://github.com/canonical/any-charm on how to use any-charm
     assert ops_test.model
-    args = {
-        "application_name": any_app_name,
-        "channel": "beta",
-        "config": {
-            "src-overwrite": json.dumps(any_charm_src_overwrite),
+    any_charm = await ops_test.model.deploy(
+        "any-charm",
+        application_name=any_app_name,
+        channel="beta",
+        config={
             "python-packages": "pydantic",
+            "src-overwrite": json.dumps(any_charm_src_overwrite),
         },
-    }
-    if machine is not None:
-        args["to"] = machine
-    any_charm = await ops_test.model.deploy("any-charm", args)
+        to=machine,
+    )
     await ops_test.model.wait_for_idle(apps=[any_charm.name])
     await ops_test.model.add_relation(f"{any_charm.name}", f"{app.name}")

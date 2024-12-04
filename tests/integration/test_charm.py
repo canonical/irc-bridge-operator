@@ -88,6 +88,7 @@ async def test_ingress_integration(app: Application, model: Model):
 
     unit_address = await tests.integration.helpers.get_unit_address(haproxy_application)
     headers = {"Host": "haproxy.internal"}
-    response = requests.get(unit_address, headers=headers, verify=False, timeout=10)
+    # Setting verify=False because it's a self-signed certificate
+    response = requests.get(unit_address, headers=headers, verify=False, timeout=10)  # nosec
 
     assert response.status_code == 200

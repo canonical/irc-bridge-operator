@@ -118,4 +118,4 @@ class IRCCharm(ops.CharmBase):
 
 
 if __name__ == "__main__":  # pragma: nocover
-    ops.main.main(IRCCharm)
+    ops.main(IRCCharm)

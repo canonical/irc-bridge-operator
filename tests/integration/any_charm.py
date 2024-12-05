@@ -28,7 +28,7 @@ class AnyCharm(AnyCharmBase):
 
         self.plugin_auth = MatrixAuthProvides(self, relation_name="provide-matrix-auth")
         self.framework.observe(
-            self.on.provide_irc_bridge_relation_created, self._on_relation_created
+            self.on.provide_matrix_auth_relation_created, self._on_relation_created
         )
         self.framework.observe(
             self.plugin_auth.on.matrix_auth_request_received, self._on_matrix_auth_request_received

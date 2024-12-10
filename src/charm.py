@@ -5,6 +5,7 @@
 """Charm for irc-bridge."""
 
 import logging
+import socket
 import typing
 
 import ops
@@ -18,6 +19,8 @@ from irc import IRCBridgeService
 from matrix_observer import MatrixObserver
 
 logger = logging.getLogger(__name__)
+
+IRC_BIND_PORT = 8090
 
 
 class IRCCharm(ops.CharmBase):
@@ -34,7 +37,7 @@ class IRCCharm(ops.CharmBase):
         self._database = DatabaseObserver(self, DATABASE_RELATION_NAME)
         self._matrix = MatrixObserver(self, MATRIX_RELATION_NAME)
         # 8090 is used for Synapse -> IRC Bridge communication
-        self.ingress = IngressPerAppRequirer(self, port=8090, strip_prefix=True)
+        self.ingress = IngressPerAppRequirer(self, port=IRC_BIND_PORT, strip_prefix=True)
         self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(self.on.install, self._on_install)
         self.framework.observe(self.on.upgrade_charm, self._on_upgrade_charm)
@@ -74,6 +77,19 @@ class IRCCharm(ops.CharmBase):
             bridge_admins=self.model.config.get("bridge_admins", None),
         )
 
+    def _get_external_url(self) -> str:
+        """Return URL to access IRC Bridge from Matrix."""
+        # Default: FQDN
+        external_url = f"http://{socket.getfqdn()}:{IRC_BIND_PORT}"
+        # If can connect to juju-info, get unit IP
+        if binding := self.model.get_binding("juju-info"):
+            unit_ip = str(binding.network.bind_address)
+            external_url = f"http://{unit_ip}:{IRC_BIND_PORT}"
+        # If ingress is set, get ingress url
+        if self.ingress.url:
+            external_url = self.ingress.url
+        return external_url
+
     def reconcile(self) -> None:
         """Reconcile the charm.
 
@@ -112,7 +128,7 @@ class IRCCharm(ops.CharmBase):
             self.unit.status = ops.MaintenanceStatus(f"Invalid configuration: {e}")
             logger.exception("Invalid configuration: {%s}", e)
             return
-        self._irc.reconcile(db, matrix, config)
+        self._irc.reconcile(db, matrix, config, self._get_external_url())
         self._matrix.set_irc_registration(self._irc.get_registration())
         self.unit.status = ops.ActiveStatus()
 

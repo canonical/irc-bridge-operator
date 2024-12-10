@@ -61,7 +61,11 @@ class IRCBridgeService:
     """
 
     def reconcile(
-        self, db: DatasourcePostgreSQL, matrix: MatrixAuthProviderData, config: CharmConfig
+        self,
+        db: DatasourcePostgreSQL,
+        matrix: MatrixAuthProviderData,
+        config: CharmConfig,
+        external_url: str,
     ) -> None:
         """Reconcile the service.
 
@@ -74,9 +78,10 @@ class IRCBridgeService:
             db: the database configuration
             matrix: the matrix configuration
             config: the charm configuration
+            external_url: ingress url (or unit IP)
         """
         self.prepare()
-        self.configure(db, matrix, config)
+        self.configure(db, matrix, config, external_url)
         self.reload()
 
     def prepare(self) -> None:
@@ -126,7 +131,11 @@ class IRCBridgeService:
             raise InstallError(error_msg) from e
 
     def configure(
-        self, db: DatasourcePostgreSQL, matrix: MatrixAuthProviderData, config: CharmConfig
+        self,
+        db: DatasourcePostgreSQL,
+        matrix: MatrixAuthProviderData,
+        config: CharmConfig,
+        external_url: str,
     ) -> None:
         """Configure the service.
 
@@ -134,9 +143,10 @@ class IRCBridgeService:
             db: the database configuration
             matrix: the matrix configuration
             config: the charm configuration
+            external_url: ingress url (or unit IP)
         """
         self._generate_pem_file_local()
-        self._generate_app_registration_local(matrix, config)
+        self._generate_app_registration_local(config, external_url)
         self._eval_conf_local(db, matrix, config)
 
     def _generate_pem_file_local(self) -> None:
@@ -154,21 +164,19 @@ class IRCBridgeService:
         result = subprocess.run(pem_create_command, check=True, capture_output=True)  # nosec
         logger.info("PEM file creation result: %s", result)
 
-    def _generate_app_registration_local(
-        self, matrix: MatrixAuthProviderData, config: CharmConfig
-    ) -> None:
+    def _generate_app_registration_local(self, config: CharmConfig, external_url: str) -> None:
         """Generate the content of the app registration file.
 
         Args:
-            matrix: the matrix configuration
             config: the charm configuration
+            external_url: ingress url (or unit IP)
         """
         app_reg_create_command = [
             "/bin/bash",
             "-c",
             f"[[ -f {IRC_BRIDGE_REGISTRATION_FILE_PATH} ]] || "
             f"snap run matrix-appservice-irc -r -f {IRC_BRIDGE_REGISTRATION_FILE_PATH}"
-            f" -u {matrix.homeserver}"
+            f" -u {external_url}"
             f" -c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
         ]
         logger.info("Creating an app registration file for IRC bridge.")

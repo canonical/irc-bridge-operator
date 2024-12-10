@@ -7,6 +7,7 @@
 import logging
 
 import pytest
+import requests
 from juju.application import Application
 from juju.model import Model
 from requests import Session
@@ -21,11 +22,15 @@ logger = logging.getLogger(__name__)
 @pytest.mark.abort_on_fail
 async def test_ingress_integration(app: Application, model: Model):
     """
-    arrange: deploy haproxy and relate it to self-signed-certificates. Relate
-        haproxy with IRC bridge.
-    act: simulate Synapse requesting IRC bridge.
+    arrange: assert IRC /health is ok, deploy haproxy and relate it to
+        self-signed-certificates. Relate haproxy with IRC bridge.
+    act: request /health via haproxy.
     assert: request is successful.
     """
+    unit_address = await tests.integration.helpers.get_unit_address(app)
+    response = requests.get(f"http://{unit_address}:8090/health", timeout=30)
+    assert response.status_code == 200
+    assert response.text == "OK"
     haproxy_application = await model.deploy("haproxy", channel="2.8/edge")
     self_signed_application = await model.deploy("self-signed-certificates", channel="edge")
     external_hostname = "haproxy.internal"
@@ -44,9 +49,11 @@ async def test_ingress_integration(app: Application, model: Model):
     session = Session()
     session.mount("https://", DNSResolverHTTPSAdapter(external_hostname, str(unit_address)))
     response = session.get(
-        f"https://{unit_address}/",
-        headers={"Host": "haproxy.internal"},
+        f"https://{unit_address}/health",
+        headers={"Host": external_hostname},
         verify=False,  # nosec - calling charm ingress URL
         timeout=30,
     )
+
     assert response.status_code == 200
+    assert response.text == "OK"

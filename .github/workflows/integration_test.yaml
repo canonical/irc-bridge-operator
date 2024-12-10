@@ -12,3 +12,4 @@ jobs:
       self-hosted-runner-label: "edge"
       juju-channel: 3.4/stable
       provider: lxd
+      modules: '["test_charm.py", "test_ingress.py"]'

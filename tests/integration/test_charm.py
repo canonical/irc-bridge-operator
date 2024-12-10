@@ -8,7 +8,6 @@ import logging
 
 import ops
 import pytest
-import requests
 from juju.application import Application
 from juju.model import Model
 from pytest_operator.plugin import OpsTest
@@ -62,33 +61,3 @@ async def test_lifecycle_after_relations(app: Application, ops_test: OpsTest, mo
     )
 
     assert unit.workload_status == ops.model.ActiveStatus.name
-
-
-@pytest.mark.asyncio
-@pytest.mark.abort_on_fail
-async def test_ingress_integration(app: Application, model: Model):
-    """
-    arrange: deploy haproxy and relate it to self-signed-certificates. Relate
-        haproxy with IRC bridge.
-    act: simulate Synapse requesting IRC bridge.
-    assert: request is successful.
-    """
-    haproxy_application = await model.deploy("haproxy", channel="2.8/edge")
-    self_signed_application = await model.deploy("self-signed-certificates", channel="edge")
-    await haproxy_application.set_config({"external-hostname": "haproxy.internal"})
-    await model.wait_for_idle(
-        apps=[self_signed_application.name, haproxy_application.name], status="active"
-    )
-    await model.add_relation(self_signed_application.name, haproxy_application.name)
-    await model.wait_for_idle(
-        apps=[self_signed_application.name, haproxy_application.name], status="active"
-    )
-    await model.add_relation(app.name, haproxy_application.name)
-    await model.wait_for_idle(apps=[app.name, haproxy_application.name], status="active")
-
-    unit_address = await tests.integration.helpers.get_unit_address(haproxy_application)
-    headers = {"Host": "haproxy.internal"}
-    # Setting verify=False because it's a self-signed certificate
-    response = requests.get(unit_address, headers=headers, verify=False, timeout=10)  # nosec
-
-    assert response.status_code == 200

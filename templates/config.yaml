@@ -5,6 +5,8 @@ homeserver:
   url: "https://ubuntu.com"
   domain: "ubuntu.com"
   enablePresence: true
+  bindPort: 8090
+  bindHostname: 0.0.0.0
 ircService:
   servers:
     irc.eu.libera.chat:
@@ -79,7 +81,7 @@ ircService:
     enabled: false
     initial: false
   ident:
-    enabled: false
+    enabled: true
     port: 1113
     address: "::"
   logging:

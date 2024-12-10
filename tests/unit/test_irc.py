@@ -62,10 +62,11 @@ def test_reconcile_calls_prepare_configure_and_reload_methods(irc_bridge_service
         bridge_admins="admin1:example.com,admin2:example.com",
     )
 
-    irc_bridge_service.reconcile(db, matrix, config)
+    url = "http://localhost:8090"
+    irc_bridge_service.reconcile(db, matrix, config, url)
 
     mock_prepare.assert_called_once()
-    mock_configure.assert_called_once_with(db, matrix, config)
+    mock_configure.assert_called_once_with(db, matrix, config, url)
     mock_reload.assert_called_once()
 
 
@@ -248,7 +249,6 @@ def test_configure_generates_app_registration_local(irc_bridge_service, mocker):
     """
     mock_run = mocker.patch.object(subprocess, "run")
 
-    matrix = MatrixAuthProviderData(homeserver="matrix.example.com")
     config = CharmConfig(
         ident_enabled=True,
         bot_nickname="my_bot",
@@ -256,7 +256,7 @@ def test_configure_generates_app_registration_local(irc_bridge_service, mocker):
     )
 
     irc_bridge_service._generate_app_registration_local(  # pylint: disable=protected-access
-        matrix, config
+        config, "http://localhost:8090"
     )
 
     # pylint: disable=duplicate-code
@@ -266,7 +266,7 @@ def test_configure_generates_app_registration_local(irc_bridge_service, mocker):
             "-c",
             f"[[ -f {IRC_BRIDGE_REGISTRATION_FILE_PATH} ]] || "
             f"snap run matrix-appservice-irc -r -f {IRC_BRIDGE_REGISTRATION_FILE_PATH}"
-            f" -u {matrix.homeserver} "
+            f" -u http://localhost:8090 "
             f"-c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
         ],
         check=True,

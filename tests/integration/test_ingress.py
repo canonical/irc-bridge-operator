@@ -27,6 +27,13 @@ async def test_ingress_integration(app: Application, model: Model):
     act: request /health via haproxy.
     assert: request is successful.
     """
+    # Deploy postgresql charm and relate with the charm
+    await model.deploy("postgresql", channel="14/stable")
+    await model.wait_for_idle(apps=["postgresql"], status="active", timeout=60 * 60)
+    await model.add_relation(app.name, "postgresql")
+    await model.wait_for_idle(
+        apps=[f"{app.name}", "postgresql"], status="active", timeout=60 * 60
+    )
     unit_address = await tests.integration.helpers.get_unit_address(app)
     response = requests.get(f"http://{unit_address}:8090/health", timeout=30)
     assert response.status_code == 200

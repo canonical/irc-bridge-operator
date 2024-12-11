@@ -60,7 +60,7 @@ async def app_fixture(
 async def app_integrated_fixture(ops_test: OpsTest, app: Application, model: Model):
     """Integrate the charm with PostgreSQL and AnyCharm as matrix-auth provider."""
     config = {"bridge_admins": "admin:example.com", "bot_nickname": "bot"}
-    app.set_config(config)
+    await app.set_config(config)
     await model.deploy("postgresql", channel="14/stable")
     await model.wait_for_idle(apps=["postgresql"], status="active", timeout=60 * 60)
     await model.add_relation(app.name, "postgresql")

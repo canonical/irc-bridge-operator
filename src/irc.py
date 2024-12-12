@@ -23,6 +23,7 @@ from constants import (
     IRC_BRIDGE_PEM_FILE_PATH,
     IRC_BRIDGE_REGISTRATION_FILE_PATH,
     IRC_BRIDGE_SERVICE_NAME,
+    IRC_BRIDGE_SIGNING_KEY_FILE_PATH,
     IRC_BRIDGE_SNAP_NAME,
     IRC_BRIDGE_TEMPLATE_CONFIG_FILE_PATH,
     SNAP_MATRIX_APPSERVICE_ARGS,
@@ -190,8 +191,7 @@ class IRCBridgeService:
             "-c",
             "/snap/matrix-appservice-irc/11/bin/node",
             "/snap/matrix-appservice-irc/11/app/lib/generate-signing-key.js",
-            ">",
-            "/data/config/signingkey.jwk",
+            f"> {IRC_BRIDGE_SIGNING_KEY_FILE_PATH}",
         ]
         logger.info("Creating an media proxy key for IRC bridge.")
         result = subprocess.run(media_proxy_key_command, check=True, capture_output=True)  # nosec

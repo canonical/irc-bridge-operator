@@ -28,7 +28,8 @@ async def test_ingress_integration(app_integrated: Application, model: Model):
     assert: request is successful.
     """
     unit_address = await tests.integration.helpers.get_unit_address(app_integrated)
-    response = requests.get(f"http://{unit_address}:8090/health", timeout=30)
+    unit_address = unit_address.removeprefix("http://")
+    response = requests.get(f"{unit_address}:8090/health", timeout=30)
     assert response.status_code == 200
     assert response.text == "OK"
     haproxy_application = await model.deploy("haproxy", channel="2.8/edge")
@@ -48,10 +49,11 @@ async def test_ingress_integration(app_integrated: Application, model: Model):
     )
 
     unit_address = await tests.integration.helpers.get_unit_address(haproxy_application)
+    unit_address = unit_address.removeprefix("http://")
     session = Session()
     session.mount("https://", DNSResolverHTTPSAdapter(external_hostname, str(unit_address)))
     response = session.get(
-        f"https://{unit_address}/health",
+        f"https://{unit_address}/{model.name}-{app_integrated.name}/health",
         headers={"Host": external_hostname},
         verify=False,  # nosec - calling charm ingress URL
         timeout=30,

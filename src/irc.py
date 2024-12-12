@@ -216,7 +216,7 @@ class IRCBridgeService:
             db_conn = data["database"]["connectionString"]
             if db_conn == "" or db_conn != db.uri:
                 data["database"]["connectionString"] = db.uri
-            data["homeserver"]["url"] = f"https://{matrix.homeserver}"
+            data["homeserver"]["url"] = matrix.homeserver
             data["ircService"]["passwordEncryptionKeyPath"] = f"{IRC_BRIDGE_PEM_FILE_PATH}"
             data["ircService"]["ident"]["enabled"] = config.ident_enabled
             data["ircService"]["permissions"] = {}

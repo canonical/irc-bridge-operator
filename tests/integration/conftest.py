@@ -70,7 +70,7 @@ async def app_integrated_fixture(ops_test: OpsTest, app: Application, model: Mod
     await model.wait_for_idle(
         apps=[f"{app.name}", "postgresql", "matrix-homeserver"],
         status="active",
-        idle_period=30,
+        idle_period=60,
         timeout=60 * 60,
     )
     yield app

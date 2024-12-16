@@ -29,7 +29,7 @@ async def test_ingress_integration(app_integrated: Application, model: Model):
     """
     unit_address = await tests.integration.helpers.get_unit_address(app_integrated)
     unit_address = unit_address.removeprefix("http://")
-    response = requests.get(f"{unit_address}:8090/health", timeout=30)
+    response = requests.get(f"http://{unit_address}:8090/health", timeout=30)
     assert response.status_code == 200
     assert response.text == "OK"
     haproxy_application = await model.deploy("haproxy", channel="2.8/edge")

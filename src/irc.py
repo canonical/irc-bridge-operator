@@ -189,12 +189,10 @@ class IRCBridgeService:
         media_proxy_key_command = [
             "/bin/bash",
             "-c",
-            "/snap/matrix-appservice-irc/11/bin/node",
-            "/snap/matrix-appservice-irc/11/app/lib/generate-signing-key.js",
-            f"> {IRC_BRIDGE_SIGNING_KEY_FILE_PATH}",
+            f"/snap/matrix-appservice-irc/11/bin/node /snap/matrix-appservice-irc/11/app/lib/generate-signing-key.js > {IRC_BRIDGE_SIGNING_KEY_FILE_PATH}",  # pylint: disable=line-too-long
         ]
         logger.info("Creating an media proxy key for IRC bridge.")
-        result = subprocess.run(media_proxy_key_command, check=True, capture_output=True)  # nosec
+        result = subprocess.run(media_proxy_key_command, check=True)  # nosec
         logger.info("Media proxy key file creation result: %s", result)
 
     def _eval_conf_local(
@@ -217,6 +215,9 @@ class IRCBridgeService:
             if db_conn == "" or db_conn != db.uri:
                 data["database"]["connectionString"] = db.uri
             data["homeserver"]["url"] = matrix.homeserver
+            data["ircService"]["mediaProxy"][
+                "signingKeyPath"
+            ] = f"{IRC_BRIDGE_SIGNING_KEY_FILE_PATH}"
             data["ircService"]["passwordEncryptionKeyPath"] = f"{IRC_BRIDGE_PEM_FILE_PATH}"
             data["ircService"]["ident"]["enabled"] = config.ident_enabled
             data["ircService"]["permissions"] = {}

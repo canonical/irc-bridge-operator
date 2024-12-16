@@ -4,15 +4,19 @@
 
 """Helper functions for the integration tests."""
 
+import ipaddress
 import json
 import pathlib
 import random
 import string
 import tempfile
+from urllib.parse import urlparse
 
 import ops
 from juju.application import Application
+from juju.client._definitions import FullStatus, UnitStatus
 from pytest_operator.plugin import OpsTest
+from requests.adapters import DEFAULT_POOLBLOCK, DEFAULT_POOLSIZE, DEFAULT_RETRIES, HTTPAdapter
 
 
 class ExecutionError(Exception):
@@ -180,3 +184,88 @@ async def generate_anycharm_relation(
     )
     await ops_test.model.wait_for_idle(apps=[any_charm.name])
     await ops_test.model.add_relation(f"{any_charm.name}", f"{app.name}")
+
+
+async def get_unit_address(application: Application) -> str:
+    """Get the unit address to make HTTP requests.
+
+    Args:
+        application: The deployed application
+
+    Returns:
+        The unit address
+    """
+    status: FullStatus = await application.model.get_status([application.name])
+    unit_status: UnitStatus = next(iter(status.applications[application.name].units.values()))
+    assert unit_status.public_address, "Invalid unit address"
+    address = (
+        unit_status.public_address
+        if isinstance(unit_status.public_address, str)
+        else unit_status.public_address.decode()
+    )
+
+    unit_ip_address = ipaddress.ip_address(address)
+    url = f"http://{str(unit_ip_address)}"
+    if isinstance(unit_ip_address, ipaddress.IPv6Address):
+        url = f"http://[{str(unit_ip_address)}]"
+    return url
+
+
+class DNSResolverHTTPSAdapter(HTTPAdapter):
+    """A simple mounted DNS resolver for HTTP requests."""
+
+    def __init__(
+        self,
+        hostname,
+        ip,
+    ):
+        """Initialize the dns resolver.
+
+        Args:
+            hostname: DNS entry to resolve.
+            ip: Target IP address.
+        """
+        self.hostname = hostname
+        self.ip = ip
+        super().__init__(
+            pool_connections=DEFAULT_POOLSIZE,
+            pool_maxsize=DEFAULT_POOLSIZE,
+            max_retries=DEFAULT_RETRIES,
+            pool_block=DEFAULT_POOLBLOCK,
+        )
+
+    # Ignore pylint rule as this is the parent method signature
+    def send(
+        self, request, stream=False, timeout=None, verify=True, cert=None, proxies=None
+    ):  # pylint: disable=too-many-arguments, too-many-positional-arguments
+        """Wrap HTTPAdapter send to modify the outbound request.
+
+        Args:
+            request: Outbound HTTP request.
+            stream: argument used by parent method.
+            timeout: argument used by parent method.
+            verify: argument used by parent method.
+            cert: argument used by parent method.
+            proxies: argument used by parent method.
+
+        Returns:
+            Response: HTTP response after modification.
+        """
+        connection_pool_kwargs = self.poolmanager.connection_pool_kw
+
+        result = urlparse(request.url)
+        if result.hostname == self.hostname:
+            ip = self.ip
+            if result.scheme == "https" and ip:
+                request.url = request.url.replace(
+                    "https://" + result.hostname,
+                    "https://" + ip,
+                )
+                connection_pool_kwargs["server_hostname"] = result.hostname
+                connection_pool_kwargs["assert_hostname"] = result.hostname
+                request.headers["Host"] = result.hostname
+            else:
+                connection_pool_kwargs.pop("server_hostname", None)
+                connection_pool_kwargs.pop("assert_hostname", None)
+
+        return super().send(request, stream, timeout, verify, cert, proxies)

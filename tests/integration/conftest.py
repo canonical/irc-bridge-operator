@@ -7,9 +7,12 @@ from pathlib import Path
 
 import pytest_asyncio
 import yaml
+from juju.application import Application
 from juju.model import Model
 from pytest import Config, fixture
 from pytest_operator.plugin import OpsTest
+
+import tests.integration.helpers
 
 
 @fixture(scope="module", name="metadata")
@@ -51,3 +54,23 @@ async def app_fixture(
         application = await model.deploy(charm, application_name=app_name)
 
     yield application
+
+
+@pytest_asyncio.fixture(scope="module", name="app_integrated")
+async def app_integrated_fixture(ops_test: OpsTest, app: Application, model: Model):
+    """Integrate the charm with PostgreSQL and AnyCharm as matrix-auth provider."""
+    config = {"bridge_admins": "admin:example.com", "bot_nickname": "bot"}
+    await app.set_config(config)
+    await model.deploy("postgresql", channel="14/stable")
+    await model.wait_for_idle(apps=["postgresql"], status="active", timeout=60 * 60)
+    await model.add_relation(app.name, "postgresql")
+    await tests.integration.helpers.generate_anycharm_relation(
+        app, ops_test, "matrix-homeserver", None
+    )
+    await model.wait_for_idle(
+        apps=[f"{app.name}", "postgresql", "matrix-homeserver"],
+        status="active",
+        idle_period=60,
+        timeout=60 * 60,
+    )
+    yield app

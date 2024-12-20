@@ -23,5 +23,8 @@ requires:
     interface: postgresql_client
     limit: 1
   matrix-auth:
-    interface: irc_bridge
+    interface: matrix_auth
+    limit: 1
+  ingress:
+    interface: ingress
     limit: 1

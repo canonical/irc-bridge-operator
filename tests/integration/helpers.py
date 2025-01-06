@@ -10,6 +10,7 @@ import pathlib
 import random
 import string
 import tempfile
+import typing
 from urllib.parse import urlparse
 
 import ops
@@ -196,7 +197,8 @@ async def get_unit_address(application: Application) -> str:
         The unit address
     """
     status: FullStatus = await application.model.get_status([application.name])
-    unit_status: UnitStatus = next(iter(status.applications[application.name].units.values()))
+    application = typing.cast(Application, status.applications[application.name])
+    unit_status: UnitStatus = next(iter(application.units.values()))
     assert unit_status.public_address, "Invalid unit address"
     address = (
         unit_status.public_address

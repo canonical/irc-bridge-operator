@@ -6,7 +6,7 @@
 import logging
 import typing
 
-from charms.synapse.v0.matrix_auth import (
+from charms.synapse.v1.matrix_auth import (
     MatrixAuthProviderData,
     MatrixAuthRequirerData,
     MatrixAuthRequires,

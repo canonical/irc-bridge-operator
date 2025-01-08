@@ -189,7 +189,7 @@ class IRCBridgeService:
         media_proxy_key_command = [
             "/bin/bash",
             "-c",
-            f"/snap/matrix-appservice-irc/11/bin/node /snap/matrix-appservice-irc/11/app/lib/generate-signing-key.js > {IRC_BRIDGE_SIGNING_KEY_FILE_PATH}",  # pylint: disable=line-too-long
+            f"/snap/matrix-appservice-irc/current/bin/node /snap/matrix-appservice-irc/current/app/lib/generate-signing-key.js > {IRC_BRIDGE_SIGNING_KEY_FILE_PATH}",  # pylint: disable=line-too-long
         ]
         logger.info("Creating an media proxy key for IRC bridge.")
         result = subprocess.run(media_proxy_key_command, check=True)  # nosec

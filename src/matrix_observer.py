@@ -64,5 +64,4 @@ class MatrixObserver(Object):
         irc_data = MatrixAuthRequirerData(registration=registration)
         relation = self.model.get_relation(self.matrix.relation_name)
         if relation:
-            irc_data.set_registration_id(model=self.model, relation=relation)
             self.matrix.update_relation_data(relation=relation, matrix_auth_requirer_data=irc_data)

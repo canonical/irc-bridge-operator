@@ -165,7 +165,7 @@ async def generate_anycharm_relation(
     """
     any_app_name = any_charm_name
     any_charm_content = pathlib.Path("tests/integration/any_charm.py").read_text(encoding="utf-8")
-    matrix_auth_content = pathlib.Path("lib/charms/synapse/v0/matrix_auth.py").read_text(
+    matrix_auth_content = pathlib.Path("lib/charms/synapse/v1/matrix_auth.py").read_text(
         encoding="utf-8"
     )
     any_charm_src_overwrite = {

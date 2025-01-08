@@ -43,7 +43,6 @@ class AnyCharm(AnyCharmBase):
             matrix_auth_data = MatrixAuthProviderData(
                 homeserver="https://example.com", shared_secret=secret
             )
-            matrix_auth_data.set_shared_secret_id(model=self.model, relation=relation)
             self.plugin_auth.update_relation_data(relation, matrix_auth_data)
 
     def _on_matrix_auth_request_received(self, _):
@@ -51,29 +50,5 @@ class AnyCharm(AnyCharmBase):
         relation = self.model.get_relation("provide-matrix-auth")
         if relation is not None:
             logger.info("Getting relation data")
-            remote_data = self.plugin_auth.get_remote_relation_data()
-            logger.info("Remote data: %s", remote_data)
-
-    def _on_relation_changed(self, _):
-        """Get the relation data and log it."""
-        relation = self.model.get_relation("provide-matrix-auth")
-        logger.info("Relation: %s", relation)
-        relation = self.model.get_relation("provide-matrix-auth")
-        logger.info("Relation: %s", relation)
-        if relation is not None:
-            try:
-                logger.info("Getting relation data")
-                matrix_auth_data = MatrixAuthProviderData.from_relation(
-                    model=self.model, relation=relation
-                )
-            except ValueError as e:
-                logger.error("Failed to get relation data: %s", e)
-                logger.info("Setting relation data")
-                secret = token_hex(16)
-                matrix_auth_data = MatrixAuthProviderData(
-                    homeserver="https://example.com", shared_secret=secret
-                )
-            matrix_auth_data.set_shared_secret_id(model=self.model, relation=relation)
-            self.plugin_auth.update_relation_data(relation, matrix_auth_data)
             remote_data = self.plugin_auth.get_remote_relation_data()
             logger.info("Remote data: %s", remote_data)

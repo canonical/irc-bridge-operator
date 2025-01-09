@@ -10,7 +10,7 @@ import subprocess  # nosec
 import yaml
 from charms.operator_libs_linux.v1 import systemd
 from charms.operator_libs_linux.v2 import snap
-from charms.synapse.v0.matrix_auth import MatrixAuthProviderData
+from charms.synapse.v1.matrix_auth import MatrixAuthProviderData
 
 import exceptions
 from charm_types import CharmConfig, DatasourcePostgreSQL

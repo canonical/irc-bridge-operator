@@ -11,3 +11,5 @@ bases:
 parts:
   charm:
     build-packages: [cargo, rustc, pkg-config, libffi-dev, libssl-dev]
+    charm-binary-python-packages:
+    - cryptography

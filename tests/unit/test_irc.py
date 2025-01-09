@@ -25,7 +25,7 @@ from constants import (
     IRC_BRIDGE_SNAP_NAME,
 )
 from irc import InstallError, IRCBridgeService, ReloadError, StartError, StopError
-from lib.charms.synapse.v0.matrix_auth import MatrixAuthProviderData
+from lib.charms.synapse.v1.matrix_auth import MatrixAuthProviderData
 
 
 @pytest.fixture(name="irc_bridge_service")

@@ -82,7 +82,7 @@ ircService:
     initial: false
   ident:
     enabled: true
-    port: 1113
+    port: 113
     address: "::"
   logging:
     level: "debug"

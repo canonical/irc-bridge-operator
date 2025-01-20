@@ -30,7 +30,7 @@ ircService:
       botConfig:
         enabled: true
         nick: "UbuntuLiberaBot"
-        username: "ubunbtuliberabot"
+        username: "ubuntuliberabot"
         joinChannelsIfNoUsers: true
       privateMessages:
         enabled: true

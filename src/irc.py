@@ -6,7 +6,9 @@
 import logging
 import shutil
 import subprocess  # nosec
+from urllib.parse import urlparse
 
+import requests
 import yaml
 from charms.operator_libs_linux.v1 import systemd
 from charms.operator_libs_linux.v2 import snap
@@ -47,6 +49,40 @@ class StopError(exceptions.SystemdError):
 
 class InstallError(exceptions.SnapError):
     """Exception raised when unable to install dependencies for the service."""
+
+
+def get_matrix_domain(matrix_homeserver_url: str) -> str:
+    """Fetch the domain (server_name) from the Homeserver URL.
+
+    Args:
+        matrix_homeserver_url: Matrix URL provided by matrix-auth integration.
+
+    Returns:
+        The content of server_name from the JSON response, or the
+            homeserver domain if an error occurs.
+    """
+    try:
+        # This API returns server_name
+        # See:
+        # https://spec.matrix.org/v1.13/server-server-api/#publishing-keys
+        matrix_homeserver_key_url = matrix_homeserver_url.rstrip("/") + "/_matrix/key/v2/server"
+
+        response = requests.get(matrix_homeserver_key_url, timeout=5)
+        response.raise_for_status()
+        data = response.json()
+
+        return data.get("server_name", urlparse(matrix_homeserver_key_url).netloc)
+
+    except requests.exceptions.RequestException as e:
+        logging.exception("Request error for URL %s: %s", matrix_homeserver_key_url, e)
+    except ValueError as e:
+        logging.error("JSON parsing error for URL %s: %s", matrix_homeserver_key_url, e)
+    except KeyError as e:
+        logging.error(
+            "Missing expected key in response for URL %s: %s", matrix_homeserver_key_url, e
+        )
+
+    return urlparse(matrix_homeserver_key_url).netloc
 
 
 class IRCBridgeService:
@@ -215,6 +251,7 @@ class IRCBridgeService:
             if db_conn == "" or db_conn != db.uri:
                 data["database"]["connectionString"] = db.uri
             data["homeserver"]["url"] = matrix.homeserver
+            data["homeserver"]["domain"] = get_matrix_domain(matrix.homeserver)
             data["ircService"]["mediaProxy"][
                 "signingKeyPath"
             ] = f"{IRC_BRIDGE_SIGNING_KEY_FILE_PATH}"

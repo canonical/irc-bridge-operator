@@ -5,13 +5,16 @@
 """Integration tests."""
 
 import logging
+from urllib.parse import urlparse
 
 import ops
 import pytest
+import yaml
 from juju.application import Application
 from pytest_operator.plugin import OpsTest
 
 import tests.integration.helpers
+from constants import IRC_BRIDGE_CONFIG_FILE_PATH
 
 logger = logging.getLogger(__name__)
 
@@ -42,3 +45,25 @@ async def test_lifecycle_after_relations(app_integrated: Application):
     """
     unit = app_integrated.units[0]
     assert unit.workload_status == ops.model.ActiveStatus.name
+
+
+@pytest.mark.asyncio
+@pytest.mark.abort_on_fail
+async def test_config(app_integrated: Application, matrix_homeserver: str):
+    """
+    arrange: charm has all expected relations.
+    act: get configuration file content.
+    assert: irc bridge is properly configured.
+    """
+    unit = app_integrated.units[0]
+    assert unit.workload_status == ops.model.ActiveStatus.name
+
+    action = await unit.run(f"cat {IRC_BRIDGE_CONFIG_FILE_PATH}", timeout=60)
+    await action.wait()
+
+    code = action.results.get("return-code")
+    stdout = action.results.get("stdout")
+    assert code == 0
+    config = yaml.safe_load(stdout)
+    assert config["homeserver"]["url"] == matrix_homeserver
+    assert config["homeserver"]["domain"] == urlparse(matrix_homeserver).netloc

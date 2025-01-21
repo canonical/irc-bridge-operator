@@ -15,6 +15,12 @@ from pytest_operator.plugin import OpsTest
 import tests.integration.helpers
 
 
+@fixture(scope="module", name="matrix_homeserver")
+def matrix_homeserver():
+    """Provide Matrix homeserver."""
+    yield "https://example.com"
+
+
 @fixture(scope="module", name="metadata")
 def fixture_metadata():
     """Provide charm metadata."""

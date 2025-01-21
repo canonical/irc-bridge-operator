@@ -13,6 +13,7 @@ import pytest
 import yaml
 from charms.operator_libs_linux.v1 import systemd
 from charms.operator_libs_linux.v2 import snap
+from requests.exceptions import RequestException
 
 from charm_types import CharmConfig, DatasourcePostgreSQL
 from constants import (
@@ -24,7 +25,14 @@ from constants import (
     IRC_BRIDGE_SERVICE_NAME,
     IRC_BRIDGE_SNAP_NAME,
 )
-from irc import InstallError, IRCBridgeService, ReloadError, StartError, StopError
+from irc import (
+    InstallError,
+    IRCBridgeService,
+    ReloadError,
+    StartError,
+    StopError,
+    get_matrix_domain,
+)
 from lib.charms.synapse.v1.matrix_auth import MatrixAuthProviderData
 
 
@@ -416,3 +424,36 @@ def test_stop_raises_stop_error_if_stop_fails(irc_bridge_service, mocker):
         irc_bridge_service.stop()
 
     mock_service_stop.assert_called_once_with(IRC_BRIDGE_SNAP_NAME)
+
+
+@patch("requests.get")
+def test_get_matrix_domain_success(mock_get):
+    """Test that the get_matrix_domain method returns the server_name value.
+
+    arrange: Prepare a mock for the API call.
+    act: Call get_matrix_domain.
+    assert: Ensure that the domain is the one expected (example.org).
+    """
+    mock_response = MagicMock()
+    expected_domain = "example.org"
+    mock_response.json.return_value = {"server_name": expected_domain}
+    mock_response.raise_for_status.return_value = None
+    mock_get.return_value = mock_response
+
+    assert get_matrix_domain("https://chat-server.example.org") == expected_domain
+
+
+@patch("requests.get")
+def test_get_matrix_domain_error(mock_get):
+    """Test that the get_matrix_domain method returns the URL domain value in
+        case of error.
+
+    arrange: Prepare a mock for the API call that raises Exception.
+    act: Call get_matrix_domain.
+    assert: Ensure that the domains is the one expected
+        (chat-server.example.org).
+    """
+    mock_get.side_effect = RequestException("Mocked exception")
+
+    expected_domain = "chat-server.example.org"
+    assert get_matrix_domain("https://chat-server.example.org") == expected_domain

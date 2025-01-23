@@ -19,7 +19,7 @@ problematic event, causing the appservice sender to break silently and stop
 processing new events.
 
 ### Solution
-1. **Backup the Synapse Database**:
+1. **Back up the Synapse database**:
    Before making any changes, ensure you have a full backup of your Synapse
    database to prevent data loss.
 

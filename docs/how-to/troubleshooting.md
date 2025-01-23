@@ -34,7 +34,7 @@ processing new events.
 3. **Restart Synapse**:
    After executing the query, restart the Synapse service to apply the changes.
 
-### Additional Notes
+### Additional notes
 - This solution skips the problematic event and allows Synapse to resume
 sending events to the IRC bridge.
 - If the issue persists, verify Synapse logs for additional errors or

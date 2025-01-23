@@ -13,7 +13,7 @@ restarting Synapse does not resolve the issue.
   push_bulk to https://chat.example.com/irc threw exception(JSONDecodeError): Expecting value: line 1 column 1 (char 0)
   ```
 
-### Root Cause
+### Root cause
 The `appservice_stream_position` in the Synapse database can get stuck on a
 problematic event, causing the appservice sender to break silently and stop
 processing new events.

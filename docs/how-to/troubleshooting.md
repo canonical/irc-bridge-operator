@@ -37,5 +37,5 @@ processing new events.
 ### Additional notes
 - This solution skips the problematic event and allows Synapse to resume
 sending events to the IRC bridge.
-- If the issue persists, verify Synapse logs for additional errors or
+- If the issue persists, check the Synapse logs for additional errors or
 misconfigurations.

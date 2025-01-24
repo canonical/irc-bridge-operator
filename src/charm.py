@@ -21,6 +21,7 @@ from matrix_observer import MatrixObserver
 logger = logging.getLogger(__name__)
 
 IRC_BIND_PORT = 8090
+IDENT_PORT = 113
 
 
 class IRCCharm(ops.CharmBase):
@@ -128,6 +129,9 @@ class IRCCharm(ops.CharmBase):
             self.unit.status = ops.MaintenanceStatus(f"Invalid configuration: {e}")
             logger.exception("Invalid configuration: {%s}", e)
             return
+        if config.ident_enabled:
+            logger.info("Ident is enabled, exposing port %d", IDENT_PORT)
+            self.unit.set_ports(IDENT_PORT)
         self._irc.reconcile(db, matrix, config, self._get_external_url())
         self._matrix.set_irc_registration(self._irc.get_registration())
         self.unit.status = ops.ActiveStatus()

@@ -41,4 +41,4 @@ processing new events.
 sending events to the IRC bridge.
 - If the issue persists, check the Synapse logs for additional errors or
 misconfigurations.
-- In this [IRC-Bridge issue](https://github.com/matrix-org/matrix-appservice-irc/issues/1222#issuecomment-766318251), you can find more details about the error.
+- In this [IRC-Bridge issue](https://github.com/matrix-org/matrix-appservice-irc/issues/1222), you can find more details about the error.

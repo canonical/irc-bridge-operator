@@ -1,4 +1,4 @@
-# Troubleshooting
+# How to troubleshoot IRC bridge issues
 
 ## Issue: Synapse Stops Sending Events to the IRC Bridge
 
@@ -23,6 +23,8 @@ processing new events.
    Before making any changes, ensure you have a full backup of your Synapse
    database to prevent data loss.
 
+   Find more details about the backup in [How to Backup and Restore](https://charmhub.io/synapse/docs/how-to-backup-and-restore).
+
 2. **Update the `appservice_stream_position`**:
    Run the following SQL query to update the `appservice_stream_position`
    to the latest event:
@@ -39,3 +41,4 @@ processing new events.
 sending events to the IRC bridge.
 - If the issue persists, check the Synapse logs for additional errors or
 misconfigurations.
+- In this [IRC-Bridge issue](https://github.com/matrix-org/matrix-appservice-irc/issues/1222#issuecomment-766318251), you can find more details about the error.

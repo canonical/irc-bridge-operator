@@ -10,7 +10,7 @@ import typing
 from abc import ABC, abstractmethod
 
 import ops
-from pydantic import BaseModel, Field, ValidationError, validator
+from pydantic import BaseModel, Field, validator
 
 
 class ReconcilingCharm(ops.CharmBase, ABC):
@@ -70,15 +70,17 @@ class CharmConfig(BaseModel):
             The string converted to list.
 
         Raises:
-            ValidationError: if user_id is not as expected.
+            ValueError: if user_id is not as expected.
         """
         # Based on documentation
         # https://spec.matrix.org/v1.10/appendices/#user-identifiers
-        userid_regex = r"@[a-z0-9._=/+-]+:\w+\.\w+"
+        userid_regex = r"@[a-z0-9._=/+-]+:\w+(\.\w+)+"
         if value is None:
             return []
         value_list = ["@" + user_id.strip() for user_id in value.split(",")]
-        for user_id in value_list:
-            if not re.fullmatch(userid_regex, user_id):
-                raise ValidationError(f"Invalid user ID format: {user_id}", cls)
+        invalid_user_ids = [
+            user_id for user_id in value_list if not re.fullmatch(userid_regex, user_id)
+        ]
+        if invalid_user_ids:
+            raise ValueError(f"Invalid user ID format(s): {', '.join(invalid_user_ids)}")
         return value_list

@@ -126,7 +126,7 @@ juju integrate haproxy self-signed-certificates
 juju integrate irc-bridge haproxy
 ```
 
-### Deploy Synapse in Microk8s controller
+### Deploy Synapse in MicroK8s controller
 
 Switch to the MicroK8S controller and refer to the [Synapse Getting Started](https://charmhub.io/synapse/docs/tutorial-getting-started) tutorial for step-by-step instructions.
 

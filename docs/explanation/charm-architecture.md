@@ -37,7 +37,7 @@ registration file and shares it with Synapse, which then registers the IRC Bridg
 The IRC Bridge Snap is utilized to package and distribute [matrix-appservice-irc](https://github.com/matrix-org/matrix-appservice-irc),
 providing a consistent, secure, and maintainable deployment across various
 environments. By leveraging [Snap](https://snapcraft.io/about), the application benefits from simplified
-installation, automatic updates, and dependency isolation.
+installation, automatic updates and dependency isolation.
 
 For more details or to participate in its development, please refer to the
 [GitHub repository](https://github.com/canonical/matrix-appservice-irc).

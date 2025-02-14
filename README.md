@@ -74,7 +74,7 @@ this process by using a [Multipass](https://multipass.run/) VM as outlined in th
 VM IP in steps that assume you're running locally. To get the IP address of the
 Multipass instance run ```multipass info my-juju-vm```.
 
-### Set up a Tutorial Model
+### Set up a tutorial model
 
 To manage resources effectively and to separate this tutorial's workload from
 your usual work, create a new model using the following command.

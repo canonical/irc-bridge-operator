@@ -136,7 +136,7 @@ To switch, run the following command:
 juju switch microk8s-localhost
 ```
 
-:warning: microk8s-localhost is the Microk8s controller.
+:warning: `microk8s-localhost` is the MicroK8s controller.
 
 The command `juju controllers` list all the existings controllers in the environment.
 

@@ -149,7 +149,7 @@ for managing the bridge.
 juju run-action synapse/0 register-user username=admin admin=yes
 ```
 
-Save the password since will be used in further steps.
+Save the password since it will be used in further steps.
 
 ### Create an offer
 

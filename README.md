@@ -228,7 +228,7 @@ After this, you can join the room python that corresponds to the IRC python chan
 
 - [HAProxy](https://charmhub.io/haproxy): HAProxy is a TCP/HTTP reverse proxy which is particularly suited for high availability environments.
 - [Postgresql](https://charmhub.io/postgresql): PostgreSQL is a powerful, open source object-relational database system.
-- [Synapse](https://charmhub.io/synapse): Synapse is an open-source Matrix homeserver developed from 2019 through 2023 as part of the Matrix.org Foundation. Briefly, Matrix is an open standard for communications on the internet, supporting federation, encryption and VoIP.
+- [Synapse](https://charmhub.io/synapse): Synapse is an open-source homeserver that is part of the Matrix.org Foundation. Matrix is an open standard for communications on the internet, supporting federation, encryption and VoIP.
 
 ## Learn more
 * [Read more](https://charmhub.io/irc-bridge)

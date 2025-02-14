@@ -78,6 +78,6 @@ charmcraft pack
 
 refer to the [README.md](https://github.com/canonical/irc-bridge-operator/blob/main/README.md) file.
 
-## Canonical Contributor Agreement
+## Canonical contributor agreement
 
 Canonical welcomes contributions to the Synapse Operator. Please check out our [contributor agreement](https://ubuntu.com/legal/contributors) if you're interested in contributing to the solution.

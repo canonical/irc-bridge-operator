@@ -171,7 +171,7 @@ Now that Synapse is set, change it back to the LXD controller.
 juju switch localhost-localhost
 ```
 
-:warning: localhost-localhost is the LXD controller.
+:warning: `localhost-localhost` is the LXD controller.
 
 The command `juju controllers` list all the existings controllers in the environment.
 

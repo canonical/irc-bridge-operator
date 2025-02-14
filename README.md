@@ -108,8 +108,8 @@ Run the following commands to deploy PostgreSQL charm and relate it to the IRC
 Bridge charm.
 
 ```
-juju deploy postgresql --channel 14/stable
-juju relate irc-bridge postgresql
+juju deploy postgresql-k8s --channel 14/stable
+juju integrate irc-bridge postgresql
 ```
 
 ### Deploy and integrate HAProxy

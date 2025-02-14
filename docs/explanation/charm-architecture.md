@@ -5,7 +5,7 @@ acting as a bridge. It runs on a Juju model alongside HAProxy (load balancer)
 and PostgreSQL (database).
 
 IRC Bridge is installed as a Snap in the Juju Machine unit and the charm
-interacts with it as the required integrations are set.
+interacts with it when the required integrations are set.
 
 ```mermaid
 C4Component

@@ -1,9 +1,9 @@
 # How to contribute
 
-## Overview
-
 This document explains the processes and practices recommended for contributing
 enhancements to the IRC Bridge operator.
+
+## Overview
 
 - Generally, before developing enhancements to this charm, you should consider
 [opening an issue](https://github.com/canonical/irc-bridge-operator/issues)
@@ -62,7 +62,7 @@ chmod +x .git/hooks/pre-commit
 ### Changelog
 
 Please ensure that any new feature, fix, or significant change is documented by
-adding an entry to the `docs/changelog.md` file.
+adding an entry to the `docs/CHANGELOG.md` file.
 
 To learn more about changelog best practices, visit [Keep a Changelog](https://keepachangelog.com/).
 

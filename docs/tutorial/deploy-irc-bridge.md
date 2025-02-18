@@ -145,7 +145,7 @@ Access Synapse via Element with the admin user created previously.
 
 To interact with the Bridge, you can invite the user "ircappservice" to a room or sent a message.
 
-Send a message to the user (if a warning shows up, ignore and proceed) ircappservice.
+Send a message to the user ircappservice. If a warning shows up, ignore and proceed.
 
 The Bridge will show a help menu with all the options available. Try the following to guarantee
 that the bridge is working.

@@ -8,7 +8,7 @@ with other charms to set up a working Matrix application.
 * A working station, e.g., a laptop, with amd64 architecture.
 * Juju 3 installed and bootstrapped to a LXD and MicroK8s controller. You can accomplish
 this process by using a [Multipass](https://multipass.run/) VM as outlined in this guide: [Set up / Tear down your test environment](https://canonical-juju.readthedocs-hosted.com/en/3.6/user/howto/manage-your-deployment/manage-your-deployment-environment/#set-things-up)
-* [Synapse charm](https://charmhub.io/synapse) deployed. refer to the [Synapse Getting Started](https://charmhub.io/synapse/docs/tutorial-getting-started) tutorial for step-by-step instructions.
+* [Synapse charm](https://charmhub.io/synapse) deployed. Refer to the [Synapse Getting Started](https://charmhub.io/synapse/docs/tutorial-getting-started) tutorial for step-by-step instructions.
 
 :warning: When using a Multipass VM, make sure to replace IP addresses with the
 VM IP in steps that assume you're running locally. To get the IP address of the

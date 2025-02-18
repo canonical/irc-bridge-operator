@@ -10,7 +10,7 @@ to it.
 
 The IRC Bridge is implemented as an Application Service, as defined in the Matrix
 specification. This means it interacts with Synapse through the Application
-Service API, allowing it to manage virtual users, handle messages, and bridge
+Service API, allowing it to manage virtual users, handle messages and bridge
 communications between Matrix and IRC efficiently.
 
 ```mermaid

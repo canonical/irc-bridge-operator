@@ -89,7 +89,7 @@ The command `juju controllers` list all the existings controllers in the environ
 
 ### Create the bridge admin user
 
-The user set in the `bridge_admins` should be created in Synapse and will be used
+The user set in the `bridge_admins` configuration should be created in Synapse and will be used
 for managing the bridge.
 
 ```

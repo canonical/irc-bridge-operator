@@ -93,7 +93,7 @@ The user set in the `bridge_admins` configuration should be created in Synapse a
 for managing the bridge.
 
 ```
-juju run-action synapse/0 register-user username=admin admin=yes
+juju run synapse/0 register-user username=admin admin=yes
 ```
 
 Save the password since it will be used in further steps.

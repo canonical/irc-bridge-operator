@@ -76,7 +76,7 @@ charmcraft pack
 
 ### Deploy
 
-refer to the [README.md](https://github.com/canonical/irc-bridge-operator/blob/main/README.md) file.
+Refer to the [README.md](https://github.com/canonical/irc-bridge-operator/blob/main/README.md) file.
 
 ## Canonical contributor agreement
 

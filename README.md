@@ -68,7 +68,7 @@ To begin, refer to the [Deploy IRC Bridge](https://charmhub.io/irc-bridge/docs/t
 ## Integrations
 
 - [HAProxy](https://charmhub.io/haproxy): HAProxy is a TCP/HTTP reverse proxy which is particularly suited for high availability environments.
-- [Postgresql](https://charmhub.io/postgresql): PostgreSQL is a powerful, open source object-relational database system.
+- [PostgreSQL](https://charmhub.io/postgresql): PostgreSQL is a powerful, open source object-relational database system.
 - [Synapse](https://charmhub.io/synapse): Synapse is an open-source homeserver that is part of the Matrix.org Foundation. Matrix is an open standard for communications on the internet, supporting federation, encryption and VoIP.
 
 ## Learn more

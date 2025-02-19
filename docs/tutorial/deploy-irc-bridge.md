@@ -162,7 +162,7 @@ To check all available options, send the following command:
 
 Screenshot example:
 
-![IRC screenshot](imgs/irc-screenshot.jpeg)
+![IRC screenshot](./irc-screenshot.jpeg)
 
 ### Join a IRC channel
 
@@ -170,3 +170,15 @@ You can use send a message to the user "ircappservice" like `!join #python` and
 this will be interpreted as a command to join the #python channel.
 
 After this, you can join the room python that corresponds to the IRC python channel.
+
+## Clean up the Environment
+
+Well done! You've successfully completed the Deploy IRC Bridge tutorial.
+To remove the model environment you created during this tutorial,
+use the following command.
+
+```
+juju destroy-model irc-bridge-tutorial
+```
+
+Refer to the "Clean up the environment" step in [Synapse Getting Started](https://charmhub.io/synapse/docs/tutorial-getting-started#p-29229-clean-up-the-environment) tutorial for detailed instructions on how to clean up the Synapse environment.

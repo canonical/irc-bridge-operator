@@ -21,7 +21,6 @@ from constants import (
     IRC_BRIDGE_KEY_ALGO,
     IRC_BRIDGE_KEY_OPTS,
     IRC_BRIDGE_PEM_FILE_PATH,
-    IRC_BRIDGE_REGISTRATION_FILE_PATH,
     IRC_BRIDGE_SERVICE_NAME,
     IRC_BRIDGE_SNAP_NAME,
 )
@@ -248,39 +247,62 @@ def test_configure_generates_pem_file_local(irc_bridge_service, mocker):
     # pylint: enable=duplicate-code
 
 
-def test_configure_generates_app_registration_local(irc_bridge_service, mocker):
+def test_configure_generates_app_registration_local(irc_bridge_service, mocker, tmp_path: Path):
     """Test that the _generate_app_registration_local method generates the app registration file.
 
     arrange: Prepare a mock for the subprocess.run method.
     act: Call the _generate_app_registration_local method.
     assert: Ensure that the subprocess.run method was called with the correct arguments.
     """
-    mock_run = mocker.patch.object(subprocess, "run")
+    registration_file_path = tmp_path / "appservice-registration-irc.yaml"
+    Path(str(registration_file_path) + ".tmp").touch()
+    with patch("irc.IRC_BRIDGE_REGISTRATION_FILE_PATH", registration_file_path):
+        mock_run = mocker.patch.object(subprocess, "run")
+        config = CharmConfig(
+            ident_enabled=True,
+            bot_nickname="my_bot",
+            bridge_admins="admin1:example.com,admin2:example.com",
+        )
+        assert (
+            not registration_file_path.exists()
+        ), f"Expected {registration_file_path} not to exist before running the command"
 
-    config = CharmConfig(
-        ident_enabled=True,
-        bot_nickname="my_bot",
-        bridge_admins="admin1:example.com,admin2:example.com",
-    )
+        irc_bridge_service._generate_app_registration_local(  # pylint: disable=protected-access
+            config, "http://localhost:8090"
+        )
 
-    irc_bridge_service._generate_app_registration_local(  # pylint: disable=protected-access
-        config, "http://localhost:8090"
-    )
+        # pylint: disable=duplicate-code
+        mock_run.assert_called_once_with(
+            [
+                "/bin/bash",
+                "-c",
+                f"snap run matrix-appservice-irc -r -f {registration_file_path}.tmp"
+                f" -u http://localhost:8090 "
+                f"-c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
+            ],
+            check=True,
+            capture_output=True,
+        )
+        # pylint: enable=duplicate-code
+        assert registration_file_path.exists(), f"Expected {registration_file_path} to exist"
 
-    # pylint: disable=duplicate-code
-    mock_run.assert_called_once_with(
-        [
-            "/bin/bash",
-            "-c",
-            f"[[ -f {IRC_BRIDGE_REGISTRATION_FILE_PATH} ]] || "
-            f"snap run matrix-appservice-irc -r -f {IRC_BRIDGE_REGISTRATION_FILE_PATH}"
-            f" -u http://localhost:8090 "
-            f"-c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
-        ],
-        check=True,
-        capture_output=True,
-    )
-    # pylint: enable=duplicate-code
+
+def test_skip_media_proxy_key(irc_bridge_service, mocker, tmp_path: Path):
+    """Test that the _generate_media_proxy_key method not generates the key file
+        if already exists.
+
+    arrange: Prepare a mock for the subprocess.run method.
+    act: Call the _generate_media_proxy_key method.
+    assert: Ensure that the subprocess.run method was not called.
+    """
+    signing_key_file_path = tmp_path / "signing.key"
+    signing_key_file_path.touch()
+    with patch("irc.IRC_BRIDGE_SIGNING_KEY_FILE_PATH", signing_key_file_path):
+        mock_run = mocker.patch.object(subprocess, "run")
+
+        irc_bridge_service._generate_media_proxy_key()  # pylint: disable=protected-access
+
+        mock_run.assert_not_called()
 
 
 def test_configure_evaluates_configuration_file_local(irc_bridge_service, mocker):

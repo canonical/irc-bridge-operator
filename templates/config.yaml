@@ -126,7 +126,7 @@ ircService:
     signingKeyPath: "/data/config/signingkey.jwk"
     ttlSeconds: 3600
     bindPort: 11111
-    publicUrl: "https://irc.bridge/media"
+    publicUrl: "https://media-not-supported/media"
   userActivity:
     minUserActiveDays: 1
     inactiveAfterDays: 30

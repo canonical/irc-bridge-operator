@@ -208,20 +208,25 @@ class IRCBridgeService:
             config: the charm configuration
             external_url: ingress url (or unit IP)
         """
+        temp_registration_file = f"{IRC_BRIDGE_REGISTRATION_FILE_PATH}.tmp"
         app_reg_create_command = [
             "/bin/bash",
             "-c",
-            f"[[ -f {IRC_BRIDGE_REGISTRATION_FILE_PATH} ]] || "
-            f"snap run matrix-appservice-irc -r -f {IRC_BRIDGE_REGISTRATION_FILE_PATH}"
+            f"snap run matrix-appservice-irc -r -f {temp_registration_file}"
             f" -u {external_url}"
             f" -c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
         ]
-        logger.info("Creating an app registration file for IRC bridge.")
+        logger.info("Creating a temporary app registration file for IRC bridge.")
         result = subprocess.run(app_reg_create_command, check=True, capture_output=True)  # nosec
         logger.info("App registration file creation result: %s", result)
+        logger.info("Command succeed, moving temporary file to expected location.")
+        shutil.move(temp_registration_file, str(IRC_BRIDGE_REGISTRATION_FILE_PATH))
 
     def _generate_media_proxy_key(self) -> None:
         """Generate the content of the media proxy key."""
+        if IRC_BRIDGE_SIGNING_KEY_FILE_PATH.exists():
+            logger.info("Media proxy key file %s already exists, skipping")
+            return
         media_proxy_key_command = [
             "/bin/bash",
             "-c",

@@ -287,6 +287,24 @@ def test_configure_generates_app_registration_local(irc_bridge_service, mocker, 
         assert registration_file_path.exists(), f"Expected {registration_file_path} to exist"
 
 
+def test_skip_media_proxy_key(irc_bridge_service, mocker, tmp_path: Path):
+    """Test that the _generate_media_proxy_key method not generates the key file
+        if already exists.
+
+    arrange: Prepare a mock for the subprocess.run method.
+    act: Call the _generate_media_proxy_key method.
+    assert: Ensure that the subprocess.run method was not called.
+    """
+    signing_key_file_path = tmp_path / "signing.key"
+    signing_key_file_path.touch()
+    with patch("irc.IRC_BRIDGE_SIGNING_KEY_FILE_PATH", signing_key_file_path):
+        mock_run = mocker.patch.object(subprocess, "run")
+
+        irc_bridge_service._generate_media_proxy_key()  # pylint: disable=protected-access
+
+        mock_run.assert_not_called()
+
+
 def test_configure_evaluates_configuration_file_local(irc_bridge_service, mocker):
     """Test that the _eval_conf_local method evaluates the configuration file.
 

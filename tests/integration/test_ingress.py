@@ -43,7 +43,7 @@ async def test_ingress_integration(app_integrated: Application, model: Model):
     await model.wait_for_idle(
         apps=[self_signed_application.name, haproxy_application.name], status="active"
     )
-    await model.add_relation(app_integrated.name, haproxy_application.name)
+    await model.add_relation(f"{app_integrated.name}:ingress", haproxy_application.name)
     await model.wait_for_idle(
         apps=[app_integrated.name, haproxy_application.name], status="active"
     )
@@ -78,8 +78,14 @@ async def test_ingress_media_integration(app_integrated: Application, model: Mod
     assert response.status_code == 200
     assert response.headers.get("Content-Type") == "application/json"
     assert response.json() == {"ok": True}
-    haproxy_application = await model.deploy("haproxy", channel="2.8/edge")
-    self_signed_application = await model.deploy("self-signed-certificates", channel="edge")
+    haproxy_application = await model.deploy(
+        "haproxy", application_name="haproxy-media", channel="2.8/edge"
+    )
+    self_signed_application = await model.deploy(
+        "self-signed-certificates",
+        application_name="self-signed-certificates-media",
+        channel="edge",
+    )
     external_hostname = "haproxy-media.internal"
     await haproxy_application.set_config({"external-hostname": external_hostname})
     await model.wait_for_idle(

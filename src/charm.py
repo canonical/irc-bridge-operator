@@ -21,6 +21,8 @@ from matrix_observer import MatrixObserver
 logger = logging.getLogger(__name__)
 
 IRC_BIND_PORT = 8090
+IRC_MEDIA_BIND_PORT = 11111
+
 IDENT_PORT = 113
 
 
@@ -38,7 +40,12 @@ class IRCCharm(ops.CharmBase):
         self._database = DatabaseObserver(self, DATABASE_RELATION_NAME)
         self._matrix = MatrixObserver(self, MATRIX_RELATION_NAME)
         # 8090 is used for Synapse -> IRC Bridge communication
-        self.ingress = IngressPerAppRequirer(self, port=IRC_BIND_PORT, strip_prefix=True)
+        self.ingress = IngressPerAppRequirer(
+            self, port=IRC_BIND_PORT, strip_prefix=True, relation_name="ingress"
+        )
+        self.ingress_media = IngressPerAppRequirer(
+            self, port=IRC_MEDIA_BIND_PORT, strip_prefix=True, relation_name="ingress-media"
+        )
         self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(self.on.install, self._on_install)
         self.framework.observe(self.on.upgrade_charm, self._on_upgrade_charm)
@@ -91,6 +98,19 @@ class IRCCharm(ops.CharmBase):
             external_url = self.ingress.url
         return external_url
 
+    def _get_media_external_url(self) -> str:
+        """Return URL to access media."""
+        # Default: FQDN
+        external_url = f"http://{socket.getfqdn()}:{IRC_MEDIA_BIND_PORT}"
+        # If can connect to juju-info, get unit IP
+        if binding := self.model.get_binding("juju-info"):
+            unit_ip = str(binding.network.bind_address)
+            external_url = f"http://{unit_ip}:{IRC_MEDIA_BIND_PORT}"
+        # If ingress media is set, get ingress url
+        if self.ingress_media:
+            external_url = self.ingress_media.url
+        return external_url
+
     def reconcile(self) -> None:
         """Reconcile the charm.
 
@@ -132,7 +152,9 @@ class IRCCharm(ops.CharmBase):
         if config.ident_enabled:
             logger.info("Ident is enabled, exposing port %d", IDENT_PORT)
             self.unit.set_ports(IDENT_PORT)
-        self._irc.reconcile(db, matrix, config, self._get_external_url())
+        self._irc.reconcile(
+            db, matrix, config, self._get_external_url(), self._get_media_external_url()
+        )
         self._matrix.set_irc_registration(self._irc.get_registration())
         self.unit.status = ops.ActiveStatus()
 

@@ -3,6 +3,9 @@
 
 """IRC Bridge charm business logic."""
 
+# Reconcile and further methods require URLs from ingress integrations.
+# pylint: disable=too-many-positional-arguments, too-many-arguments
+
 import logging
 import shutil
 import subprocess  # nosec
@@ -103,6 +106,7 @@ class IRCBridgeService:
         matrix: MatrixAuthProviderData,
         config: CharmConfig,
         external_url: str,
+        media_external_url: str,
     ) -> None:
         """Reconcile the service.
 
@@ -116,9 +120,10 @@ class IRCBridgeService:
             matrix: the matrix configuration
             config: the charm configuration
             external_url: ingress url (or unit IP)
+            media_external_url: media ingress url (or unit IP)
         """
         self.prepare()
-        self.configure(db, matrix, config, external_url)
+        self.configure(db, matrix, config, external_url, media_external_url)
         self.reload()
 
     def prepare(self) -> None:
@@ -173,6 +178,7 @@ class IRCBridgeService:
         matrix: MatrixAuthProviderData,
         config: CharmConfig,
         external_url: str,
+        media_external_url: str,
     ) -> None:
         """Configure the service.
 
@@ -181,10 +187,15 @@ class IRCBridgeService:
             matrix: the matrix configuration
             config: the charm configuration
             external_url: ingress url (or unit IP)
+            media_external_url: media ingress url (or unit IP)
         """
         self._generate_pem_file_local()
+        # First re-generate configuration in case something is not ok
+        # otherwise generate_app_registration_local fails if
+        # configuration file is invalid
+        self._eval_conf_local(db, matrix, config, media_external_url)
         self._generate_app_registration_local(config, external_url)
-        self._eval_conf_local(db, matrix, config)
+        self._eval_conf_local(db, matrix, config, media_external_url)
 
     def _generate_pem_file_local(self) -> None:
         """Generate the PEM file content."""
@@ -237,7 +248,11 @@ class IRCBridgeService:
         logger.info("Media proxy key file creation result: %s", result)
 
     def _eval_conf_local(
-        self, db: DatasourcePostgreSQL, matrix: MatrixAuthProviderData, config: CharmConfig
+        self,
+        db: DatasourcePostgreSQL,
+        matrix: MatrixAuthProviderData,
+        config: CharmConfig,
+        media_external_url: str,
     ) -> None:
         """Generate the content of the irc configuration file.
 
@@ -245,6 +260,7 @@ class IRCBridgeService:
             db: the database configuration
             matrix: the matrix configuration
             config: the charm configuration
+            media_external_url: media ingress url (or unit IP)
 
         Raises:
             SynapseConfigurationFileError: when encountering a KeyError from the configuration file
@@ -260,6 +276,7 @@ class IRCBridgeService:
             data["ircService"]["mediaProxy"][
                 "signingKeyPath"
             ] = f"{IRC_BRIDGE_SIGNING_KEY_FILE_PATH}"
+            data["ircService"]["mediaProxy"]["publicUrl"] = media_external_url
             data["ircService"]["passwordEncryptionKeyPath"] = f"{IRC_BRIDGE_PEM_FILE_PATH}"
             data["ircService"]["ident"]["enabled"] = config.ident_enabled
             data["ircService"]["permissions"] = {}

@@ -70,10 +70,10 @@ def test_reconcile_calls_prepare_configure_and_reload_methods(irc_bridge_service
     )
 
     url = "http://localhost:8090"
-    irc_bridge_service.reconcile(db, matrix, config, url)
+    irc_bridge_service.reconcile(db, matrix, config, url, "10.10.10.10")
 
     mock_prepare.assert_called_once()
-    mock_configure.assert_called_once_with(db, matrix, config, url)
+    mock_configure.assert_called_once_with(db, matrix, config, url, "10.10.10.10")
     mock_reload.assert_called_once()
 
 
@@ -332,7 +332,9 @@ def test_configure_evaluates_configuration_file_local(irc_bridge_service, mocker
         bridge_admins="admin1:example.com,admin2:example.com",
     )
 
-    irc_bridge_service._eval_conf_local(db, matrix, config)  # pylint: disable=protected-access
+    irc_bridge_service._eval_conf_local(  # pylint: disable=protected-access
+        db, matrix, config, "10.10.10.10"
+    )
 
     calls = [
         mocker.call(f"{IRC_BRIDGE_CONFIG_FILE_PATH.absolute()}", "r", encoding="utf-8"),

@@ -107,7 +107,7 @@ class IRCCharm(ops.CharmBase):
             unit_ip = str(binding.network.bind_address)
             external_url = f"http://{unit_ip}:{IRC_MEDIA_BIND_PORT}"
         # If ingress media is set, get ingress url
-        if self.ingress_media:
+        if self.ingress_media.url:
             external_url = self.ingress_media.url
         return external_url
 

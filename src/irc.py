@@ -190,6 +190,10 @@ class IRCBridgeService:
             media_external_url: media ingress url (or unit IP)
         """
         self._generate_pem_file_local()
+        # First re-generate configuration in case something is not ok
+        # otherwise generate_app_registration_local fails if
+        # configuration file is invalid
+        self._eval_conf_local(db, matrix, config, media_external_url)
         self._generate_app_registration_local(config, external_url)
         self._eval_conf_local(db, matrix, config, media_external_url)
 

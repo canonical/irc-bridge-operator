@@ -76,7 +76,7 @@ async def test_ingress_media_integration(app_integrated: Application, model: Mod
     unit_address = unit_address.removeprefix("http://")
     response = requests.get(f"http://{unit_address}:11111/health", timeout=30)
     assert response.status_code == 200
-    assert response.headers.get("Content-Type") == "application/json"
+    assert response.headers.get("Content-Type") == "application/json; charset=utf-8"
     assert response.json() == {"ok": True}
     haproxy_application = await model.deploy(
         "haproxy", application_name="haproxy-media", channel="2.8/edge"

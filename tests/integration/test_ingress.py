@@ -95,7 +95,7 @@ async def test_ingress_media_integration(app_integrated: Application, model: Mod
     await model.wait_for_idle(
         apps=[self_signed_application.name, haproxy_application.name], status="active"
     )
-    await model.add_relation(app_integrated.name, haproxy_application.name)
+    await model.add_relation(f"{app_integrated.name}:ingress-media", haproxy_application.name)
     await model.wait_for_idle(
         apps=[app_integrated.name, haproxy_application.name], status="active"
     )

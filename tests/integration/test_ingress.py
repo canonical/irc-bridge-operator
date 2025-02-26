@@ -112,5 +112,5 @@ async def test_ingress_media_integration(app_integrated: Application, model: Mod
     )
 
     assert response.status_code == 200
-    assert response.headers.get("Content-Type") == "application/json"
+    assert response.headers.get("Content-Type") == "application/json; charset=utf-8"
     assert response.json() == {"ok": True}

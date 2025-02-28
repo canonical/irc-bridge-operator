@@ -28,3 +28,6 @@ requires:
   ingress:
     interface: ingress
     limit: 1
+  ingress-media:
+    interface: ingress
+    limit: 1

@@ -13,6 +13,10 @@ IRC_BRIDGE_KEY_OPTS = "rsa_keygen_bits:2048"
 DATABASE_NAME = "ircbridge"
 DATABASE_RELATION_NAME = "database"
 
+# Ingress
+INGRESS_RELATION_NAME = "ingress"
+INGRESS_MEDIA_RELATION_NAME = "ingress-media"
+
 # Paths
 ENVIRONMENT_OS_FILE = "/etc/environment"
 IRC_BRIDGE_CONFIG_DIR_PATH = pathlib.Path("/etc/matrix-appservice-irc")

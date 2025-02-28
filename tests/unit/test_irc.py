@@ -26,6 +26,7 @@ from constants import (
 )
 from irc import (
     InstallError,
+    IRCBridgeParams,
     IRCBridgeService,
     ReloadError,
     StartError,
@@ -70,10 +71,18 @@ def test_reconcile_calls_prepare_configure_and_reload_methods(irc_bridge_service
     )
 
     url = "http://localhost:8090"
-    irc_bridge_service.reconcile(db, matrix, config, url, "10.10.10.10")
+    params = IRCBridgeParams(
+        db=db,
+        matrix=matrix,
+        config=config,
+        external_url=url,
+        media_external_url="10.10.10.10",
+    )
+    irc_bridge_service.set_parameters(params)
+    irc_bridge_service.reconcile()
 
     mock_prepare.assert_called_once()
-    mock_configure.assert_called_once_with(db, matrix, config, url, "10.10.10.10")
+    mock_configure.assert_called_once()
     mock_reload.assert_called_once()
 
 
@@ -267,9 +276,15 @@ def test_configure_generates_app_registration_local(irc_bridge_service, mocker, 
             not registration_file_path.exists()
         ), f"Expected {registration_file_path} not to exist before running the command"
 
-        irc_bridge_service._generate_app_registration_local(  # pylint: disable=protected-access
-            config, "http://localhost:8090"
+        params = IRCBridgeParams(
+            db=None,
+            matrix=None,
+            config=config,
+            external_url="http://localhost:8090",
+            media_external_url="10.10.10.10",
         )
+        irc_bridge_service.set_parameters(params)
+        irc_bridge_service._generate_app_registration_local()  # pylint: disable=protected-access
 
         # pylint: disable=duplicate-code
         mock_run.assert_called_once_with(
@@ -332,9 +347,15 @@ def test_configure_evaluates_configuration_file_local(irc_bridge_service, mocker
         bridge_admins="admin1:example.com,admin2:example.com",
     )
 
-    irc_bridge_service._eval_conf_local(  # pylint: disable=protected-access
-        db, matrix, config, "10.10.10.10"
+    params = IRCBridgeParams(
+        db=db,
+        matrix=matrix,
+        config=config,
+        external_url="http://localhost:8090",
+        media_external_url="10.10.10.10",
     )
+    irc_bridge_service.set_parameters(params)
+    irc_bridge_service._eval_conf_local()  # pylint: disable=protected-access
 
     calls = [
         mocker.call(f"{IRC_BRIDGE_CONFIG_FILE_PATH.absolute()}", "r", encoding="utf-8"),

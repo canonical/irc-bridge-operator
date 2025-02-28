@@ -13,16 +13,20 @@ from charms.traefik_k8s.v2.ingress import IngressPerAppRequirer
 from pydantic import ValidationError
 
 from charm_types import CharmConfig
-from constants import DATABASE_RELATION_NAME, MATRIX_RELATION_NAME
+from constants import (
+    DATABASE_RELATION_NAME,
+    INGRESS_MEDIA_RELATION_NAME,
+    INGRESS_RELATION_NAME,
+    MATRIX_RELATION_NAME,
+)
 from database_observer import DatabaseObserver
-from irc import IRCBridgeService
+from irc import IRCBridgeParams, IRCBridgeService
 from matrix_observer import MatrixObserver
 
 logger = logging.getLogger(__name__)
 
 IRC_BIND_PORT = 8090
 IRC_MEDIA_BIND_PORT = 11111
-
 IDENT_PORT = 113
 
 
@@ -41,10 +45,13 @@ class IRCCharm(ops.CharmBase):
         self._matrix = MatrixObserver(self, MATRIX_RELATION_NAME)
         # 8090 is used for Synapse -> IRC Bridge communication
         self.ingress = IngressPerAppRequirer(
-            self, port=IRC_BIND_PORT, strip_prefix=True, relation_name="ingress"
+            self, port=IRC_BIND_PORT, strip_prefix=True, relation_name=INGRESS_RELATION_NAME
         )
         self.ingress_media = IngressPerAppRequirer(
-            self, port=IRC_MEDIA_BIND_PORT, strip_prefix=True, relation_name="ingress-media"
+            self,
+            port=IRC_MEDIA_BIND_PORT,
+            strip_prefix=True,
+            relation_name=INGRESS_MEDIA_RELATION_NAME,
         )
         self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(self.on.install, self._on_install)
@@ -152,9 +159,15 @@ class IRCCharm(ops.CharmBase):
         if config.ident_enabled:
             logger.info("Ident is enabled, exposing port %d", IDENT_PORT)
             self.unit.set_ports(IDENT_PORT)
-        self._irc.reconcile(
-            db, matrix, config, self._get_external_url(), self._get_media_external_url()
+        params = IRCBridgeParams(
+            db=db,
+            matrix=matrix,
+            config=config,
+            external_url=self._get_external_url(),
+            media_external_url=self._get_media_external_url(),
         )
+        self._irc.set_parameters(params)
+        self._irc.reconcile()
         self._matrix.set_irc_registration(self._irc.get_registration())
         self.unit.status = ops.ActiveStatus()
 

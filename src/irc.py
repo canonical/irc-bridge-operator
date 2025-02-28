@@ -3,12 +3,11 @@
 
 """IRC Bridge charm business logic."""
 
-# Reconcile and further methods require URLs from ingress integrations.
-# pylint: disable=too-many-positional-arguments, too-many-arguments
-
 import logging
 import shutil
 import subprocess  # nosec
+from dataclasses import dataclass
+from typing import Optional
 from urllib.parse import urlparse
 
 import requests
@@ -88,6 +87,25 @@ def get_matrix_domain(matrix_homeserver_url: str) -> str:
     return urlparse(matrix_homeserver_key_url).netloc
 
 
+@dataclass
+class IRCBridgeParams:
+    """IRC bridge parameters required for reconciling configuration.
+
+    Attrs:
+        db: the database configuration
+        matrix: the matrix configuration
+        config: the charm configuration
+        external_url: ingress url (or unit IP)
+        media_external_url: media ingress url (or unit IP)
+    """
+
+    db: Optional[DatasourcePostgreSQL]
+    matrix: Optional[MatrixAuthProviderData]
+    config: Optional[CharmConfig]
+    external_url: str
+    media_external_url: str
+
+
 class IRCBridgeService:
     """IRC Bridge service class.
 
@@ -100,13 +118,31 @@ class IRCBridgeService:
     PEM and the configuration file will be used by the matrix-appservice-irc service.
     """
 
+    def __init__(self) -> None:
+        """Init IRC Bridge class."""
+        self.db = None
+        self.matrix = None
+        self.config = None
+        self.external_url = ""
+        self.media_external_url = ""
+
+    def set_parameters(
+        self,
+        params: IRCBridgeParams,
+    ) -> None:
+        """Prepare IRC Bridge before reconciling configuration.
+
+        Args:
+            params: IRCBridgeParams instance needed by IRC Bridge.
+        """
+        self.db = params.db
+        self.matrix = params.matrix
+        self.config = params.config
+        self.external_url = params.external_url
+        self.media_external_url = params.media_external_url
+
     def reconcile(
         self,
-        db: DatasourcePostgreSQL,
-        matrix: MatrixAuthProviderData,
-        config: CharmConfig,
-        external_url: str,
-        media_external_url: str,
     ) -> None:
         """Reconcile the service.
 
@@ -114,16 +150,9 @@ class IRCBridgeService:
         - Check if the snap is installed
         - Check if the configuration files exist
         - Check if the service is running
-
-        Args:
-            db: the database configuration
-            matrix: the matrix configuration
-            config: the charm configuration
-            external_url: ingress url (or unit IP)
-            media_external_url: media ingress url (or unit IP)
         """
         self.prepare()
-        self.configure(db, matrix, config, external_url, media_external_url)
+        self.configure()
         self.reload()
 
     def prepare(self) -> None:
@@ -174,28 +203,15 @@ class IRCBridgeService:
 
     def configure(
         self,
-        db: DatasourcePostgreSQL,
-        matrix: MatrixAuthProviderData,
-        config: CharmConfig,
-        external_url: str,
-        media_external_url: str,
     ) -> None:
-        """Configure the service.
-
-        Args:
-            db: the database configuration
-            matrix: the matrix configuration
-            config: the charm configuration
-            external_url: ingress url (or unit IP)
-            media_external_url: media ingress url (or unit IP)
-        """
+        """Configure the service."""
         self._generate_pem_file_local()
         # First re-generate configuration in case something is not ok
         # otherwise generate_app_registration_local fails if
         # configuration file is invalid
-        self._eval_conf_local(db, matrix, config, media_external_url)
-        self._generate_app_registration_local(config, external_url)
-        self._eval_conf_local(db, matrix, config, media_external_url)
+        self._eval_conf_local()
+        self._generate_app_registration_local()
+        self._eval_conf_local()
 
     def _generate_pem_file_local(self) -> None:
         """Generate the PEM file content."""
@@ -212,20 +228,17 @@ class IRCBridgeService:
         result = subprocess.run(pem_create_command, check=True, capture_output=True)  # nosec
         logger.info("PEM file creation result: %s", result)
 
-    def _generate_app_registration_local(self, config: CharmConfig, external_url: str) -> None:
-        """Generate the content of the app registration file.
-
-        Args:
-            config: the charm configuration
-            external_url: ingress url (or unit IP)
-        """
+    def _generate_app_registration_local(self) -> None:
+        """Generate the content of the app registration file."""
+        if self.config is None:
+            raise ValueError("IRCBridge is missing charm configuration for reconciling")
         temp_registration_file = f"{IRC_BRIDGE_REGISTRATION_FILE_PATH}.tmp"
         app_reg_create_command = [
             "/bin/bash",
             "-c",
             f"snap run matrix-appservice-irc -r -f {temp_registration_file}"
-            f" -u {external_url}"
-            f" -c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {config.bot_nickname}",
+            f" -u {self.external_url}"
+            f" -c {IRC_BRIDGE_CONFIG_FILE_PATH} -l {self.config.bot_nickname}",
         ]
         logger.info("Creating a temporary app registration file for IRC bridge.")
         result = subprocess.run(app_reg_create_command, check=True, capture_output=True)  # nosec
@@ -249,39 +262,41 @@ class IRCBridgeService:
 
     def _eval_conf_local(
         self,
-        db: DatasourcePostgreSQL,
-        matrix: MatrixAuthProviderData,
-        config: CharmConfig,
-        media_external_url: str,
     ) -> None:
         """Generate the content of the irc configuration file.
 
-        Args:
-            db: the database configuration
-            matrix: the matrix configuration
-            config: the charm configuration
-            media_external_url: media ingress url (or unit IP)
-
         Raises:
-            SynapseConfigurationFileError: when encountering a KeyError from the configuration file
+            SynapseConfigurationFileError: configuration key not found.
+            ValueError: if an attribute is not set for running the reconciliation.
         """
+        if None in (
+            self.db,
+            self.matrix,
+            self.config,
+            self.external_url,
+            self.media_external_url,
+        ):
+            raise ValueError("IRCBridge is not fully prepared before reconciliation")
         with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "r", encoding="utf-8") as config_file:
             data = yaml.safe_load(config_file)
         try:
             db_conn = data["database"]["connectionString"]
-            if db_conn == "" or db_conn != db.uri:
-                data["database"]["connectionString"] = db.uri
-            data["homeserver"]["url"] = matrix.homeserver
-            data["homeserver"]["domain"] = get_matrix_domain(matrix.homeserver)
+            if self.db:
+                if db_conn == "" or db_conn != self.db.uri:
+                    data["database"]["connectionString"] = self.db.uri
+            if self.matrix:
+                data["homeserver"]["url"] = self.matrix.homeserver
+                data["homeserver"]["domain"] = get_matrix_domain(self.matrix.homeserver)
             data["ircService"]["mediaProxy"][
                 "signingKeyPath"
             ] = f"{IRC_BRIDGE_SIGNING_KEY_FILE_PATH}"
-            data["ircService"]["mediaProxy"]["publicUrl"] = media_external_url
+            data["ircService"]["mediaProxy"]["publicUrl"] = self.media_external_url
             data["ircService"]["passwordEncryptionKeyPath"] = f"{IRC_BRIDGE_PEM_FILE_PATH}"
-            data["ircService"]["ident"]["enabled"] = config.ident_enabled
-            data["ircService"]["permissions"] = {}
-            for admin in config.bridge_admins:
-                data["ircService"]["permissions"][admin] = "admin"
+            if self.config:
+                data["ircService"]["ident"]["enabled"] = self.config.ident_enabled
+                data["ircService"]["permissions"] = {}
+                for admin in self.config.bridge_admins:
+                    data["ircService"]["permissions"][admin] = "admin"
         except KeyError as e:
             logger.exception("KeyError: {%s}", e)
             raise exceptions.SynapseConfigurationFileError(

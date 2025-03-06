@@ -1,4 +1,4 @@
 ops==2.19.0
 pydantic==2.10.6
-cryptography==44.0.1
+cryptography==44.0.2
 requests==2.32.3

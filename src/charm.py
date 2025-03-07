@@ -166,8 +166,7 @@ class IRCCharm(ops.CharmBase):
             external_url=self._get_external_url(),
             media_external_url=self._get_media_external_url(),
         )
-        self._irc.set_parameters(params)
-        self._irc.reconcile()
+        self._irc.reconcile(params)
         self._matrix.set_irc_registration(self._irc.get_registration())
         self.unit.status = ops.ActiveStatus()
 

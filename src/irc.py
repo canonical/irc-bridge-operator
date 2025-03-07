@@ -143,6 +143,7 @@ class IRCBridgeService:
 
     def reconcile(
         self,
+        params: IRCBridgeParams,
     ) -> None:
         """Reconcile the service.
 
@@ -150,7 +151,11 @@ class IRCBridgeService:
         - Check if the snap is installed
         - Check if the configuration files exist
         - Check if the service is running
+
+        Args:
+            params: IRCBridgeParams instance needed by IRC Bridge.
         """
+        self.set_parameters(params)
         self.prepare()
         self.configure()
         self.reload()

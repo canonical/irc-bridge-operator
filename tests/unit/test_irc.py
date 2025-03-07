@@ -78,8 +78,7 @@ def test_reconcile_calls_prepare_configure_and_reload_methods(irc_bridge_service
         external_url=url,
         media_external_url="10.10.10.10",
     )
-    irc_bridge_service.set_parameters(params)
-    irc_bridge_service.reconcile()
+    irc_bridge_service.reconcile(params)
 
     mock_prepare.assert_called_once()
     mock_configure.assert_called_once()

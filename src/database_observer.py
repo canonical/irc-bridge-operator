@@ -61,7 +61,6 @@ class DatabaseObserver(Object):
                 fields=["uris", "endpoints", "username", "password", "database"]
             ).values()
         )
-
         if not relation_data:
             return None
 

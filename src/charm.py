@@ -58,6 +58,12 @@ class IRCCharm(ops.CharmBase):
         self.framework.observe(self.on.upgrade_charm, self._on_upgrade_charm)
         self.framework.observe(self.on.start, self._on_start)
         self.framework.observe(self.on.stop, self._on_stop)
+        self.framework.observe(
+            self.on.ingress_media_relation_changed, self._on_ingress_media_relation_changed
+        )
+        self.framework.observe(
+            self.on.ingress_media_relation_departed, self._on_ingress_media_relation_departed
+        )
 
     def _on_config_changed(self, _: ops.ConfigChangedEvent) -> None:
         """Handle config changed."""
@@ -79,6 +85,22 @@ class IRCCharm(ops.CharmBase):
         """Handle stop."""
         self.unit.status = ops.MaintenanceStatus("Stopping charm")
         self._irc.stop()
+
+    def _on_ingress_media_relation_changed(self, _: ops.StartEvent) -> None:
+        """Handle ingress-media-relation-changed.
+
+        If ingress-media is created/changed, IRC should be reconfigured.
+        """
+        logger.info("Reconfiguring media proxy with URL %s", self._get_media_external_url())
+        self.reconcile()
+
+    def _on_ingress_media_relation_departed(self, _: ops.StartEvent) -> None:
+        """Handle ingress-media-relation-departed.
+
+        If ingress-media is departed, IRC should be reconfigured.
+        """
+        logger.info("Reconfiguring media proxy with URL %s", self._get_media_external_url())
+        self.reconcile()
 
     def _get_charm_config(self) -> CharmConfig:
         """Reconcile the charm.

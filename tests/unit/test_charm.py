@@ -8,7 +8,7 @@
 # pylint: disable=R0801, protected-access
 
 import json
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import ops
 from ops import testing
@@ -93,61 +93,59 @@ def test_ingress_media_removed(monkeypatch: MonkeyPatch) -> None:
     assert mock_irc.reconcile.call_count == 2
 
 
-def test_ingress_media():
+def test_ingress_media(monkeypatch: MonkeyPatch):
     """
     arrange: start the charm with all integrations and commands mocked.
     act: add ingress-media relation.
     assert: The media url points to the ingress relation data URL.
     """
     mock_irc = MagicMock()
-    with patch(
-        "charm.IRCBridgeService",
-        return_value=mock_irc,
-    ), patch("charm.MatrixObserver", return_value=MagicMock()):
-        ctx = testing.Context(IRCCharm)
-        config = {"bot_nickname": "testbot", "bridge_admins": "admin:example.com"}
-        database_data = {
-            "database": "ircbridge",
-            "endpoints": "postgresql-k8s-primary.local:5432",
-            "password": "123",
-            "username": "user1",
-        }
-        matrix_auth_data = {"shared_secret_id": "123", "homeserver": "https://example.com/"}
-        relations = [
-            testing.Relation(
-                id=1,
-                endpoint="database",
-                interface="postgresql_client",
-                remote_app_data=database_data,
-            ),
-            testing.Relation(
-                id=2,
-                endpoint="matrix-auth",
-                interface="matrix_auth",
-                remote_app_data=matrix_auth_data,
-            ),
-        ]
-        secrets = [testing.Secret(id="123", tracked_content={"shared-secret-content": "abc"})]
-        state = testing.State(leader=True, config=config, relations=relations, secrets=secrets)
-        out = ctx.run(ctx.on.config_changed(), state)
-        assert out.unit_status == testing.ActiveStatus()
-        assert mock_irc.reconcile.called
-        args, _ = mock_irc.reconcile.call_args
-        assert args[0].media_external_url == "http://192.0.2.0:11111"
+    monkeypatch.setattr("charm.IRCBridgeService", lambda *_, **__: mock_irc)
+    monkeypatch.setattr("charm.MatrixObserver", lambda *_, **__: MagicMock())
 
-        media_url = "https://media/"
-        relations.append(
-            testing.Relation(
-                id=3,
-                endpoint="ingress-media",
-                interface="ingress",
-                remote_app_data={"ingress": json.dumps({"url": media_url})},
-            )
+    ctx = testing.Context(IRCCharm)
+    config = {"bot_nickname": "testbot", "bridge_admins": "admin:example.com"}
+    database_data = {
+        "database": "ircbridge",
+        "endpoints": "postgresql-k8s-primary.local:5432",
+        "password": "123",
+        "username": "user1",
+    }
+    matrix_auth_data = {"shared_secret_id": "123", "homeserver": "https://example.com/"}
+    relations = [
+        testing.Relation(
+            id=1,
+            endpoint="database",
+            interface="postgresql_client",
+            remote_app_data=database_data,
+        ),
+        testing.Relation(
+            id=2,
+            endpoint="matrix-auth",
+            interface="matrix_auth",
+            remote_app_data=matrix_auth_data,
+        ),
+    ]
+    secrets = [testing.Secret(id="123", tracked_content={"shared-secret-content": "abc"})]
+    state = testing.State(leader=True, config=config, relations=relations, secrets=secrets)
+
+    out = ctx.run(ctx.on.config_changed(), state)
+    assert out.unit_status == testing.ActiveStatus()
+    assert mock_irc.reconcile.call_count == 1
+    args, _ = mock_irc.reconcile.call_args
+    assert args[0].media_external_url == "http://192.0.2.0:11111"
+
+    media_url = "https://media/"
+    relations.append(
+        testing.Relation(
+            id=3,
+            endpoint="ingress-media",
+            interface="ingress",
+            remote_app_data={"ingress": json.dumps({"url": media_url})},
         )
-        state = testing.State(leader=True, config=config, relations=relations, secrets=secrets)
-        out = ctx.run(ctx.on.config_changed(), state)
+    )
+    state = testing.State(leader=True, config=config, relations=relations, secrets=secrets)
+    out = ctx.run(ctx.on.config_changed(), state)
 
-        assert out.unit_status == testing.ActiveStatus()
-        assert mock_irc.reconcile.called
-        args, _ = mock_irc.reconcile.call_args
-        assert args[0].media_external_url == media_url
+    assert out.unit_status == testing.ActiveStatus()
+    assert mock_irc.reconcile.call_count == 2

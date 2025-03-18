@@ -149,3 +149,5 @@ def test_ingress_media(monkeypatch: MonkeyPatch):
 
     assert out.unit_status == testing.ActiveStatus()
     assert mock_irc.reconcile.call_count == 2
+    args, _ = mock_irc.reconcile.call_args
+    assert args[0].media_external_url == media_url

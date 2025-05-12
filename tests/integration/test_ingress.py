@@ -38,19 +38,20 @@ async def test_ingress_integration(app_integrated: Application, model: Model):
         apps=[self_signed_application.name, haproxy_application.name],
         status="active",
         raise_on_error=True,
+        timeout=300,
     )
     external_hostname = "haproxy.internal"
     await haproxy_application.set_config({"external-hostname": external_hostname})
     await model.wait_for_idle(
-        apps=[self_signed_application.name, haproxy_application.name], status="active"
+        apps=[self_signed_application.name, haproxy_application.name], status="active", timeout=300
     )
     await model.add_relation(self_signed_application.name, haproxy_application.name)
     await model.wait_for_idle(
-        apps=[self_signed_application.name, haproxy_application.name], status="active"
+        apps=[self_signed_application.name, haproxy_application.name], status="active", timeout=300
     )
     await model.add_relation(f"{app_integrated.name}:ingress", haproxy_application.name)
     await model.wait_for_idle(
-        apps=[app_integrated.name, haproxy_application.name], status="active"
+        apps=[app_integrated.name, haproxy_application.name], status="active", timeout=300
     )
 
     unit_address = await tests.integration.helpers.get_unit_address(haproxy_application)
@@ -96,18 +97,19 @@ async def test_ingress_media_integration(app_integrated: Application, model: Mod
         apps=[self_signed_application.name, haproxy_application.name],
         status="active",
         raise_on_error=True,
+        timeout=300,
     )
     await haproxy_application.set_config({"external-hostname": external_hostname})
     await model.wait_for_idle(
-        apps=[self_signed_application.name, haproxy_application.name], status="active"
+        apps=[self_signed_application.name, haproxy_application.name], status="active", timeout=300
     )
     await model.add_relation(self_signed_application.name, haproxy_application.name)
     await model.wait_for_idle(
-        apps=[self_signed_application.name, haproxy_application.name], status="active"
+        apps=[self_signed_application.name, haproxy_application.name], status="active", timeout=300
     )
     await model.add_relation(f"{app_integrated.name}:ingress-media", haproxy_application.name)
     await model.wait_for_idle(
-        apps=[app_integrated.name, haproxy_application.name], status="active"
+        apps=[app_integrated.name, haproxy_application.name], status="active", timeout=300
     )
 
     unit_address = await tests.integration.helpers.get_unit_address(haproxy_application)

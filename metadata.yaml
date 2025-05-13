@@ -3,7 +3,7 @@
 name: irc-bridge
 display-name: IRC Bridge
 summary: IRC Bridge charm for Matrix.
-docs: https://discourse.charmhub.io/
+docs: https://discourse.charmhub.io/t/irc-bridge-documentation-overview/17755
 issues: https://github.com/canonical/irc-bridge-operator/issues
 maintainers:
   - https://launchpad.net/~canonical-is-devops

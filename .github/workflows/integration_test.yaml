@@ -8,8 +8,6 @@ jobs:
     uses: canonical/operator-workflows/.github/workflows/integration_test.yaml@main
     secrets: inherit
     with:
-      self-hosted-runner: true
-      self-hosted-runner-label: "edge"
       juju-channel: 3.4/stable
       provider: lxd
       modules: '["test_charm.py", "test_ingress.py"]'

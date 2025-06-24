@@ -3,6 +3,7 @@
   "extends": [
     "config:base"
   ],
+  "enabled": false,
   "regexManagers": [
     {
       "fileMatch": ["(^|/)rockcraft.yaml$"],

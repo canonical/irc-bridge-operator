@@ -63,7 +63,7 @@ Integrations overview:
 
 ## Get started
 
-To begin, refer to the [Deploy IRC Bridge](https://charmhub.io/irc-bridge/docs/tutorial-deploy-irc-bridge) tutorial for step-by-step instructions.
+To begin, refer to the tutorial for step-by-step instructions.
 
 ## Integrations
 
@@ -75,9 +75,19 @@ To begin, refer to the [Deploy IRC Bridge](https://charmhub.io/irc-bridge/docs/t
 * [Read more](https://charmhub.io/irc-bridge)
 * [Developer documentation](https://github.com/matrix-org/matrix-appservice-irc/blob/develop/CONTRIBUTING.md)
 * [Official webpage](https://github.com/matrix-org/matrix-appservice-irc/tree/develop)
-* [Troubleshooting](docs/how-to/troubleshooting.md)
+* [Troubleshooting](how-to/troubleshooting.md)
 
 ## Project and community
 * [Issues](https://github.com/canonical/irc-bridge-operator/issues)
 * [Contributing](https://github.com/canonical/irc-bridge-operator/blob/main/CONTRIBUTING.md)
 * [Matrix](https://matrix.to/#/#charmhub-charmdev:ubuntu.com)
+
+
+# Contents
+
+1. [Tutorial](tutorial/deploy-irc-bridge.md)
+1. [How To](how-to)
+  1. [Troubleshooting](how-to/troubleshooting.md)
+  1. [Contribute](how-to/contribute.md)
+1. [Explanation](explanation)
+  1. [Charm architecture](explanation/charm-architecture.md)

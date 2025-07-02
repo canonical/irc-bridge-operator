@@ -21,7 +21,7 @@ examines
 - Please help us out in ensuring easy to review branches by rebasing your pull
 request branch onto the `main` branch. This also avoids merge commits and
 creates a linear Git commit history.
-- Please generate src documentation for every commit. See the section below for
+- Please generate source documentation for every commit. See the section below for
 more details.
 
 ## Developing

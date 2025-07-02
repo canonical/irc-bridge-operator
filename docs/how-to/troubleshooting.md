@@ -1,8 +1,8 @@
 # How to troubleshoot IRC bridge issues
 
-This section will help you troubleshoot various issues with ERC bridge.
+This section will help you troubleshoot various issues with the IRC bridge charm.
 
-## Issue where Synapse stops sending events to the IRC bridge
+## Synapse stops sending events to the IRC bridge
 
 This section details the issue when Synapse stops sending events to the IRC bridge.
 

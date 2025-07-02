@@ -1,7 +1,7 @@
 # How-to guides
 
 The following guides cover key processes and common tasks for managing
-and using the IRC-Bridge charm.
+and using the IRC Bridge charm.
 
 ## Operations
 * [Troubleshooting]

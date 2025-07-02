@@ -63,7 +63,7 @@ Integrations overview:
 
 ## Get started
 
-To begin, refer to the tutorial for step-by-step instructions.
+To begin, refer to the [tutorial](tutorial/deploy-irc-bridge.md) for step-by-step instructions.
 
 ## Integrations
 

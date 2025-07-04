@@ -43,3 +43,14 @@ To begin, refer to the [Deploy IRC Bridge](https://charmhub.io/irc-bridge/docs/t
 * [Issues](https://github.com/canonical/irc-bridge-operator/issues)
 * [Contributing](https://github.com/canonical/irc-bridge-operator/blob/main/CONTRIBUTING.md)
 * [Matrix](https://matrix.to/#/#charmhub-charmdev:ubuntu.com)
+
+# Contents
+
+1. [Tutorial](tutorial)
+  1. [Deploy IRC bridge](tutorial/deploy-irc-bridge.md)
+1. [How To](how-to)
+  1. [Troubleshooting](how-to/troubleshooting.md)
+  1. [Contribute](how-to/contribute.md)
+1. [Explanation](explanation)
+  1. [Charm architecture](explanation/charm-architecture.md)
+1. [Changelog](CHANGELOG.md)

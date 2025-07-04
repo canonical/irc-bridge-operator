@@ -85,7 +85,7 @@ To begin, refer to the [tutorial](tutorial/deploy-irc-bridge.md) for step-by-ste
 
 # Contents
 
-1. [Tutorial](tutorial/deploy-irc-bridge.md)
+1. [Tutorial](tutorial)
 1. [How To](how-to)
   1. [Troubleshooting](how-to/troubleshooting.md)
   1. [Contribute](how-to/contribute.md)

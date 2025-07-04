@@ -63,7 +63,7 @@ Integrations overview:
 
 ## Get started
 
-To begin, refer to the [Deploy IRC Bridge](https://charmhub.io/irc-bridge/docs/tutorial-deploy-irc-bridge) tutorial for step-by-step instructions.
+To begin, refer to the [Deploy IRC Bridge](https://charmhub.io/irc-bridge/docs/tutorial) tutorial for step-by-step instructions.
 
 ## Integrations
 

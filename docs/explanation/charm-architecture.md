@@ -32,7 +32,7 @@ Snap and generates the necessary configuration.
 7. From the Matrix authentication integration, the Charm creates the IRC
 registration file and shares it with Synapse, which then registers the IRC Bridge as an application service.
 
-## IRC Bridge Snap
+## IRC bridge snap
 
 The IRC Bridge Snap is utilized to package and distribute [matrix-appservice-irc](https://github.com/matrix-org/matrix-appservice-irc),
 providing a consistent, secure and maintainable deployment across various

@@ -10,7 +10,7 @@ enhancements to the IRC Bridge operator.
 explaining your use case.
 - If you would like to chat with us about your use-cases or proposed
 implementation, you can reach us at [Canonical Matrix public channel](https://matrix.to/#/#charmhub-charmdev:ubuntu.com)
-or [Discourse](https://discourse.charmhub.io).
+or [Discourse](https://discourse.charmhub.io/t/about-the-getting-started-category/6007).
 - Familiarizing yourself with the [Charmed Operator Framework](https://juju.is/docs/sdk)
 library will help you a lot when working on new features or bug fixes.
 - All enhancements require review before being merged. Code review typically

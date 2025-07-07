@@ -164,7 +164,7 @@ To check all available options, send the following command:
 
 Screenshot example:
 
-![IRC screenshot](./irc-screenshot.jpeg)
+![irc-screenshot|690x575](upload://p4AjA75vPFwTcKWKWrzS25eFWEG.jpeg)
 
 ### Join a IRC channel
 

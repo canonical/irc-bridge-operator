@@ -13,44 +13,6 @@ specification. This means it interacts with Synapse through the Application
 Service API, allowing it to manage virtual users, handle messages and bridge
 communications between Matrix and IRC efficiently.
 
-```mermaid
-C4Deployment
-  Deployment_Node("IRC", "IRC Bridge Juju Machine Model") {
-    Container(PostgreSQL, "PostgreSQL", "Database for IRC Bridge")
-    Container(IRC_Bridge, "IRC Bridge", "IRC Bridge")
-    Container(HAProxy, "HAProxy", "Proxy")
-  }
-
-  System(IRC, "IRC", "Internet Relay Chat")
-
-  Person(User, "User", "Connects to Synapse")
-
-  Deployment_Node("Synapse", "Synapse Juju K8S Model") {
-    Container(Synapse, "Synapse", "Matrix homeserver")
-  }
-
-  Rel(User, Synapse, "HTTPS", "443")
-  Rel(Synapse, HAProxy, "HTTPS", "443")
-  Rel(HAProxy, IRC_Bridge, "HTTP", "8090")
-  Rel(IRC_Bridge, IRC, "TLS", "6697")
-  Rel(IRC_Bridge, PostgreSQL, "TCP", "5432")
-  Rel(IRC_Bridge, Synapse, "HTTPS", "443")
-  Rel(IRC, IRC_Bridge, "Identd", "1113")
-
-  UpdateRelStyle(IRC_Bridge, IRC, $offsetY="-20", $offsetX="60")
-  UpdateRelStyle(IRC, IRC_Bridge, $offsetY="-10", $offsetX="-90")
-  UpdateRelStyle(IRC_Bridge, PostgreSQL, $offsetY="-30")
-  UpdateRelStyle(User, Synapse, $offsetY="-30")
-  UpdateRelStyle(IRC_Bridge, Synapse, $offsetY="-30", $offsetX="-20")
-
-  UpdateElementStyle(User,  $bgColor="#E95420", $borderColor="#E95420")
-  UpdateElementStyle(IRC,  $bgColor="#5555ff", $borderColor="#5555ff")
-  UpdateElementStyle(PostgreSQL,  $bgColor="#77216F", $borderColor="#77216F")
-  UpdateElementStyle(IRC_Bridge,  $bgColor="#77216F", $borderColor="#77216F")
-  UpdateElementStyle(HAProxy,  $bgColor="#77216F", $borderColor="#77216F")
-  UpdateElementStyle(Synapse,  $bgColor="#77216F", $borderColor="#77216F")
-```
-
 Integrations overview:
 
 - User → Synapse: The user connects to the Matrix homeserver (Synapse) via HTTPS (port 443).
@@ -81,3 +43,14 @@ To begin, refer to the [Deploy IRC Bridge](https://charmhub.io/irc-bridge/docs/t
 * [Issues](https://github.com/canonical/irc-bridge-operator/issues)
 * [Contributing](https://github.com/canonical/irc-bridge-operator/blob/main/CONTRIBUTING.md)
 * [Matrix](https://matrix.to/#/#charmhub-charmdev:ubuntu.com)
+
+# Contents
+
+1. [Tutorial](tutorial)
+  1. [Deploy IRC bridge](tutorial/deploy-irc-bridge.md)
+1. [How To](how-to)
+  1. [Troubleshooting](how-to/troubleshooting.md)
+  1. [Contribute](how-to/contribute.md)
+1. [Explanation](explanation)
+  1. [Charm architecture](explanation/charm-architecture.md)
+1. [Changelog](CHANGELOG.md)

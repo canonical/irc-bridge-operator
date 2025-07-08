@@ -1,9 +1,13 @@
 # How to troubleshoot IRC bridge issues
 
-## Issue: Synapse Stops Sending Events to the IRC Bridge
+This section will help you troubleshoot various issues with the IRC bridge charm.
+
+## Synapse stops sending events to the IRC bridge
+
+This section details the issue when Synapse stops sending events to the IRC bridge.
 
 ### Symptoms
-- Synapse is unable to push appservice transactions to the IRC bridge.
+- Synapse is unable to push `appservice` transactions to the IRC bridge.
 - Synapse logs may indicate errors such as "Server not known" or
 appservice-specific warnings.
 - The database shows `appservice_stream_position` stuck at an old event, and
@@ -15,7 +19,7 @@ restarting Synapse does not resolve the issue.
 
 ### Root cause
 The `appservice_stream_position` in the Synapse database can get stuck on a
-problematic event, causing the appservice sender to break silently and stop
+problematic event, causing the `appservice` sender to break silently and stop
 processing new events.
 
 ### Solution

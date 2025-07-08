@@ -48,9 +48,9 @@ To begin, refer to the [Deploy IRC Bridge](https://charmhub.io/irc-bridge/docs/t
 
 1. [Tutorial](tutorial)
   1. [Deploy IRC bridge](tutorial/deploy-irc-bridge.md)
-1. [How To]()
+1. [How To](how-to)
   1. [Troubleshooting](how-to/troubleshooting.md)
   1. [Contribute](how-to/contribute.md)
-1. [Explanation]()
+1. [Explanation](explanation)
   1. [Charm architecture](explanation/charm-architecture.md)
 1. [Changelog](CHANGELOG.md)

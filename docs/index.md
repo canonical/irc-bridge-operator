@@ -1,4 +1,6 @@
+<!-- vale Canonical.007-Headings-sentence-case = NO -->
 # IRC Bridge Operator
+<!-- vale Canonical.007-Headings-sentence-case = YES -->
 
 A [Juju](https://juju.is/) [charm](https://documentation.ubuntu.com/juju/3.6/reference/charm/)
 deploying and managing an IRC Bridge (with Ident server) Integrator on bare metal.
@@ -6,7 +8,9 @@ deploying and managing an IRC Bridge (with Ident server) Integrator on bare meta
 This charm is meant to be used in conjunction with [Synapse](https://github.com/canonical/synapse-operator) and related
 to it.
 
+<!-- vale Canonical.007-Headings-sentence-case = NO -->
 ## High-level overview of IRC Bridge
+<!-- vale Canonical.007-Headings-sentence-case = YES -->
 
 The IRC Bridge is implemented as an Application Service, as defined in the Matrix
 specification. This means it interacts with Synapse through the Application

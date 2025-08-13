@@ -11,6 +11,20 @@ __pycache__/
 *.egg-info/
 */*.rock
 */*.auth
+
+# We want to ignore our StylesPath *except* for our local
+# `vocabularies/Base` directory.
+
+.vale/styles/*
+!.vale/styles/local
+!.vale/styles/config/
+
+.vale/styles/config/*
+!.vale/styles/config/vocabularies/
+
+.vale/styles/config/vocabularies/*
+!.vale/styles/config/vocabularies/local
+
 .vale/
 !.vale/styles/local
 !.vale/styles/config/vocabularies/local

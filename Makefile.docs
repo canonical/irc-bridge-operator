@@ -16,7 +16,7 @@ DOCS_FILES ?= docs/
 .PHONY: vale-install
 vale-install: ## Make sure Vale is installed on the system
 	@command -v vale >/dev/null 2>&1 || { \
-		@echo "--- Installing Vale using snap... ---"
+		echo "--- Installing Vale using snap... ---"; \
 		sudo snap install vale; \
 	}
 	@vale --version

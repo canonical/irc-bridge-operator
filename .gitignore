@@ -12,3 +12,5 @@ __pycache__/
 */*.rock
 */*.auth
 .vale/
+!.vale/styles/local
+!.vale/styles/config/vocabularies/local

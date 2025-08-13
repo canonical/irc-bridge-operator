@@ -24,7 +24,3 @@ __pycache__/
 
 .vale/styles/config/vocabularies/*
 !.vale/styles/config/vocabularies/local
-
-.vale/
-!.vale/styles/local
-!.vale/styles/config/vocabularies/local

@@ -18,3 +18,6 @@ jobs:
         with:
           files: 'README.md CONTRIBUTING.md docs/'
           fail_on_error: true
+        env:
+          # This token is required for the action to post comments on pull requests.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -16,7 +16,7 @@ jobs:
       - name: Run Vale Linter
         uses: errata-ai/vale-action@v2.1.1
         with:
-          files: '{README.md,CONTRIBUTING.md,docs/**/*.md}'
+          files: '["README.md","CONTRIBUTING.md","docs/"]'
           fail_on_error: true
         env:
           # This token is required for the action to post comments on pull requests.

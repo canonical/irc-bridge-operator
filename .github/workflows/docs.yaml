@@ -1,0 +1,20 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ "main", "update-to-use-vale-package" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  vale:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5.0.0
+
+      - name: Run Vale Linter
+        uses: errata-ai/vale-action@v2.1.1
+        with:
+          files: 'README.md CONTRIBUTING.md docs/'
+          fail_on_error: true

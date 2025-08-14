@@ -1,4 +1,6 @@
+<!-- vale Canonical.007-Headings-sentence-case = NO -->
 # Deploy IRC bridge
+<!-- vale Canonical.007-Headings-sentence-case = YES -->
 
 In this tutorial, we will deploy IRC Bridge, add configurations and integrate it
 with other charms to set up a working Matrix application.
@@ -26,7 +28,9 @@ your usual work, create a new model using the following command.
 juju add-model irc-bridge-tutorial
 ```
 
+<!-- vale Canonical.007-Headings-sentence-case = NO -->
 ### Deploy IRC bridge
+<!-- vale Canonical.007-Headings-sentence-case = YES -->
 
 ```
 juju deploy irc-bridge --channel edge
@@ -35,7 +39,9 @@ juju deploy irc-bridge --channel edge
 The tutorial uses the edge channel to get the latest updates on the
 Matrix-Auth library.
 
+<!-- vale Canonical.007-Headings-sentence-case = NO -->
 ### Configure IRC bridge
+<!-- vale Canonical.007-Headings-sentence-case = YES -->
 
 IRC Bridge has two mandatory configurations:
 
@@ -112,7 +118,9 @@ applications to integrate with it.
 juju offer synapse:matrix-auth
 ```
 
+<!-- vale Canonical.007-Headings-sentence-case = NO -->
 ### Integrate IRC bridge with Synapse
+<!-- vale Canonical.007-Headings-sentence-case = YES -->
 
 Now that the user used by IRC is created and the offer is available, change it
 back to the LXD controller to integrate IRC Bridge and Synapse.
@@ -166,7 +174,9 @@ Screenshot example:
 
 ![irc-screenshot|690x575](upload://p4AjA75vPFwTcKWKWrzS25eFWEG.jpeg)
 
+<!-- vale Canonical.007-Headings-sentence-case = NO -->
 ### Join a IRC channel
+<!-- vale Canonical.007-Headings-sentence-case = YES -->
 
 You can send a message to the user `ircappservice` like `!join #python` and
 this will be interpreted as a command to join the #python channel.

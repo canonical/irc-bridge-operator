@@ -6,30 +6,64 @@
 
 # Vale settings
 VALE_DIR ?= .vale
-PRAECEPTA_CONFIG ?= .vale.ini
-DOCS_FILES ?= docs/
+PRAECEPTA_CONFIG 	?= .vale.ini
+VALE_DOCS_FILES 	?= docs/ README.md CONTRIBUTING.md
+LYCHEE_DOCS_FILES 	?=  "'./**/*.md' './**/*.html' './**/*.rst'"
+
+HAS_VALE			:= $(shell command -v vale;)
+HAS_LYCHEE			:= $(shell command -v lychee;)
+
+# ==============================================================================
+# Docs Targets
+# ==============================================================================
+
+.PHONY: docs-check
+docs-check: vale lychee ## Run all Docs checks
+
+.PHONY: docs-clean
+docs-clean: vale-clean
+
+# ==============================================================================
+# Dependency Check Targets
+# ==============================================================================
+
+.PHONY: .check-vale
+.check-vale:
+ifndef HAS_VALE
+	$(call errmsg,'vale' is not installed. Please install it first) \
+	exit 1;
+endif
+
+.PHONY: .check-lychee
+.check-lychee:
+ifndef HAS_LYCHEE
+	$(call errmsg,'lychee' is not installed. Please install it first) \
+	exit 1;
+endif
+
 
 # ==============================================================================
 # Main Vale Targets
 # ==============================================================================
 
-.PHONY: vale-install
-vale-install: ## Make sure Vale is installed on the system
-	@command -v vale >/dev/null 2>&1 || { \
-		echo "--- Installing Vale using snap... ---"; \
-		sudo snap install vale; \
-	}
-	@vale --version
-
-.PHONY: vale-install
+.PHONY: vale-sync
 vale-sync: ## Download and install external Vale configuration sources
-	@echo "--- Syncing Vale styles... ---"
+	$(call msg,--- Syncing Vale styles... ---)
 	@vale sync
 
-.PHONY: vale-check
-vale-check: vale-install vale-sync
-	@echo "--- Running Vale checks on $(DOCS_FILES)... ---"
-	@vale --config=$(PRAECEPTA_CONFIG) $(DOCS_FILES)
+.PHONY: vale
+vale: .check-vale vale-sync ## Run Vale checks on docs
+	$(call msg,--- Running Vale checks on "$(VALE_DOCS_FILES)"... ---)
+	@vale --config=$(PRAECEPTA_CONFIG) $(VALE_DOCS_FILES)
+
+# ==============================================================================
+# Main Lychee Targets
+# ==============================================================================
+
+.PHONY: lychee
+lychee: .check-lychee ## Run Lychee checks on docs
+	$(call msg,--- Running lychee checks on "$(LYCHEE_DOCS_FILES)"... ---)
+	@lychee $(LYCHEE_DOCS_FILES)
 
 # ==============================================================================
 # Helper Targets
@@ -37,5 +71,5 @@ vale-check: vale-install vale-sync
 
 .PHONY: vale-clean
 vale-clean:
-	@echo "--- Cleaning downloaded packages and ignored files from $(VALE_DIR)... ---"
+	$(call msg,--- Cleaning downloaded packages and ignored files from "$(VALE_DIR)"... ---)
 	@git clean -dfX $(VALE_DIR)

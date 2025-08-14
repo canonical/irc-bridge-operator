@@ -7,17 +7,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  vale:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v5.0.0
+  docs-checks:
+    uses: canonical/operator-workflows/.github/workflows/docs.yaml@add-documentation-workflow
+    secrets: inherit
 
-      - name: Run Vale Linter
-        uses: errata-ai/vale-action@v2.1.1
-        with:
-          files: '["README.md","CONTRIBUTING.md","docs/"]'
-          fail_on_error: true
-        env:
-          # This token is required for the action to post comments on pull requests.
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

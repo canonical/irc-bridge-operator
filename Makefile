@@ -11,6 +11,7 @@
 # Colors
 NO_COLOR=\033[0m
 CYAN_COLOR=\033[0;36m
+YELLOW_COLOR=\033[0;93m
 RED_COLOR=\033[0;91m
 
 msg = @printf '$(CYAN_COLOR)$(1)$(NO_COLOR)\n'
@@ -35,5 +36,5 @@ _list-targets: ## This collects and prints all targets, ignore internal commands
 			if (match($$0, /## .*/))                              \
 				comment = substr($$0, RSTART + 3);                \
 			if (target != ".PHONY" && target !~ /^_/ && !seen[target]++) \
-				printf "  make %-20s # %s\n", target, comment;    \
+				printf "  make %-20s $(YELLOW_COLOR)# %s$(NO_COLOR)\n", target, comment;    \
 		}' $(MAKEFILE_LIST) | sort

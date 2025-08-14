@@ -12,9 +12,7 @@ __pycache__/
 */*.rock
 */*.auth
 
-# We want to ignore our StylesPath *except* for our local
-# `vocabularies/Base` directory.
-
+# Ignore Vale config and StylesPath *except* for our local directories.
 .vale/styles/*
 !.vale/styles/local
 !.vale/styles/config/

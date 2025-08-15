@@ -7,5 +7,5 @@ on:
 
 jobs:
   docs-checks:
-    uses: canonical/operator-workflows/.github/workflows/docs.yaml@add-documentation-workflow
+    uses: canonical/operator-workflows/.github/workflows/docs.yaml@main
     secrets: inherit

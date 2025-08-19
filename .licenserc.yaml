@@ -35,4 +35,5 @@ header:
     - '.woke.yaml'
     - '.woke.yml'
     - 'zap_rules.tsv'
+    - '.lycheeignore'
   comment: on-failure

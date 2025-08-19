@@ -1,6 +1,0 @@
-homeserver
-Ident
-Identd
-IRC
-misconfigurations
-rebasing

@@ -254,7 +254,10 @@ class IRCBridgeService:
     def _generate_media_proxy_key(self) -> None:
         """Generate the content of the media proxy key."""
         if IRC_BRIDGE_SIGNING_KEY_FILE_PATH.exists():
-            logger.info("Media proxy key file %s already exists, skipping")
+            logger.info(
+                "Media proxy key file %s already exists, skipping",
+                IRC_BRIDGE_SIGNING_KEY_FILE_PATH,
+            )
             return
         media_proxy_key_command = [
             "/bin/bash",
@@ -292,9 +295,9 @@ class IRCBridgeService:
             if self.matrix:
                 data["homeserver"]["url"] = self.matrix.homeserver
                 data["homeserver"]["domain"] = get_matrix_domain(self.matrix.homeserver)
-            data["ircService"]["mediaProxy"][
-                "signingKeyPath"
-            ] = f"{IRC_BRIDGE_SIGNING_KEY_FILE_PATH}"
+            data["ircService"]["mediaProxy"]["signingKeyPath"] = (
+                f"{IRC_BRIDGE_SIGNING_KEY_FILE_PATH}"
+            )
             data["ircService"]["mediaProxy"]["publicUrl"] = self.media_external_url
             data["ircService"]["passwordEncryptionKeyPath"] = f"{IRC_BRIDGE_PEM_FILE_PATH}"
             if self.config:

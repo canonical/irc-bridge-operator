@@ -185,7 +185,7 @@ async def generate_anycharm_relation(
     )
     await ops_test.model.wait_for_idle(apps=[any_charm.name])
     await ops_test.model.add_relation(
-       f"{any_charm.name}:provide-matrix-auth", f"{app.name}:matrix-auth"
+        f"{any_charm.name}:provide-matrix-auth", f"{app.name}:matrix-auth"
     )
 
 

@@ -1,0 +1,28 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"
+    arrange: build and deploy the charm.
+    act: relate to a db and a matrix homeserver.
+    assert: that the charm ends up in active state.
+    ","0","test_lifecycle_after_relations","tests.integration","2025-10-30","broken","2025-10-30","","test_charm","",""
+"
+    arrange: assert IRC /health is ok, deploy haproxy and relate it to
+        self-signed-certificates. Relate haproxy with IRC bridge.
+    act: request /health via haproxy.
+    assert: request is successful.
+    ","0","test_ingress_integration","tests.integration","2025-10-30","broken","2025-10-30","","test_ingress","",""
+"
+    arrange: build and deploy the charm.
+    act: nothing.
+    assert: that the charm ends up in blocked state because of missing relations.
+    ","5","test_lifecycle_before_relations","tests.integration","2025-10-30","passed","2025-10-30","","test_charm","",""
+"
+    arrange: assert IRC Media /health is ok, deploy haproxy and relate it to
+        self-signed-certificates. Relate haproxy with IRC bridge.
+    act: request /health via haproxy.
+    assert: request is successful.
+    ","0","test_ingress_media_integration","tests.integration","2025-10-30","broken","2025-10-30","","test_ingress","",""
+"
+    arrange: charm has all expected relations.
+    act: get configuration file content.
+    assert: irc bridge is properly configured.
+    ","0","test_config","tests.integration","2025-10-30","broken","2025-10-30","","test_charm","",""

@@ -1,0 +1,121 @@
+[32mINFO    [0m pytest_operator.plugin:plugin.py:951 Model status:
+
+Model              Controller           Cloud/Region         Version  SLA          Timestamp
+test-ingress-2xo6  github-pr-e9ad0-lxd  localhost/localhost  3.4.6    unsupported  10:45:55Z
+
+App                       Version  Status  Scale  Charm                     Channel      Rev  Exposed  Message
+haproxy                            active      1  haproxy                   2.8/edge     245  no       
+irc-bridge                         active      1  irc-bridge                               0  no       
+matrix-homeserver                  active      1  any-charm                 latest/beta   92  no       
+postgresql                14.19    active      1  postgresql                14/stable    936  no       
+self-signed-certificates           active      1  self-signed-certificates  1/edge       424  no       
+
+Unit                         Workload  Agent  Machine  Public address  Ports     Message
+haproxy/0*                   active    idle   3        10.210.45.240   80/tcp    
+irc-bridge/0*                active    idle   0        10.210.45.112             
+matrix-homeserver/0*         active    idle   2        10.210.45.140             
+postgresql/0*                active    idle   1        10.210.45.155   5432/tcp  Primary
+self-signed-certificates/0*  active    idle   4        10.210.45.163             
+
+Machine  State    Address        Inst id        Base          AZ  Message
+0        started  10.210.45.112  juju-af45cd-0  ubuntu@22.04      Running
+1        started  10.210.45.155  juju-af45cd-1  ubuntu@22.04      Running
+2        started  10.210.45.140  juju-af45cd-2  ubuntu@22.04      Running
+3        started  10.210.45.240  juju-af45cd-3  ubuntu@24.04      Running
+4        started  10.210.45.163  juju-af45cd-4  ubuntu@24.04      Running
+
+[32mINFO    [0m pytest_operator.plugin:plugin.py:957 Juju error logs:
+
+machine-0: 10:39:19 ERROR juju.worker.dependency "lxd-container-provisioner" manifold worker returned unexpected error: container types not yet available
+machine-0: 10:39:19 ERROR juju.worker.dependency "kvm-container-provisioner" manifold worker returned unexpected error: container types not yet available
+unit-irc-bridge-0: 10:39:20 ERROR juju.worker.meterstatus error running "meter-status-changed": charm missing from disk
+machine-1: 10:39:22 ERROR juju.worker.dependency "kvm-container-provisioner" manifold worker returned unexpected error: container types not yet available
+machine-1: 10:39:22 ERROR juju.worker.dependency "lxd-container-provisioner" manifold worker returned unexpected error: container types not yet available
+unit-postgresql-0: 10:39:22 ERROR juju.worker.meterstatus error running "meter-status-changed": charm missing from disk
+machine-2: 10:41:44 ERROR juju.worker.dependency "kvm-container-provisioner" manifold worker returned unexpected error: container types not yet available
+machine-2: 10:41:44 ERROR juju.worker.dependency "lxd-container-provisioner" manifold worker returned unexpected error: container types not yet available
+unit-matrix-homeserver-0: 10:41:44 ERROR juju.worker.meterstatus error running "meter-status-changed": charm missing from disk
+unit-irc-bridge-0: 10:42:22 ERROR unit.irc-bridge/0.juju-log matrix-auth:5: Request error for URL https://example.com/_matrix/key/v2/server: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+Traceback (most recent call last):
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/src/irc.py", line 73, in get_matrix_domain
+    response.raise_for_status()
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+unit-irc-bridge-0: 10:42:24 ERROR unit.irc-bridge/0.juju-log matrix-auth:5: Request error for URL https://example.com/_matrix/key/v2/server: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+Traceback (most recent call last):
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/src/irc.py", line 73, in get_matrix_domain
+    response.raise_for_status()
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+unit-irc-bridge-0: 10:42:26 ERROR unit.irc-bridge/0.juju-log matrix-auth:5: Request error for URL https://example.com/_matrix/key/v2/server: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+Traceback (most recent call last):
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/src/irc.py", line 73, in get_matrix_domain
+    response.raise_for_status()
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+unit-irc-bridge-0: 10:42:32 ERROR unit.irc-bridge/0.juju-log matrix-auth:5: Request error for URL https://example.com/_matrix/key/v2/server: HTTPSConnectionPool(host='example.com', port=443): Read timed out. (read timeout=5)
+Traceback (most recent call last):
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/urllib3/connection.py", line 565, in getresponse
+    httplib_response = super().getresponse()
+  File "/usr/lib/python3.10/http/client.py", line 1375, in getresponse
+    response.begin()
+  File "/usr/lib/python3.10/http/client.py", line 318, in begin
+    version, status, reason = self._read_status()
+  File "/usr/lib/python3.10/http/client.py", line 279, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+  File "/usr/lib/python3.10/socket.py", line 705, in readinto
+    return self._sock.recv_into(b)
+  File "/usr/lib/python3.10/ssl.py", line 1303, in recv_into
+    return self.read(nbytes, buffer)
+  File "/usr/lib/python3.10/ssl.py", line 1159, in read
+    return self._sslobj.read(len, buffer)
+TimeoutError: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/urllib3/util/retry.py", line 474, in increment
+    raise reraise(type(error), error, _stacktrace)
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/urllib3/util/util.py", line 39, in reraise
+    raise value
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/urllib3/connectionpool.py", line 536, in _make_request
+    self._raise_timeout(err=e, url=url, timeout_value=read_timeout)
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/urllib3/connectionpool.py", line 367, in _raise_timeout
+    raise ReadTimeoutError(
+urllib3.exceptions.ReadTimeoutError: HTTPSConnectionPool(host='example.com', port=443): Read timed out. (read timeout=5)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/src/irc.py", line 72, in get_matrix_domain
+    response = requests.get(matrix_homeserver_key_url, timeout=5)
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/requests/adapters.py", line 713, in send
+    raise ReadTimeout(e, request=request)
+requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='example.com', port=443): Read timed out. (read timeout=5)
+machine-3: 10:44:18 ERROR juju.worker.dependency "kvm-container-provisioner" manifold worker returned unexpected error: container types not yet available
+machine-3: 10:44:18 ERROR juju.worker.dependency "lxd-container-provisioner" manifold worker returned unexpected error: container types not yet available
+unit-haproxy-0: 10:44:19 ERROR juju.worker.meterstatus error running "meter-status-changed": charm missing from disk
+machine-4: 10:45:15 ERROR juju.worker.dependency "kvm-container-provisioner" manifold worker returned unexpected error: container types not yet available
+machine-4: 10:45:15 ERROR juju.worker.dependency "lxd-container-provisioner" manifold worker returned unexpected error: container types not yet available
+unit-self-signed-certificates-0: 10:45:15 ERROR juju.worker.meterstatus error running "meter-status-changed": charm missing from disk
+
+[32mINFO    [0m pytest_operator.plugin:plugin.py:1039 Forgetting model main...

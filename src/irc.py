@@ -254,7 +254,7 @@ class IRCBridgeService:
     def _generate_media_proxy_key(self) -> None:
         """Generate the content of the media proxy key."""
         if IRC_BRIDGE_SIGNING_KEY_FILE_PATH.exists():
-            logger.info("Media proxy key file %s already exists, skipping")
+            logger.info("Media proxy key file already exists, skipping")
             return
         media_proxy_key_command = [
             "/bin/bash",

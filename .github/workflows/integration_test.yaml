@@ -11,3 +11,8 @@ jobs:
       juju-channel: 3.4/stable
       provider: lxd
       modules: '["test_charm.py", "test_ingress.py"]'
+  allure-report:
+    if: always() && !cancelled()
+    needs:
+      - integration-tests
+    uses: canonical/operator-workflows/.github/workflows/allure_report.yaml@main

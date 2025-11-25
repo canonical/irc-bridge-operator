@@ -48,7 +48,8 @@ def test_database_created_calls_reconcile():
     relation = harness.charm.framework.model.get_relation("database", 0)
 
     with patch.object(
-        harness.charm.database._charm, "reconcile"  # pylint: disable=protected-access
+        harness.charm.database._charm,
+        "reconcile",  # pylint: disable=protected-access
     ) as mock_reconcile:
         harness.charm.database.database.on.database_created.emit(relation)
         assert mock_reconcile.called

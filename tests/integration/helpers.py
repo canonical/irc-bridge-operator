@@ -209,9 +209,9 @@ async def get_unit_address(application: Application) -> str:
     )
 
     unit_ip_address = ipaddress.ip_address(address)
-    url = f"http://{str(unit_ip_address)}"
+    url = f"http://{unit_ip_address!s}"
     if isinstance(unit_ip_address, ipaddress.IPv6Address):
-        url = f"http://[{str(unit_ip_address)}]"
+        url = f"http://[{unit_ip_address!s}]"
     return url
 
 
@@ -239,9 +239,7 @@ class DNSResolverHTTPSAdapter(HTTPAdapter):
         )
 
     # Ignore pylint rule as this is the parent method signature
-    def send(
-        self, request, stream=False, timeout=None, verify=True, cert=None, proxies=None
-    ):  # pylint: disable=too-many-arguments, too-many-positional-arguments
+    def send(self, request, stream=False, timeout=None, verify=True, cert=None, proxies=None):  # pylint: disable=too-many-arguments, too-many-positional-arguments
         """Wrap HTTPAdapter send to modify the outbound request.
 
         Args:

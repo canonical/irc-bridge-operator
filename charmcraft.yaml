@@ -10,18 +10,15 @@ bases:
       channel: "22.04"
 parts:
   charm:
+    source: .
+    plugin: uv
     build-snaps:
-      - rustup
-    override-build: |
-      rustup default stable
-      craftctl default
-    build-packages:
-      - libffi-dev
-      - libssl-dev
-      - pkg-config
-    charm-binary-python-packages:
-    - cryptography
-
+    - astral-uv
+  dump:
+    plugin: templates
+    source: .
+    stage:
+    - templates
 charm-libs:
   - lib: traefik_k8s.ingress
     version: "2"

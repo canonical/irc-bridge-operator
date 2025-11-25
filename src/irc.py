@@ -285,7 +285,7 @@ class IRCBridgeService:
             self.media_external_url,
         ):
             raise ValueError("IRCBridge is not fully prepared before reconciliation")
-        with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", "r", encoding="utf-8") as config_file:
+        with open(f"{IRC_BRIDGE_CONFIG_FILE_PATH}", encoding="utf-8") as config_file:
             data = yaml.safe_load(config_file)
         try:
             db_conn = data["database"]["connectionString"]
@@ -295,9 +295,9 @@ class IRCBridgeService:
             if self.matrix:
                 data["homeserver"]["url"] = self.matrix.homeserver
                 data["homeserver"]["domain"] = get_matrix_domain(self.matrix.homeserver)
-            data["ircService"]["mediaProxy"][
-                "signingKeyPath"
-            ] = f"{IRC_BRIDGE_SIGNING_KEY_FILE_PATH}"
+            data["ircService"]["mediaProxy"]["signingKeyPath"] = (
+                f"{IRC_BRIDGE_SIGNING_KEY_FILE_PATH}"
+            )
             data["ircService"]["mediaProxy"]["publicUrl"] = self.media_external_url
             data["ircService"]["passwordEncryptionKeyPath"] = f"{IRC_BRIDGE_PEM_FILE_PATH}"
             if self.config:
@@ -319,7 +319,7 @@ class IRCBridgeService:
         Returns:
             str: the content of the app registration file
         """
-        with open(IRC_BRIDGE_REGISTRATION_FILE_PATH, "r", encoding="utf-8") as registration_file:
+        with open(IRC_BRIDGE_REGISTRATION_FILE_PATH, encoding="utf-8") as registration_file:
             return registration_file.read()
 
     def reload(self) -> None:

@@ -289,9 +289,8 @@ class IRCBridgeService:
             data = yaml.safe_load(config_file)
         try:
             db_conn = data["database"]["connectionString"]
-            if self.db:
-                if db_conn == "" or db_conn != self.db.uri:
-                    data["database"]["connectionString"] = self.db.uri
+            if self.db and (db_conn == "" or db_conn != self.db.uri):
+                data["database"]["connectionString"] = self.db.uri
             if self.matrix:
                 data["homeserver"]["url"] = self.matrix.homeserver
                 data["homeserver"]["domain"] = get_matrix_domain(self.matrix.homeserver)

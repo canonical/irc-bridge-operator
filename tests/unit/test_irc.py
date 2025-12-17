@@ -358,7 +358,7 @@ def test_configure_evaluates_configuration_file_local(irc_bridge_service, mocker
     irc_bridge_service._eval_conf_local()  # pylint: disable=protected-access
 
     calls = [
-        mocker.call(f"{IRC_BRIDGE_CONFIG_FILE_PATH.absolute()}", "r", encoding="utf-8"),
+        mocker.call(f"{IRC_BRIDGE_CONFIG_FILE_PATH.absolute()}", encoding="utf-8"),
         mocker.call(f"{IRC_BRIDGE_CONFIG_FILE_PATH.absolute()}", "w", encoding="utf-8"),
     ]
 

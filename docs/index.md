@@ -56,6 +56,6 @@ To begin, refer to the [Deploy IRC Bridge](https://charmhub.io/irc-bridge/docs/t
   1. [Troubleshooting](how-to/troubleshooting.md)
   1. [Contribute](how-to/contribute.md)
   1. [Upgrade](how-to/upgrade.md)
-1. [Explanation](explanation)
-  1. [Charm architecture](explanation/charm-architecture.md)
+1. [Reference](reference)
+  1. [Charm architecture](reference/charm-architecture.md) 
 1. [Changelog](CHANGELOG.md)

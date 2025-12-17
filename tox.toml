@@ -185,4 +185,5 @@ dependency_groups = [ "lint" ]
 src_path = "{toxinidir}/src/"
 tst_path = "{toxinidir}/tests/"
 docs_path = "{toxinidir}/docs"
+lib_path = "{toxinidir}/lib/"
 all_path = [ "{toxinidir}/src/", "{toxinidir}/tests/" ]

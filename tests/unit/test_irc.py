@@ -97,8 +97,9 @@ def test_prepare_installs_snap_package_and_creates_configuration_files(mocker, t
     config_file_path = tmp_path / "config"
     environment_file_path = tmp_path / "environment"
     environment_file_path.touch()
-    with patch("irc.IRC_BRIDGE_CONFIG_DIR_PATH", config_file_path), patch(
-        "irc.ENVIRONMENT_OS_FILE", environment_file_path
+    with (
+        patch("irc.IRC_BRIDGE_CONFIG_DIR_PATH", config_file_path),
+        patch("irc.ENVIRONMENT_OS_FILE", environment_file_path),
     ):
         irc_bridge_service = IRCBridgeService()
         mock_install_snap_package = mocker.patch.object(
@@ -114,7 +115,7 @@ def test_prepare_installs_snap_package_and_creates_configuration_files(mocker, t
             snap_name=IRC_BRIDGE_SNAP_NAME, snap_channel="edge"
         )
         mock_generate_media_proxy_key.assert_called_once()
-        with open(environment_file_path, "r", encoding="utf-8") as env_file:
+        with open(environment_file_path, encoding="utf-8") as env_file:
             content = env_file.read()
         assert "SNAP_MATRIX_APPSERVICE_ARGS" in content
         config_yaml_file = config_file_path / "config.yaml"
@@ -271,9 +272,9 @@ def test_configure_generates_app_registration_local(irc_bridge_service, mocker, 
             bot_nickname="my_bot",
             bridge_admins="admin1:example.com,admin2:example.com",
         )
-        assert (
-            not registration_file_path.exists()
-        ), f"Expected {registration_file_path} not to exist before running the command"
+        assert not registration_file_path.exists(), (
+            f"Expected {registration_file_path} not to exist before running the command"
+        )
 
         params = IRCBridgeParams(
             db=None,
@@ -357,7 +358,7 @@ def test_configure_evaluates_configuration_file_local(irc_bridge_service, mocker
     irc_bridge_service._eval_conf_local()  # pylint: disable=protected-access
 
     calls = [
-        mocker.call(f"{IRC_BRIDGE_CONFIG_FILE_PATH.absolute()}", "r", encoding="utf-8"),
+        mocker.call(f"{IRC_BRIDGE_CONFIG_FILE_PATH.absolute()}", encoding="utf-8"),
         mocker.call(f"{IRC_BRIDGE_CONFIG_FILE_PATH.absolute()}", "w", encoding="utf-8"),
     ]
 

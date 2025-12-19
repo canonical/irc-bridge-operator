@@ -45,7 +45,9 @@ async def test_ingress_integration(app_integrated: Application, model: Model):
     await model.wait_for_idle(
         apps=[self_signed_application.name, haproxy_application.name], status="active", timeout=300
     )
-    await model.add_relation(self_signed_application.name, haproxy_application.name)
+    await model.add_relation(
+        f"{self_signed_application.name}:certificates", f"{haproxy_application.name}:certificates"
+    )
     await model.wait_for_idle(
         apps=[self_signed_application.name, haproxy_application.name], status="active", timeout=300
     )
@@ -103,7 +105,9 @@ async def test_ingress_media_integration(app_integrated: Application, model: Mod
     await model.wait_for_idle(
         apps=[self_signed_application.name, haproxy_application.name], status="active", timeout=300
     )
-    await model.add_relation(self_signed_application.name, haproxy_application.name)
+    await model.add_relation(
+        f"{self_signed_application.name}:certificates", f"{haproxy_application.name}:certificates"
+    )
     await model.wait_for_idle(
         apps=[self_signed_application.name, haproxy_application.name], status="active", timeout=300
     )

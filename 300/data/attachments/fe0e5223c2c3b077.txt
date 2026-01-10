@@ -1,0 +1,128 @@
+[32mINFO    [0m juju.model:__init__.py:2301 Deploying ch:amd64/noble/haproxy-308
+[32mINFO    [0m juju.model:__init__.py:2301 Deploying ch:amd64/noble/self-signed-certificates-517
+[32mINFO    [0m juju.model:__init__.py:3254 Waiting for model:
+  self-signed-certificates-media/0 [allocating] waiting: waiting for machine
+  haproxy-media/0 [allocating] waiting: waiting for machine
+[32mINFO    [0m juju.model:__init__.py:3254 Waiting for model:
+  self-signed-certificates-media/0 [allocating] waiting: waiting for machine
+  haproxy-media/0 [allocating] waiting: waiting for machine
+[32mINFO    [0m juju.model:__init__.py:3254 Waiting for model:
+  self-signed-certificates-media/0 [executing] active: 
+  haproxy-media/0 [executing] maintenance: installing charm software
+[32mINFO    [0m juju.model:__init__.py:3254 Waiting for model:
+  self-signed-certificates-media/0 [idle] active: 
+  haproxy-media/0 [executing] active: 
+[33mWARNING [0m juju.model:__init__.py:1683 relate is deprecated and will be removed. Use integrate instead.
+[32mINFO    [0m juju.model:__init__.py:3254 Waiting for model:
+  self-signed-certificates-media/0 [idle] active: 
+  haproxy-media/0 [executing] active: 
+[33mWARNING [0m juju.model:__init__.py:1683 relate is deprecated and will be removed. Use integrate instead.
+[32mINFO    [0m juju.model:__init__.py:3254 Waiting for model:
+  irc-bridge/0 [idle] active: 
+  haproxy-media/0 [executing] active:
+[32mINFO    [0m pytest_operator.plugin:plugin.py:951 Model status:
+
+Model              Controller           Cloud/Region         Version  SLA          Timestamp
+test-ingress-edt3  github-pr-de818-lxd  localhost/localhost  3.6.12   unsupported  15:19:37Z
+
+App                             Version  Status  Scale  Charm                     Channel      Rev  Exposed  Message
+haproxy                                  active      1  haproxy                   2.8/edge     308  no       
+haproxy-media                            active      1  haproxy                   2.8/edge     308  no       
+irc-bridge                               active      1  irc-bridge                               0  no       
+matrix-homeserver                        active      1  any-charm                 latest/beta  124  no       
+postgresql                      14.19    active      1  postgresql                14/stable    936  no       
+self-signed-certificates                 active      1  self-signed-certificates  1/edge       517  no       
+self-signed-certificates-media           active      1  self-signed-certificates  1/edge       517  no       
+
+Unit                               Workload  Agent  Machine  Public address  Ports       Message
+haproxy-media/0*                   active    idle   5        10.119.44.58    80,443/tcp  
+haproxy/0*                         active    idle   3        10.119.44.46    80,443/tcp  
+irc-bridge/0*                      active    idle   0        10.119.44.158               
+matrix-homeserver/0*               active    idle   2        10.119.44.16                
+postgresql/0*                      active    idle   1        10.119.44.84    5432/tcp    Primary
+self-signed-certificates-media/0*  active    idle   6        10.119.44.187               
+self-signed-certificates/0*        active    idle   4        10.119.44.172               
+
+Machine  State    Address        Inst id        Base          AZ             Message
+0        started  10.119.44.158  juju-cbb2ad-0  ubuntu@22.04  runnervmi13qx  Running
+1        started  10.119.44.84   juju-cbb2ad-1  ubuntu@22.04  runnervmi13qx  Running
+2        started  10.119.44.16   juju-cbb2ad-2  ubuntu@24.04  runnervmi13qx  Running
+3        started  10.119.44.46   juju-cbb2ad-3  ubuntu@24.04  runnervmi13qx  Running
+4        started  10.119.44.172  juju-cbb2ad-4  ubuntu@24.04  runnervmi13qx  Running
+5        started  10.119.44.58   juju-cbb2ad-5  ubuntu@24.04  runnervmi13qx  Running
+6        started  10.119.44.187  juju-cbb2ad-6  ubuntu@24.04  runnervmi13qx  Running
+
+[32mINFO    [0m pytest_operator.plugin:plugin.py:957 Juju error logs:
+
+machine-0: 15:09:56 ERROR juju.worker.dependency "lxd-container-provisioner" manifold worker returned unexpected error: container types not yet available
+machine-0: 15:09:56 ERROR juju.worker.dependency "kvm-container-provisioner" manifold worker returned unexpected error: container types not yet available
+machine-1: 15:10:51 ERROR juju.worker.dependency "lxd-container-provisioner" manifold worker returned unexpected error: container types not yet available
+machine-1: 15:10:51 ERROR juju.worker.dependency "kvm-container-provisioner" manifold worker returned unexpected error: container types not yet available
+machine-2: 15:13:02 ERROR juju.worker.dependency "kvm-container-provisioner" manifold worker returned unexpected error: container types not yet available
+machine-2: 15:13:02 ERROR juju.worker.dependency "lxd-container-provisioner" manifold worker returned unexpected error: container types not yet available
+unit-irc-bridge-0: 15:13:42 ERROR unit.irc-bridge/0.juju-log matrix-auth:5: Request error for URL https://example.com/_matrix/key/v2/server: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+Traceback (most recent call last):
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/src/irc.py", line 73, in get_matrix_domain
+    response.raise_for_status()
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/lib/python3.10/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+unit-irc-bridge-0: 15:13:44 ERROR unit.irc-bridge/0.juju-log matrix-auth:5: Request error for URL https://example.com/_matrix/key/v2/server: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+Traceback (most recent call last):
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/src/irc.py", line 73, in get_matrix_domain
+    response.raise_for_status()
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/lib/python3.10/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+unit-irc-bridge-0: 15:13:46 ERROR unit.irc-bridge/0.juju-log matrix-auth:5: Request error for URL https://example.com/_matrix/key/v2/server: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+Traceback (most recent call last):
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/src/irc.py", line 73, in get_matrix_domain
+    response.raise_for_status()
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/lib/python3.10/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+unit-irc-bridge-0: 15:13:46 ERROR unit.irc-bridge/0.juju-log matrix-auth:5: Request error for URL https://example.com/_matrix/key/v2/server: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+Traceback (most recent call last):
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/src/irc.py", line 73, in get_matrix_domain
+    response.raise_for_status()
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/lib/python3.10/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+machine-3: 15:15:43 ERROR juju.worker.dependency "kvm-container-provisioner" manifold worker returned unexpected error: container types not yet available
+machine-3: 15:15:43 ERROR juju.worker.dependency "lxd-container-provisioner" manifold worker returned unexpected error: container types not yet available
+machine-4: 15:15:56 ERROR juju.worker.dependency "kvm-container-provisioner" manifold worker returned unexpected error: container types not yet available
+machine-4: 15:15:56 ERROR juju.worker.dependency "lxd-container-provisioner" manifold worker returned unexpected error: container types not yet available
+machine-5: 15:18:09 ERROR juju.worker.dependency "lxd-container-provisioner" manifold worker returned unexpected error: container types not yet available
+machine-5: 15:18:09 ERROR juju.worker.dependency "kvm-container-provisioner" manifold worker returned unexpected error: container types not yet available
+machine-6: 15:18:15 ERROR juju.worker.dependency "lxd-container-provisioner" manifold worker returned unexpected error: container types not yet available
+machine-6: 15:18:15 ERROR juju.worker.dependency "kvm-container-provisioner" manifold worker returned unexpected error: container types not yet available
+unit-irc-bridge-0: 15:19:16 ERROR unit.irc-bridge/0.juju-log ingress-media:11: Request error for URL https://example.com/_matrix/key/v2/server: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+Traceback (most recent call last):
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/src/irc.py", line 73, in get_matrix_domain
+    response.raise_for_status()
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/lib/python3.10/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+unit-irc-bridge-0: 15:19:17 ERROR unit.irc-bridge/0.juju-log ingress-media:11: Request error for URL https://example.com/_matrix/key/v2/server: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+Traceback (most recent call last):
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/src/irc.py", line 73, in get_matrix_domain
+    response.raise_for_status()
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/lib/python3.10/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+unit-irc-bridge-0: 15:19:19 ERROR unit.irc-bridge/0.juju-log ingress-media:11: Request error for URL https://example.com/_matrix/key/v2/server: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+Traceback (most recent call last):
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/src/irc.py", line 73, in get_matrix_domain
+    response.raise_for_status()
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/lib/python3.10/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+unit-irc-bridge-0: 15:19:20 ERROR unit.irc-bridge/0.juju-log ingress-media:11: Request error for URL https://example.com/_matrix/key/v2/server: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+Traceback (most recent call last):
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/src/irc.py", line 73, in get_matrix_domain
+    response.raise_for_status()
+  File "/var/lib/juju/agents/unit-irc-bridge-0/charm/venv/lib/python3.10/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://example.com/_matrix/key/v2/server
+
+[32mINFO    [0m pytest_operator.plugin:plugin.py:1039 Forgetting model main...

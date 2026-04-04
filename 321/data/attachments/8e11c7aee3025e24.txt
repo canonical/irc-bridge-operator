@@ -1,0 +1,23 @@
+[32mINFO    [0m pytest_operator.plugin:plugin.py:951 Model status:
+
+Model              Controller           Cloud/Region         Version  SLA          Timestamp
+test-ingress-vf9x  github-pr-3a2ac-lxd  localhost/localhost  3.6.20   unsupported  15:15:15Z
+
+App         Version  Status   Scale  Charm       Channel     Rev  Exposed  Message
+irc-bridge           blocked    0/1  irc-bridge                0  no       Database relation not found
+postgresql           waiting    0/1  postgresql  14/stable  1045  no       waiting for machine
+
+Unit           Workload  Agent       Machine  Public address  Ports  Message
+irc-bridge/0*  unknown   lost        0        10.51.126.27           agent lost, see 'juju show-status-log irc-bridge/0'
+postgresql/0   waiting   allocating  1        10.51.126.206          waiting for machine
+
+Machine  State  Address        Inst id        Base          AZ             Message
+0        down   10.51.126.27   juju-f539ea-0  ubuntu@22.04  runnervm727z3  Running
+1        down   10.51.126.206  juju-f539ea-1  ubuntu@22.04  runnervm727z3  Running
+
+[32mINFO    [0m pytest_operator.plugin:plugin.py:957 Juju error logs:
+
+machine-0: 15:14:05 ERROR juju.worker.dependency "kvm-container-provisioner" manifold worker returned unexpected error: container types not yet available
+machine-0: 15:14:05 ERROR juju.worker.dependency "lxd-container-provisioner" manifold worker returned unexpected error: container types not yet available
+
+[32mINFO    [0m pytest_operator.plugin:plugin.py:1039 Forgetting model main...

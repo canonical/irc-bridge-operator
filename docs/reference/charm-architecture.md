@@ -49,14 +49,14 @@ For more details or to participate in its development, please refer to the
 The `src/charm.py` is the default entry point for a charm and has the
 `IRCCharm` Python class which inherits from the `CharmBase`.
 
-CharmBase is the base class from which all Charms are formed, defined by [Ops](https://juju.is/docs/sdk/ops)
+CharmBase is the base class from which all Charms are formed, defined by [Ops](https://canonical.com/juju/docs/ops/latest/)
 (Python framework for developing charms).
 
-See more information in [Charm](https://canonical-juju.readthedocs-hosted.com/en/3.6/user/reference/charm/).
+See more information in [Charm](https://canonical.com/juju/docs/juju-cli/3.6/reference/charm/).
 
 The `__init__` method guarantees that the charm observes all events relevant to
 its operation and handles them.
 
 Note that the IRC Bridge is a machine charm, meaning it may differ from a
 Kubernetes charm in various ways.
-You can learn more about this in the [Charm Taxonomy](https://canonical-juju.readthedocs-hosted.com/en/latest/user/reference/charm/charm-taxonomy/#machine).
+You can learn more about this in the [Charm Taxonomy](https://canonical.com/juju/docs/juju-cli/3.6/reference/charm/).

@@ -11,7 +11,7 @@ with other charms to set up a working Matrix application.
 <!-- vale off -->
 * Juju 3 installed and bootstrapped to a LXD and MicroK8s controller. You can accomplish
 <!-- vale on -->
-this process by using a [Multipass](https://multipass.run/) VM as outlined in this guide: [Set up / Tear down your test environment](https://canonical-juju.readthedocs-hosted.com/en/3.6/user/howto/manage-your-deployment/manage-your-deployment-environment/#set-things-up)
+this process by using a [Multipass](https://multipass.run/) VM as outlined in this guide: [Set up / Tear down your test environment](https://canonical.com/juju/docs/juju-cli/3.6/reference/)
 * [Synapse charm](https://charmhub.io/synapse) deployed. Refer to the [Synapse Getting Started](https://charmhub.io/synapse/docs/tutorial-getting-started) tutorial for step-by-step instructions.
 
 :warning: When using a Multipass VM, make sure to replace IP addresses with the
@@ -109,7 +109,7 @@ Save the password since it will be used in further steps.
 ### Create an offer
 
 Since IRC Bridge is running in a different model, the integration between them
-should be done via an [Offer](https://canonical-juju.readthedocs-hosted.com/en/latest/user/reference/offer/#offer).
+should be done via an [Offer](https://canonical.com/juju/docs/juju-cli/3.6/reference/).
 
 The following command will expose the Matrix Auth endpoint, allowing other
 applications to integrate with it.
